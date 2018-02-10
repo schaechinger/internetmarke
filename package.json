@@ -13,7 +13,8 @@
     "soap": "0.23.0"
   },
   "scripts": {
-    "test": "./node_modules/.bin/_mocha"
+    "test": "./node_modules/.bin/_mocha",
+    "test-travis": "./node_modules/.bin/_mocha --reporter spec"
   },
   "devDependencies": {
     "mocha": "5.0.0",

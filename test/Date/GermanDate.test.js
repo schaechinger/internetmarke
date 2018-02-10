@@ -10,11 +10,11 @@ describe('German Date', () => {
   it('should format given dates right', () => {
     [
       {
-        input: new Date('2018-01-02 03:04:05'),
+        input: new Date('2018-01-02T02:04:05+00:00'),
         output: '02012018-030405'
       },
       {
-        input: new Date('1991-02-14 23:01:02'),
+        input: new Date('1991-02-14T22:01:02+00:00'),
         output: '14021991-230102'
       }
     ].forEach(({ input, output }) => {
