@@ -1,0 +1,9 @@
+sudo: false
+language: node_js
+node_js:
+  - 4.8.4
+  - 6.9.4
+  - 7.4.0
+  - "lts/*"
+before_install:
+  - npm -g install npm@latest
