@@ -21,4 +21,10 @@ describe('German Date', () => {
       germanDate.format(input).should.equal(output);
     });
   });
+
+  it('should format a fake date', () => {
+    var clock = sinon.useFakeTimers(1514764800000);
+    germanDate.format().should.equal('01012018-010000');
+    clock.restore();
+  });
 });
