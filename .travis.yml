@@ -5,7 +5,7 @@ node_js:
   - "8"
   - "7"
 env:
-  - NODE_ENV=staging
+  - NODE_ENV=test
 before_install:
   - npm i -g npm@latest
   - npm i -g yarn@latest
