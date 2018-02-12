@@ -1,15 +1,23 @@
+const config = require('config');
+
 const Internetmarke = require('../');
 
-describe('Internetmarke', () => {
+describe.only('Internetmarke', () => {
   it('should connect to service', (done) => {
-    const post = new Internetmarke();
+    try {
+      const config = require('config');
+      const im = new Internetmarke(config.get('partner'));
+      im.authenticateUser(config.get('user'))
+        .then(im => {
+          const link = im.getStampPreview({ productCode: 11 });
 
-    post.authenticate({
-      username: 'test@dpag.de',
-      password: '#MyPassword'
-    })
-      .then(result => {
-        done();
-      });
+          link.should.match(/^https:\/\/internetmarke.deutschepost.de\/.*$/);
+
+          done();
+        });
+    }
+    catch (e) {
+      console.error('Could not load config.', e.message);
+    }
   }).timeout(10000);
 });

@@ -1,3 +1,5 @@
-"use strict";
+'use strict';
 
-module.exports = require('./lib/Internetmarke');
+const Internetmarke = require('./lib/Internetmarke');
+
+module.exports = Internetmarke;

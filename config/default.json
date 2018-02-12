@@ -1,0 +1,11 @@
+{
+  "partner": {
+    "id": "",
+    "secret": "",
+    "keyPhase": 1
+  },
+  "user": {
+    "username": "",
+    "password": ""
+  }
+}
