@@ -17,6 +17,7 @@
     "test-travis": "./node_modules/.bin/_mocha --reporter spec"
   },
   "devDependencies": {
+    "config": "1.29.4",
     "coveralls": "3.0.0",
     "jsdoc": "3.5.5",
     "mocha": "5.0.0",

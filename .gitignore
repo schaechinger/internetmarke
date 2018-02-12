@@ -58,4 +58,7 @@ typings/
 .env
 
 .vscode
-out/
+/out/
+/config/development.json
+/config/test.json
+/data/
