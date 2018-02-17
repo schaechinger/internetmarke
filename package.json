@@ -1,20 +1,36 @@
 {
   "name": "internetmarke",
   "version": "0.1.0",
-  "description": "A node wrapper for the Internetmarke web service of the Deutsche Post",
+  "description": "A node wrapper for the Internetmarke web service of the Deutsche Post.",
+  "keywords": [
+    "internetmarke",
+    "stamp",
+    "post",
+    "letter",
+    "1c4a",
+    "deutsche-post"
+  ],
+  "homepage": "https://schaechinger.com/projects/internetmarke",
   "main": "index.js",
   "repository": "https://github.com/schaechinger/internetmarke.git",
   "author": "Manuel Schächinger <manuel@schaechinger.com>",
   "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/schaechinger/internetmarke/issues"
+  },
+  "scripts": {
+    "test": "./node_modules/.bin/_mocha",
+    "test-travis": "./node_modules/.bin/_mocha --reporter spec"
+  },
+  "directories": {
+    "lib": "./lib",
+    "test": "./test"
+  },
   "dependencies": {
     "md5": "2.2.1",
     "moment": "2.20.1",
     "moment-timezone": "0.5.14",
     "soap": "0.23.0"
-  },
-  "scripts": {
-    "test": "./node_modules/.bin/_mocha",
-    "test-travis": "./node_modules/.bin/_mocha --reporter spec"
   },
   "devDependencies": {
     "config": "1.29.4",

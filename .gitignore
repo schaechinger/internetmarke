@@ -57,7 +57,6 @@ typings/
 # dotenv environment variables file
 .env
 
-.vscode
 /out/
 /config/development.json
 /config/test.json
