@@ -4,12 +4,21 @@
 
 A node wrapper for the Internetmarke web service of the Deutsche Post
 
+
+## Installation
+
+```sh
+npm install internetmarke
+```
+
+
 ## Required accounts
 
 To use the module you have to request a partner account.
 You can get one from the website of the Deutsche Post or via mail.
 
 Second, an account is required that is used to pay the vouchers.
+
 
 ## Basic usage
 
@@ -19,30 +28,41 @@ Init the internetmarke object with your partner credentials.
 You can request them on the page of the Deutsche Post.
 
 ```javascript
-const Internetmarke = require('internetmarke');
-const { Partner, User } = Internetmarke;
+const Partner = require('internetmarke').Partner;
 
 const partner = new Partner({
   id: 'PARTNER_ID',
   secret: 'SCHLUESSEL_DPWN_MARKTPLATZ'
 });
+```
+
+
+### Create internetmarke instance
+
+```javascript
+const Internetmarke = require('internetmarke');
+
 const internermarke = new Internetmarke(partner);
 ```
+
 
 ### Authenticate user
 
 Once the partner credentials have been set, you can login with your account that should be used for the payment.
 
 ```javascript
+const User = require('internetmarke').User;
+
 const user = new User({
   username: 'user-account@example.com',
   password: '*****'
 });
-internetmarke.authenticateUser(user);
+internetmarke.authenticateUser(user)
   .then(() => {
     // user is authenticated
   });
 ```
+
 
 ### Order vouchers
 
@@ -52,10 +72,12 @@ You can set the `productCode` and the `voucherLayout` (Default is Address Zone) 
 To determine the right voucher, you can use the product list.
 
 ```javascript
-internermarke.orderVoucher({
-  productCode: 1
+internetmarke.orderVoucher({
+  productCode: 1,
+  price: 70
 });
 ```
+
 
 ### Checkout
 
@@ -64,9 +86,9 @@ Once done, you can proceed with the checkout which will buy the vouchers and ret
 ```javascript
 internetmarke.checkout()
   .then(shoppingcart => {
-    // shoppingcard.orderId
-    // shoppingcard.link
-    // shoppingcard.vouchers[].id
-    // shoppingcard.vouchers[].trackingCode (depending on product)
+    // shoppingcart.orderId
+    // shoppingcart.link - contains the link to the zip archive
+    // shoppingcart.vouchers[].id - used to regenerate the voucher
+    // shoppingcart.vouchers[].trackingCode (depending on product)
   });
 ```

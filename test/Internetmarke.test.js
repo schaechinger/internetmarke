@@ -4,7 +4,7 @@ const Internetmarke = require('../'),
 
 describe('Internetmarke', () => {
   const PARTNER = {
-    getSoapHeaders: sinon.stub().returns({HEADER_1: 'value'})
+    getSoapHeaders: sinon.stub().returns({})
   };
 
   it('should connect to service', (done) => {
@@ -25,10 +25,10 @@ describe('Internetmarke', () => {
   it('should change to valid voucher layouts', () => {
     const internetmarke = new Internetmarke(PARTNER);
 
-    internetmarke.setVoucherLayout(LAYOUT_ZONES.FRANKING);
+    internetmarke.setDefaultVoucherLayout(LAYOUT_ZONES.FRANKING);
     internetmarke._config.voucherLayout.should.equal(LAYOUT_ZONES.FRANKING);
 
-    internetmarke.setVoucherLayout('INVALID_ZONE');
+    internetmarke.setDefaultVoucherLayout('INVALID_ZONE');
     internetmarke._config.voucherLayout.should.equal(LAYOUT_ZONES.FRANKING);
   });
 
