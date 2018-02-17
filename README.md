@@ -1,6 +1,11 @@
 # internetmarke
 
-[![Build Status](https://travis-ci.org/schaechinger/internetmarke.svg?branch=master)](https://travis-ci.org/schaechinger/internetmarke)
+[![Build Status][travis-svg]][travis-url]
+[![Build Status][coveralls-svg]][coveralls-url]
+[![NPM version][npm-svg]][npm-url]
+
+![License][license-svg]
+![Dependencies][dependencies-svg]
 
 A node wrapper for the Internetmarke web service of the Deutsche Post
 
@@ -92,3 +97,17 @@ internetmarke.checkout()
     // shoppingcart.vouchers[].trackingCode (depending on product)
   });
 ```
+
+[npm-url]: https://npmjs.org/package/internetmarke
+[npm-svg]: https://img.shields.io/npm/v/internetmarke.svg
+[npm-downloads-svg]: https://img.shields.io/npm/dm/internetmarke.svg
+
+[travis-url]: https://travis-ci.org/schaechinger/internetmarke
+[travis-svg]: https://img.shields.io/travis/schaechinger/internetmarke/master.svg
+
+[license-svg]: https://img.shields.io/npm/l/internetmarke.svg
+
+[dependencies-svg]: https://img.shields.io/david/schaechinger/internetmarke.svg
+
+[coveralls-url]: https://coveralls.io/github/schaechinger/internetmarke
+[coveralls-svg]:  https://img.shields.io/coveralls/github/schaechinger/internetmarke.svg

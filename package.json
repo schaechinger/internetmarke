@@ -10,7 +10,6 @@
     "1c4a",
     "deutsche-post"
   ],
-  "homepage": "https://schaechinger.com/projects/internetmarke",
   "main": "index.js",
   "repository": "https://github.com/schaechinger/internetmarke.git",
   "author": "Manuel Schächinger <manuel@schaechinger.com>",
@@ -20,7 +19,8 @@
   },
   "scripts": {
     "test": "./node_modules/.bin/_mocha",
-    "test-travis": "./node_modules/.bin/_mocha --reporter spec"
+    "cover": "./node_modules/.bin/istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly -- -R spec",
+    "coveralls": "cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage"
   },
   "directories": {
     "lib": "./lib",
@@ -36,11 +36,11 @@
     "soap": "0.23.0"
   },
   "devDependencies": {
-    "config": "1.29.4",
     "coveralls": "3.0.0",
+    "istanbul": "0.4.5",
     "jsdoc": "3.5.5",
     "mocha": "5.0.0",
-    "nyc": "11.4.1",
+    "mocha-lcov-reporter": "1.3.0",
     "should": "13.2.1",
     "sinon": "4.2.2"
   }
