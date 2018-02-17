@@ -19,9 +19,9 @@ describe('Partner', () => {
 
     partner.should.be.ok();
 
-    partner.getId().should.equal(args.id);
-    partner.getSecret().should.equal(args.secret);
-    partner.getKeyPhase().should.equal(args.keyPhase);
+    partner._id.should.equal(args.id);
+    partner._secret.should.equal(args.secret);
+    partner._keyPhase.should.equal(args.keyPhase);
   });
 
   it('should generate a signature', () => {
