@@ -26,6 +26,9 @@
     "lib": "./lib",
     "test": "./test"
   },
+  "engines": {
+    "node": ">=8.0.0"
+  },
   "dependencies": {
     "md5": "2.2.1",
     "moment": "2.20.1",
