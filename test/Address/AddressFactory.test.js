@@ -16,14 +16,16 @@ describe('Address Factory', () => {
     });
 
     address.isNamed().should.be.true();
-    address.getData();
+    address.getData().should.have.property('companyName');
   });
 
-  it('should create company named address', () => {
+  it('should create a person named address', () => {
     const address = factory.create({
-      street: 'Marienplatz'
+      street: 'Marienplatz',
+      firstname: 'Bojack'
     });
 
-    address.isNamed().should.be.false();
+    address.isNamed().should.be.true();
+    address.getData().should.have.property('personName');
   });
 });
