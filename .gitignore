@@ -57,7 +57,7 @@ typings/
 # dotenv environment variables file
 .env
 
-/out/
-/config/development.json
-/config/test.json
-/data/
+out/
+config/
+data/
+scripts/

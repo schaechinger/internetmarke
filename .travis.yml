@@ -3,10 +3,14 @@ node_js:
   - "lts/*"
   - "node"
   - "8"
-env:
-  - NODE_ENV=test
 before_install:
   - npm i -g npm@latest
   - npm i -g yarn@latest
 script:
   - yarn test-travis
+deploy:
+  provider: npm
+  email: manuel@schaechinger.com
+  api:key: $NPM_TOKEN
+  on:
+    tags: true
