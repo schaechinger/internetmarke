@@ -1,7 +1,7 @@
 const User = require('../../lib/User'),
   errors = require('../../lib/errors');
 
-describe.only('User', () => {
+describe('User', () => {
   const CREDENTIALS = {
     username: 'user_1',
     password: '#MY_PASS'

@@ -1,4 +1,5 @@
-const Partner = require('../../lib/Partner');
+const Partner = require('../../lib/Partner'),
+  errors = require('../../lib/errors');
 
 describe('Partner', () => {
   const args = {
@@ -7,14 +8,10 @@ describe('Partner', () => {
     keyPhase: 2
   };
 
-  it('should create instance with empty data', () => {
-    const partner = new Partner();
-
-    partner.should.be.ok();
-
-    should.not.exist(partner.getId());
-    should.not.exist(partner.getSecret());
-    partner.getKeyPhase().should.equal(1);
+  it('should require partner credentials', () => {
+    (() => {
+      const partner = new Partner();
+    }).should.throw(errors.usage.missingPartnerCredentials);
   });
 
   it('should create instance with demo data', () => {
