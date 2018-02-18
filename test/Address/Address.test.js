@@ -13,7 +13,9 @@ describe('Address', () => {
     
     const address = new Address({ country: null });
     address._country.should.equal('DEU');
+  });
 
+  it('should reject invalid country codes', () => {
     const INVALID_CODE = 'INVALID';
     (() => {
       new Address({ country: INVALID_CODE });
@@ -27,6 +29,8 @@ describe('Address', () => {
       zip: '80331',
       city: 'München'
     });
+
+    address.isNamed().should.be.false();
 
     const data = address.getData();
     data.should.have.property('address');
