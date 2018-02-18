@@ -23,12 +23,13 @@ describe('Address', () => {
   });
 
   it('should convert address data of normal addresses', () => {
-    const address = new Address({
+    const args = {
       street: 'Marienplatz',
       houseNo: '1',
       zip: '80331',
       city: 'München'
-    });
+    };
+    const address = new Address(args);
 
     address.isNamed().should.be.false();
 
@@ -36,6 +37,19 @@ describe('Address', () => {
     data.should.have.property('address');
     data.should.not.have.property('name');
     data.address.should.have.keys('street', 'houseNo', 'zip', 'city', 'country');
+    data.address.should.containEql(args);
+    data.address.country.should.equal('DEU');
     data.address.should.not.have.property('additional');
+  });
+
+  it('should add additional information', () => {
+    const args = {
+      street: 'Marienplatz',
+      additional: 'Hinterhof'
+    };
+    const address = new Address(args);
+
+    const data = address.getData();
+    data.address.should.have.property('additional').and.equal(args.additional);
   });
 });
