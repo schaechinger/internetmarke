@@ -1,53 +1,44 @@
 const User = require('../../lib/User'),
   errors = require('../../lib/errors');
 
-describe('User', () => {
-  const CREDENTIALS = {
-    username: 'user_1',
-    password: '#MY_PASS'
-  };
-  const ORDER_IDS = [ 1234, 2345 ];
+const TEST_DATA = require('./User.data.json');
 
+describe('User', () => {
   it('should insist in credentials', () => {
     (() => {
-      [
-        {},
-        { username: 'user' },
-        { password: 'pass' },
-        { user: 'wrongKey' }
-      ].forEach((creds) => {
+      TEST_DATA.invalid.forEach((creds) => {
         const user = new User(creds);
       });
     }).should.throw(errors.usage.missingUserCredentials);
   });
 
   it('should store the credentials', () => {
-    const user = new User(CREDENTIALS);
+    const user = new User(TEST_DATA.credentials);
 
     const cred = user.getCredentials();
-    cred.should.eql(CREDENTIALS);
+    cred.should.eql(TEST_DATA.credentials);
     
     cred.password = 'MOD_PASS';
     cred.username = 'MOD_USER';
-    user.getCredentials().should.eql(CREDENTIALS);
+    user.getCredentials().should.eql(TEST_DATA.credentials);
   });
 
   it('should add order ids to the user', () => {
-    const user = new User(CREDENTIALS);
+    const user = new User(TEST_DATA.credentials);
 
     should.not.exist(user.getOrderId());
-    user.addOrderId(ORDER_IDS[0]);
-    user.getOrderId().should.equal(ORDER_IDS[0]);
+    user.addOrderId(TEST_DATA.orderIds[0]);
+    user.getOrderId().should.equal(TEST_DATA.orderIds[0]);
     user._orderIds.should.have.length(1);
 
-    user.addOrderId(ORDER_IDS[1]);
-    user.getOrderId().should.equal(ORDER_IDS[1]);
+    user.addOrderId(TEST_DATA.orderIds[1]);
+    user.getOrderId().should.equal(TEST_DATA.orderIds[1]);
     user._orderIds.should.have.length(2);
-    user._orderIds.should.containDeep(ORDER_IDS);
+    user._orderIds.should.containDeep(TEST_DATA.orderIds);
   });
 
   it('should tell if the user is authenticated', () => {
-    const user = new User(CREDENTIALS);
+    const user = new User(TEST_DATA.credentials);
     user.isAuthenticated().should.be.false();
 
     user.setToken('USER_TOKEN');

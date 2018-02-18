@@ -1,6 +1,8 @@
 const Position = require('../../lib/Order/Position'),
   errors = require('../../lib/errors');
 
+const TEST_DATA = require('./Position.data.json');
+
 describe('Position', () => {
   const POSITION = {
     productCode: 1,
@@ -23,11 +25,7 @@ describe('Position', () => {
   });
 
   it('should require parameters', () => {
-    [
-      {},
-      { productCode: 1 },
-      { voucherLayout: 'Address' }
-    ].forEach(args => {
+    TEST_DATA.invalid.forEach(args => {
       (() => {
         new Position(args);
       }).should.throw(errors.usage.missingPositionParameters);

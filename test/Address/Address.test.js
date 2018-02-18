@@ -1,25 +1,23 @@
 const Address = require('../../lib/Address'),
   errors = require('../../lib/errors');
 
+const TEST_DATA = require('./Address.data.json');
+
 describe('Address', () => {
   it('should validate the country code', () => {
-    [
-      'DEU',
-      'MEX'
-    ].forEach(country => {
+    TEST_DATA.countryCode.valid.forEach(country => {
       const address = new Address({ country });
+      country = country || 'DEU';
       address._country.should.equal(country);
     });
-    
-    const address = new Address({ country: null });
-    address._country.should.equal('DEU');
   });
 
   it('should reject invalid country codes', () => {
-    const INVALID_CODE = 'INVALID';
-    (() => {
-      new Address({ country: INVALID_CODE });
-    }).should.throw(errors.usage.invalidCountryCode + INVALID_CODE);
+    TEST_DATA.countryCode.invalid.forEach(country => {
+      (() => {
+        new Address({ country });
+      }).should.throw(errors.usage.invalidCountryCode + country);
+    });
   });
 
   it('should convert address data of normal addresses', () => {

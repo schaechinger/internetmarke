@@ -1,0 +1,30 @@
+{
+  "valid": [
+    {
+      "firstname": "Max",
+      "lastname": "Müller"
+    },
+    {
+      "firstname": "Max",
+      "lastname": "Müller",
+      "title": "Dr."
+    },
+    {
+      "firstname": "Max",
+      "lastname": "Müller",
+      "title": "Dr.",
+      "salutation": "Herr"
+    }
+  ],
+  "invalid": [
+    {},
+    {
+      "lastname": "Müller",
+      "title": "Dr.",
+      "salutation": "Herr"
+    },
+    {
+      "firstname": "Max"
+    }
+  ]
+}

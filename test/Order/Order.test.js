@@ -1,24 +1,14 @@
 const Order = require('../../lib/Order');
 
+const TEST_DATA = require('./Order.data.json');
+
 describe('Order', () => {
-  const POSITIONS = [
-    {
-      productCode: 1,
-      voucherLayout: 'Franking',
-      price: 70
-    },
-    {
-      productCode: 2,
-      voucherLayout: 'Address',
-      price: 80
-    }
-  ];
   const ORDER_ID = 1234;
 
   it('should add positions to the current order', () => {
     const order = new Order();
 
-    POSITIONS.forEach((position, i) => {
+    TEST_DATA.positions.forEach((position, i) => {
       order.addPosition(position);
 
       order._positions.should.have.length(i + 1);
@@ -48,7 +38,7 @@ describe('Order', () => {
   it('should checkout with a summary', () => {
     const order = new Order();
 
-    POSITIONS.forEach(position => {
+    TEST_DATA.positions.forEach(position => {
       order.addPosition(position);
     });
 
@@ -61,8 +51,8 @@ describe('Order', () => {
     summary.should.be.ok();
     summary.shopOrderId.should.equal(ORDER_ID);
     summary.positions.should.be.an.Array();
-    summary.positions.should.have.length(2);
-    summary.total.should.equal(150);
+    summary.positions.should.have.length(TEST_DATA.positions.length);
+    summary.total.should.equal(TEST_DATA.total);
     summary.createManifest.should.be.false();
     summary.createShippingList.should.equal(1);
   });

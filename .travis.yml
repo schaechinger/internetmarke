@@ -8,6 +8,7 @@ before_install:
   - npm i -g yarn@latest
 script:
   - yarn run cover
+after_script:
   - yarn run coveralls
 deploy:
   provider: npm

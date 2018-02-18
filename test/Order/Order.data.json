@@ -1,0 +1,15 @@
+{
+  "positions": [
+    {
+      "productCode": 1,
+      "voucherLayout": "Franking",
+      "price": 70
+    },
+    {
+      "productCode": 2,
+      "voucherLayout": "Address",
+      "price": 80
+    }
+  ],
+  "total": 150
+}

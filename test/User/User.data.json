@@ -1,0 +1,22 @@
+{
+  "invalid": [
+    {},
+    {
+      "username": "user"
+    },
+    {
+      "password": "pass"
+    },
+    {
+      "user": "wrongKey"
+    }
+  ],
+  "credentials": {
+    "username": "user_1",
+    "password": "#MY_PASS"
+  },
+  "orderIds": [
+    1234,
+    2345
+  ]
+}

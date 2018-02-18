@@ -1,0 +1,13 @@
+{
+  "countryCode": {
+    "valid": [
+      "DEU",
+      "MEX",
+      "",
+      null
+    ],
+    "invalid": [
+      "INVALID"
+    ]
+  }
+}
