@@ -77,7 +77,7 @@ describe('Internetmarke', () => {
 
       internetmarke.orderVoucher(VOUCHER);
       order.addPosition.calledOnce.should.be.true();
-      order.addPosition.args[0].should.containEql(VOUCHER);
+      order.addPosition.args[0][0].should.containEql(VOUCHER);
     });
   });
 });

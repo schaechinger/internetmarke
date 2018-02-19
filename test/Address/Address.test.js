@@ -36,8 +36,7 @@ describe('Address', () => {
         .and.equal(args.country || Address.COUNTRY_CODES.DEFAULT);
       data.address.should.not.have.property('additional');
 
-      data.should.not.have.property('personName');
-      data.should.not.have.property('companyName');
+      data.should.not.have.property('name');
     });
   });
 

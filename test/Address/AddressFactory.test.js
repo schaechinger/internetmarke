@@ -16,7 +16,7 @@ describe('Address Factory', () => {
     });
 
     address.isNamed().should.be.true();
-    address.getData().should.have.property('companyName');
+    address.getData().should.have.property('name').and.property('companyName');
   });
 
   it('should create a person named address', () => {
@@ -27,6 +27,6 @@ describe('Address Factory', () => {
     });
 
     address.isNamed().should.be.true();
-    address.getData().should.have.property('personName');
+    address.getData().should.have.property('name').and.property('personName');
   });
 });
