@@ -1,4 +1,4 @@
-const CompanyName = require('../../../lib/Address/Name/companyName');
+const CompanyName = require('../../../lib/Address/Name/CompanyName');
 
 const TEST_DATA = require('./CompanyName.data.json');
 
