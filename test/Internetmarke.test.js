@@ -20,7 +20,7 @@ describe('Internetmarke', () => {
           client.should.have.keys(
             'authenticateUserAsync', 'createShopOrderIdAsync',
             'retrievePreviewVoucherPNGAsync', 'retrievePreviewVoucherPDFAsync',
-            'checkoutShoppingCartPNGAsync', 'checkoutShoppingCartPDFAsync',
+            'checkoutShoppingCartPNGAsync', 'checkoutShoppingCartPDFAsync'
           );
 
           done();
