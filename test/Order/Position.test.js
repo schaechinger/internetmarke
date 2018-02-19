@@ -6,7 +6,7 @@ const TEST_DATA = require('./Position.data.json');
 describe('Position', () => {
   const POSITION = {
     productCode: 1,
-    voucherLayout: 'Franking',
+    voucherLayout: 'FrankingZone',
     price: 70,
     imageId: 5,
     // addressBinding

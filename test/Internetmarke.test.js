@@ -65,7 +65,7 @@ describe('Internetmarke', () => {
       const VOUCHER = {
         productCode: 1,
         price: 70,
-        voucherLayout: 'Franking'
+        voucherLayout: 'FrankingZone'
       };
 
       const internetmarke = new Internetmarke(PARTNER);

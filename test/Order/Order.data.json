@@ -2,12 +2,12 @@
   "positions": [
     {
       "productCode": 1,
-      "voucherLayout": "Franking",
+      "voucherLayout": "FrankingZone",
       "price": 70
     },
     {
       "productCode": 2,
-      "voucherLayout": "Address",
+      "voucherLayout": "AddressZone",
       "price": 80
     }
   ],
