@@ -1,3 +1,5 @@
+const User = require('../../../lib/User');
+
 const response = {
   getCredentials: {
     username: 'USER',
@@ -5,10 +7,8 @@ const response = {
   }
 };
 
-const user = {};
+const user = new User(response.getCredentials);
 user.getCredentials = sinon.stub().returns(response.getCredentials);
-user.setToken = sinon.stub().returns(user);
-user.setBalance = sinon.stub().returns(user);
 user.setTerms = sinon.stub().returns(user);
 user.setInfoMessage = sinon.stub().returns(user);
 

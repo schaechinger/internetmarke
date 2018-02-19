@@ -38,10 +38,14 @@ describe('User', () => {
   });
 
   it('should tell if the user is authenticated', () => {
+    const TOKEN = 'USER_TOKEN';
+
     const user = new User(TEST_DATA.credentials);
     user.isAuthenticated().should.be.false();
+    should.not.exist(user.getToken());
 
-    user.setToken('USER_TOKEN');
+    user.setToken(TOKEN);
     user.isAuthenticated().should.be.true();
+    user.getToken().should.equal(TOKEN);
   });
 });

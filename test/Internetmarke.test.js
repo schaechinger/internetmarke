@@ -38,8 +38,8 @@ describe('Internetmarke', () => {
         .then(() => {
           const response = CLIENT_STUB.response.authenticateUserAsync;
           USER_STUB.user.getCredentials.calledOnce.should.be.true();
-          USER_STUB.user.setToken.args[0][0].should.equal(response.userToken);
-          USER_STUB.user.setBalance.args[0][0].should.equal(response.walletBalance);
+          USER_STUB.user.getToken().should.equal(response.userToken);
+          USER_STUB.user.getBalance().should.equal(response.walletBalance);
           USER_STUB.user.setTerms.args[0][0].should.equal(response.showTermAndCondition);
           should.not.exist(USER_STUB.user.setInfoMessage.args[0][0]);
           done();
