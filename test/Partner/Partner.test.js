@@ -1,5 +1,3 @@
-const mock = require('mock-require');
-
 const Partner = require('../../lib/Partner'),
   errors = require('../../lib/errors');
 
