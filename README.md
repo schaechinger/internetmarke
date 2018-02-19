@@ -98,6 +98,42 @@ internetmarke.checkout()
   });
 ```
 
+
+### Add addresses to a voucher
+
+Vouchers that are in `AddressZone` Layout can handle addresses.
+You can add a pair of sender / receiver addresses with the AddressFactory.
+
+```javascript
+const AddressFactory = require('internetmarke').AddressFactory;
+
+const sender = AddressFactory.create({
+  firstname: 'Max',
+  lastname: 'Mustermann',
+  street: 'Marienplatz',
+  houseNo: 1,
+  zip: 80331,
+  city: 'München'
+});
+const receiver = AddressFactory.create({
+  company: 'Studio 42',
+  firstname: 'John',
+  lastname: 'Doe',
+  street: 'Morningside Road',
+  houseNo: 44,
+  zip: 'EH10 4BF'
+  city: 'Edinburgh'
+  country: 'GBR'
+});
+const addressBinding = AddressFactory.bind({ receiver, sender});
+
+internetmarke.orderVoucher({
+  addressBinding
+  /** further voucher info ... **/
+});
+```
+
+
 [npm-url]: https://npmjs.org/package/internetmarke
 [npm-svg]: https://img.shields.io/npm/v/internetmarke.svg
 [npm-downloads-svg]: https://img.shields.io/npm/dm/internetmarke.svg
