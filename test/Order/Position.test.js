@@ -31,4 +31,12 @@ describe('Position', () => {
       }).should.throw(errors.usage.missingPositionParameters);
     });
   });
+
+  it('should detect invalid layout zones', () => {
+    TEST_DATA.invalidLayoutZones.forEach(args => {
+      (() => {
+        new Position(args);
+      }).should.throw(errors.usage.invalidLayoutZone + args.voucherLayout);
+    });
+  });
 });

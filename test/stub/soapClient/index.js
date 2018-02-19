@@ -2,7 +2,7 @@ const response = {
   authenticateUserAsync: {
     userToken: '#12_USER_TOKEN',
     walletBalance: 12300,
-    showTermAndCondition: false
+    showTermAndCondition: true
   },
   checkoutShoppingCartPNGAsync: {
     walletBallance: 4200,

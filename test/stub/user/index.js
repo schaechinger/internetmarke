@@ -9,8 +9,6 @@ const response = {
 
 const user = new User(response.getCredentials);
 user.getCredentials = sinon.stub().returns(response.getCredentials);
-user.setTerms = sinon.stub().returns(user);
-user.setInfoMessage = sinon.stub().returns(user);
 
 module.exports = {
   user,

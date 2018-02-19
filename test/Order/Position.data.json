@@ -5,7 +5,17 @@
       "productCode": 1
     },
     {
+      "voucherLayout": "AddressZone"
+    }
+  ],
+  "invalidLayoutZones": [
+    {
+      "productCode": 1,
       "voucherLayout": "Address"
+    },
+    {
+      "productCode": 1,
+      "voucherLayout": "AddresZone"
     }
   ]
 }
