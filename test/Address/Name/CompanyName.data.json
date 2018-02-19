@@ -1,21 +1,23 @@
 {
   "valid": [
     {
+      "company": "BMW"
+    }
+  ],
+  "validWithPerson": [
+    {
+      "company": "BMW",
       "firstname": "Max",
       "lastname": "Müller"
     },
     {
+      "company": "BMW",
       "firstname": "Max",
       "lastname": "Müller",
       "title": "Dr."
     },
     {
-      "firstname": "Max",
-      "lastname": "Müller",
-      "title": "Dr.",
-      "salutation": "Herr"
-    },
-    {
+      "company": "BMW",
       "firstname": "Max",
       "lastname": "Müller",
       "title": "Dr.",
@@ -33,6 +35,23 @@
       "firstname": "Max"
     },
     {
+      "title": "Dr.",
+      "salutation": "Herr"
+    }
+  ],
+  "invalidInPerson": [
+    {
+      "company": "BMW",
+      "lastname": "Müller",
+      "title": "Dr.",
+      "salutation": "Herr"
+    },
+    {
+      "company": "BMW",
+      "firstname": "Max"
+    },
+    {
+      "company": "BMW",
       "title": "Dr.",
       "salutation": "Herr"
     }

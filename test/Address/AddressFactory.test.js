@@ -22,7 +22,8 @@ describe('Address Factory', () => {
   it('should create a person named address', () => {
     const address = factory.create({
       street: 'Marienplatz',
-      firstname: 'Bojack'
+      firstname: 'Max',
+      lastname: 'Müller'
     });
 
     address.isNamed().should.be.true();
