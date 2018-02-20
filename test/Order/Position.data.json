@@ -17,5 +17,16 @@
       "productCode": 1,
       "voucherLayout": "AddresZone"
     }
+  ],
+  "frankingZoneAddress": [
+    {
+      "productCode": 1,
+      "voucherLayout": "FrankingZone"
+    },
+    {
+      "productCode": 1,
+      "voucherLayout": "FrankingZone",
+      "addressBinding": "FAKE ADDRESS BINDING"
+    }
   ]
 }
