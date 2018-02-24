@@ -27,7 +27,7 @@ describe('Order', () => {
     const order = new Order();
 
     (() => {
-      order.checkout({ orderId: ORDER_ID });
+      order.getCheckout({ orderId: ORDER_ID });
     }).should.throw(errors.internetmarke.shoppingcartEmpty)
   });
 
@@ -38,7 +38,7 @@ describe('Order', () => {
       order.addPosition(position);
     });
 
-    const summary = order.checkout({
+    const summary = order.getCheckout({
       orderId: ORDER_ID,
       createManifest: false,
       createShippingList: 1
