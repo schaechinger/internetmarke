@@ -21,13 +21,26 @@ const response = {
         ]
       }
     }
+  },
+  createShopOrderIdAsync: {
+    shopOrderId: 1234567890
+  },
+  retrievePreviewVoucherPNGAsync: {
+    link: 'https://schaechinger.com'
   }
 };
 
 const client = {
+  addSoapHeader: sinon.stub(),
   authenticateUserAsync: sinon.stub().returns(Promise.resolve(response.authenticateUserAsync)),
   checkoutShoppingCartPNGAsync: sinon.stub().returns(
     Promise.resolve(response.checkoutShoppingCartPNGAsync)
+  ),
+  createShopOrderIdAsync: sinon.stub().returns(
+    Promise.resolve(response.createShopOrderIdAsync)
+  ),
+  retrievePreviewVoucherPNGAsync: sinon.stub().returns(
+    Promise.resolve(response.retrievePreviewVoucherPNGAsync)
   )
 };
 

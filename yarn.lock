@@ -943,7 +943,7 @@ performance-now@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/performance-now/-/performance-now-2.1.0.tgz#6309f4e0e5fa913ec1c69307ae364b4b377c9e7b"
 
-pino@4.11.0:
+pino@^4.11.0:
   version "4.11.0"
   resolved "https://registry.yarnpkg.com/pino/-/pino-4.11.0.tgz#29ba036d065b1bea17647c4a42a1f7b8b37f8be0"
   dependencies:
