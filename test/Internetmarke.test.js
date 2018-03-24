@@ -2,82 +2,99 @@ const Internetmarke = require('../'),
   errors = require('../lib/errors'),
   { LAYOUT_ZONES } = require('../lib/constants');
 
-const CLIENT_STUB = require('./stub/soapClient'),
-  USER_STUB = require('./stub/user');
+const PARTNER_STUB = require('./stub/partner'),
+  USER_STUB = require('./stub/user'),
+  reset = require('./stub/reset');
 
 describe('Internetmarke', () => {
-  const PARTNER = {
-    getSoapHeaders: sinon.stub().returns({})
+  const SERVICE_STUB = {
+    authenticateUser: sinon.stub().returns(Promise.resolve(true)),
+    checkout: sinon.stub().returns(Promise.resolve()),
+    previewVoucher: sinon.stub().returns(Promise.resolve())
+  };
+  const ORDER_STUB = {
+    addPosition: sinon.stub(),
+    getCheckout: sinon.stub().returns({ total: 145 })
   };
 
-  describe('API Auth', () => {
-    it('should connect to service', (done) => {
-      const internetmarke = new Internetmarke(PARTNER);
-      internetmarke._getSoapClient()
-        .then(client => {
-          client.should.be.an.Object();
-          // TODO: switch to client stub properties
-          client.should.have.keys(
-            'authenticateUserAsync', 'createShopOrderIdAsync',
-            'retrievePreviewVoucherPNGAsync', 'retrievePreviewVoucherPDFAsync',
-            'checkoutShoppingCartPNGAsync', 'checkoutShoppingCartPDFAsync'
-          );
+  /** @type {Internetmarke} */
+  let internetmarke = null;
 
-          done();
-        });
-    }).timeout(5000);
+  beforeEach(() => {
+    internetmarke = new Internetmarke(PARTNER_STUB.partner);
+    internetmarke._1C4AService = SERVICE_STUB;
+    internetmarke._order = ORDER_STUB;
+  });
 
-    it('should save user data after authentication', (done) => {
-      const internetmarke = new Internetmarke(PARTNER);
-      internetmarke._getSoapClient = sinon.stub().returns(
-        Promise.resolve(CLIENT_STUB.client)
-      );
-      internetmarke._generateOrderId = sinon.stub().returns(Promise.resolve(1234));
+  afterEach(() => {
+    reset(PARTNER_STUB.partner);
+    reset(USER_STUB.user);
+    reset(SERVICE_STUB);
+    reset(ORDER_STUB);
+  });
 
+  describe('1C4A', () => {
+    it('should call service for user authentication', done => {
       internetmarke.authenticateUser(USER_STUB.user)
         .then(() => {
-          const response = CLIENT_STUB.response.authenticateUserAsync;
-          USER_STUB.user.getCredentials.calledOnce.should.be.true();
-          USER_STUB.user.getToken().should.equal(response.userToken);
-          USER_STUB.user.getBalance().should.equal(response.walletBalance);
-          USER_STUB.user.getTerms().should.equal(response.showTermAndCondition);
-          should.not.exist(USER_STUB.user.getInfoMessage());
+          SERVICE_STUB.authenticateUser.calledOnce.should.be.true();
+          
           done();
-        })
-        .catch(e => {
-          should.not.exist(e);
         });
+    });
+
+    it('should call service for voucher preview', done => {
+      internetmarke.getVoucherPreview({})
+        .then(() => {
+          SERVICE_STUB.previewVoucher.calledOnce.should.be.true();
+
+          done();
+        });
+    });
+
+    describe('Order Management', () => {
+      it('should add a voucher to the order', () => {
+        const VOUCHER = {
+          productCode: 1,
+          price: 70,
+          voucherLayout: LAYOUT_ZONES.FRANKING
+        };
+
+        internetmarke.orderVoucher(VOUCHER);
+        ORDER_STUB.addPosition.calledOnce.should.be.true();
+        ORDER_STUB.addPosition.args[0][0].should.containEql(VOUCHER);
+      });
+
+      it('should not checkout if wallet is empty', () => {
+        internetmarke.authenticateUser(USER_STUB.user);
+        (() => {
+          internetmarke.checkout();
+        }).should.throw(errors.internetmarke.walletEmpty);
+      });
+
+      it('should call service for checkout', done => {
+        const getBalance = USER_STUB.user.getBalance;
+        USER_STUB.user.getBalance = sinon.stub().returns(1000000);
+
+        internetmarke.authenticateUser(USER_STUB.user);
+        internetmarke.checkout()
+          .then(() => {
+            SERVICE_STUB.checkout.calledOnce.should.be.true();
+
+            USER_STUB.user.getBalance = getBalance;
+            done();
+          });
+      });
     });
   });
 
-  describe('Order vouchers', () => {
-    it('should change to valid voucher layouts', () => {
-      const internetmarke = new Internetmarke(PARTNER);
+  it('should validate voucher layouts', () => {
+    internetmarke.setDefaultVoucherLayout(LAYOUT_ZONES.FRANKING)
+      .should.be.true();
+    internetmarke._config.voucherLayout.should.equal(LAYOUT_ZONES.FRANKING);
 
-      internetmarke.setDefaultVoucherLayout(LAYOUT_ZONES.FRANKING);
-      internetmarke._config.voucherLayout.should.equal(LAYOUT_ZONES.FRANKING);
-
-      internetmarke.setDefaultVoucherLayout('INVALID_ZONE');
-      internetmarke._config.voucherLayout.should.equal(LAYOUT_ZONES.FRANKING);
-    });
-
-    it ('should add a voucher to the order', () => {
-      const VOUCHER = {
-        productCode: 1,
-        price: 70,
-        voucherLayout: 'FrankingZone'
-      };
-
-      const internetmarke = new Internetmarke(PARTNER);
-
-      const order = {
-        addPosition: sinon.stub()
-      };
-      internetmarke._order = order;
-
-      internetmarke.orderVoucher(VOUCHER);
-      order.addPosition.calledOnce.should.be.true();
-      order.addPosition.args[0][0].should.containEql(VOUCHER);
-    });
+    internetmarke.setDefaultVoucherLayout('INVALID_ZONE')
+      .should.be.false();
+    internetmarke._config.voucherLayout.should.equal(LAYOUT_ZONES.FRANKING);
   });
 });

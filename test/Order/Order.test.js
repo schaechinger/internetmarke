@@ -1,4 +1,5 @@
-const Order = require('../../lib/Order');
+const Order = require('../../lib/Order'),
+  errors = require('../../lib/errors');
 
 const TEST_DATA = require('./Order.data.json');
 
@@ -22,18 +23,13 @@ describe('Order', () => {
     });
   });
 
-  it('should not checkout without an order id', () => {
-    const order = new Order();
-
-    order.checkout().should.be.false();
-  });
-
   it('should not checkout without any positions', () => {
     const order = new Order();
 
-    order.checkout({ orderId: ORDER_ID }).should.be.false();
+    (() => {
+      order.getCheckout({ orderId: ORDER_ID });
+    }).should.throw(errors.internetmarke.shoppingcartEmpty)
   });
-
 
   it('should checkout with a summary', () => {
     const order = new Order();
@@ -42,7 +38,7 @@ describe('Order', () => {
       order.addPosition(position);
     });
 
-    const summary = order.checkout({
+    const summary = order.getCheckout({
       orderId: ORDER_ID,
       createManifest: false,
       createShippingList: 1
