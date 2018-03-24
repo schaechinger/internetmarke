@@ -8,7 +8,7 @@ before_install:
   - npm i -g yarn@latest
 script:
   - yarn run cover
-after_script:
+after_success:
   - yarn run coveralls
 deploy:
   provider: npm
@@ -16,3 +16,4 @@ deploy:
   api_key: $NPM_TOKEN
   on:
     tags: true
+    branch: master
