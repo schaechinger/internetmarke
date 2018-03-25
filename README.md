@@ -23,7 +23,7 @@ To use the module you have to request a partner account from Deutsche Post for e
 
 * **1C4A** (One Click For Application, required!) is used to order vouchers.
 
-  You can get the partner account from the german website of [Deutsche Post][post-1c4a] or via mail: pcf-1click@deutschepost.de
+  You can get the partner account from the website of [Deutsche Post][post-1c4a] or via mail: pcf-1click@deutschepost.de
 
 * **Prod WS** (Product List Web Service) is used to retrieve the list of available products (the distinct types of stamps for different dimensions etc.). This is optional if you know the ids and prices of the vouchers you want to order.
 
@@ -132,6 +132,19 @@ internetmarke.orderVoucher({ product });
 ```
 
 If you do not have a product from the product service you can use `productCode` and `price` instead to order a voucher.
+
+#### Voucher preview
+
+You can create a preview voucher before checkout.
+
+```javascript
+internetmarke.getVoucherPreview({ product })
+  .then({ link } => {
+    // link to the deutsche post service that contains the preview image for the product
+  });
+```
+
+Of course you can also use `productCode` instead of the `product` here.
 
 
 ### Checkout
