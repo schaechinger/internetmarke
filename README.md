@@ -98,6 +98,17 @@ internetmarke.checkout()
   });
 ```
 
+#### Retrieve older orders
+
+Every order can be re-downloaded with their order id.
+
+```javascript
+internetmarke.retrieveOrder({ orderId: 1234 })
+  .then(shoppingcart => {
+    // same structure as checkout
+  });
+```
+
 
 ### Add addresses to a voucher
 

@@ -27,6 +27,23 @@ const response = {
   },
   retrievePreviewVoucherPNGAsync: {
     link: 'https://schaechinger.com'
+  },
+  retrieveOrderAsync: {
+    link: 'https://schaechinger.com',
+    shoppingCart: {
+      shopOrderId: 1234,
+      voucherList: {
+        voucher: [
+          {
+            voucherId: 'A1235'
+          },
+          {
+            voucherId: 'B1235',
+            trackId: 'PQ-1234567890-DE'
+          }
+        ]
+      }
+    }
   }
 };
 
@@ -41,6 +58,9 @@ const client = {
   ),
   retrievePreviewVoucherPNGAsync: sinon.stub().returns(
     Promise.resolve(response.retrievePreviewVoucherPNGAsync)
+  ),
+  retrieveOrderAsync: sinon.stub().returns(
+    Promise.resolve(response.retrieveOrderAsync)
   )
 };
 
