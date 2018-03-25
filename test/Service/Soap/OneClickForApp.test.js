@@ -86,7 +86,46 @@ describe('1C4A Service', () => {
         .then(result => {
           const response = CLIENT_STUB.response.checkoutShoppingCartPNGAsync;
           USER_STUB.user._balance.should.equal(response.walletBallance);
-          result.should.have.properties([ 'orderId', 'link', 'vouchers' ]);
+
+          done();
+        });
+    });
+
+    it('should process shopping cart data', () => {
+      const result = service._processShoppingCart(CLIENT_STUB.response.checkoutShoppingCartPNGAsync);
+
+      result.should.have.properties(['orderId', 'link', 'vouchers']);
+
+      result.vouchers.forEach(voucher => {
+        voucher.should.have.property('id');
+      });
+    });
+  });
+
+  describe('retrieveOrder', () => {
+    const params = {
+      order: { ORDER_FAKE_STUB: true }
+    };
+
+    it('should call the retrieve order method', done => {
+      service.retrieveOrder(params)
+        .then(result => {
+          CLIENT_STUB.client.retrieveOrderAsync.calledOnce.should.be.true();
+          CLIENT_STUB.client.retrieveOrderAsync.args[0][0]
+            .should.containDeep(params.order);
+
+          done();
+        });
+    });
+
+    it('should process the data', done => {
+      const processMethod = service._processShoppingCart;
+      service._processShoppingCart = sinon.stub().returns({});
+
+      service.retrieveOrder(params)
+        .then(result => {
+          service._processShoppingCart.calledOnce.should.be.true();
+          service._processShoppingCart = processMethod;
 
           done();
         });
