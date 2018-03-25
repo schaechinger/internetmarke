@@ -67,6 +67,48 @@ internetmarke.authenticateUser(user)
 ```
 
 
+### Product list
+
+The product list contains all available vouchers that can be ordered. They are cached and are get updated once a day.
+To access the product service (Prod WS) a dedicated client account is necessary!
+
+```javascript
+const client = factory.createClient({
+  username: 'USERNAME',
+  password: '********'
+});
+```
+
+If your id (`Mandant-ID`) differs from the upper case version of the username you can add it to the factory method.
+
+To enable the product service hand your client account to the internetmarke instance.
+
+```javascript
+internetmarke.enableProductService({ client })
+  .then(success => {
+    // you can now access the product list
+  });
+```
+
+Once the product service is enable you can retrieve the whole product list or a single product.
+
+```javascript
+internetmarke.getProductList()
+  .then(productList => {
+    // array of products
+  });
+
+internetmarke.findProduct({ id: 1})
+  .then(product => {
+    // product.getId() contains the id used to order a voucher
+    // product.getName() is the readable name of the product
+    // product.getPrice() contains the price in Euro Cents
+  });
+```
+
+You can get the minimal and maximal dimensions and weight informations of every product with the properties `_dimensions` and `_weight`. This will be used to match a product with given packet information to retrieve the best fitting product.
+
+
 ### Order vouchers
 
 As soon as the user has been authenticated you can start ordering vouchers.
@@ -75,11 +117,10 @@ You can set the `productCode` and the `voucherLayout` (Default is Address Zone) 
 To determine the right voucher, you can use the product list.
 
 ```javascript
-internetmarke.orderVoucher({
-  productCode: 1,
-  price: 70
-});
+internetmarke.orderVoucher({ product });
 ```
+
+If you do not have a product from the product service you can use `productCode` and `price` instead to order a voucher.
 
 
 ### Checkout
@@ -93,6 +134,18 @@ internetmarke.checkout()
     // shoppingcart.link - contains the link to the zip archive
     // shoppingcart.vouchers[].id - used to regenerate the voucher
     // shoppingcart.vouchers[].trackingCode (depending on product)
+  });
+```
+
+
+### Retrieve older orders
+
+Every order can be re-downloaded with the order id.
+
+```javascript
+internetmarke.retrieveOrder({ orderId: 1234 })
+  .then(shoppingcart => {
+
   });
 ```
 
