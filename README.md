@@ -33,9 +33,9 @@ Init the internetmarke object with your partner credentials.
 You can request them on the page of the Deutsche Post.
 
 ```javascript
-const Partner = require('internetmarke').Partner;
+const factory = require('internetmarke').factory;
 
-const partner = new Partner({
+const partner = factory.createPartner({
   id: 'PARTNER_ID',
   secret: 'SCHLUESSEL_DPWN_MARKTPLATZ'
 });
@@ -56,14 +56,12 @@ const internermarke = new Internetmarke(partner);
 Once the partner credentials have been set, you can login with your account that should be used for the payment.
 
 ```javascript
-const User = require('internetmarke').User;
-
-const user = new User({
+const user = factory.createUser({
   username: 'user-account@example.com',
   password: '*****'
 });
 internetmarke.authenticateUser(user)
-  .then(() => {
+  .then(success => {
     // user is authenticated
   });
 ```
@@ -105,9 +103,7 @@ Vouchers that are in `AddressZone` Layout can handle addresses.
 You can add a pair of sender / receiver addresses with the AddressFactory.
 
 ```javascript
-const AddressFactory = require('internetmarke').AddressFactory;
-
-const sender = AddressFactory.create({
+const sender = factory.createAddress({
   firstname: 'Max',
   lastname: 'Mustermann',
   street: 'Marienplatz',
@@ -115,7 +111,7 @@ const sender = AddressFactory.create({
   zip: 80331,
   city: 'München'
 });
-const receiver = AddressFactory.create({
+const receiver = factory.createAddress({
   company: 'Studio 42',
   firstname: 'John',
   lastname: 'Doe',
@@ -125,7 +121,7 @@ const receiver = AddressFactory.create({
   city: 'Edinburgh'
   country: 'GBR'
 });
-const addressBinding = AddressFactory.bind({ receiver, sender});
+const addressBinding = factory.bindAddresses({ receiver, sender});
 
 internetmarke.orderVoucher({
   addressBinding
