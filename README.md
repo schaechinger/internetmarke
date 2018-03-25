@@ -19,10 +19,17 @@ npm install internetmarke
 
 ## Required accounts
 
-To use the module you have to request a partner account.
-You can get one from the website of the Deutsche Post or via mail.
+To use the module you have to request a partner account from Deutsche Post for every web service you want to use and your payment account:
 
-Second, an account is required that is used to pay the vouchers.
+* **1C4A** (One Click For Application, required!) is used to order vouchers.
+
+  You can get the partner account from the german website of [Deutsche Post][post-1c4a] or via mail: pcf-1click@deutschepost.de
+
+* **Prod WS** (Product List Web Service) is used to retrieve the list of available products (the distinct types of stamps for different dimensions etc.). This is optional if you know the ids and prices of the vouchers you want to order.
+
+  The client account can be requested via mail (see above) only.
+
+* Further you need your personal **Portokasse** account with payment info that is used on checkout. If you do not have one please create one at the web portal of [Deutsche Post][post-portokasse]
 
 
 ## Basic usage
@@ -41,8 +48,12 @@ const partner = factory.createPartner({
 });
 ```
 
+If your `keyPhase` is different that `1` please add it the the factory method.
+
 
 ### Create internetmarke instance
+
+You can do so by handing the created partner to the Internetmarke constructor. This will connect you to the 1C4A service.
 
 ```javascript
 const Internetmarke = require('internetmarke');
@@ -53,7 +64,7 @@ const internermarke = new Internetmarke(partner);
 
 ### Authenticate user
 
-Once the partner credentials have been set, you can login with your account that should be used for the payment.
+Once the partner credentials have been set, you can login with your user account that should be used for the payment.
 
 ```javascript
 const user = factory.createUser({
@@ -207,3 +218,7 @@ internetmarke.orderVoucher({
 
 [coveralls-url]: https://coveralls.io/github/schaechinger/internetmarke
 [coveralls-svg]:  https://img.shields.io/coveralls/github/schaechinger/internetmarke.svg
+
+
+[post-1c4a]: https://www.deutschepost.de/de/i/internetmarke-porto-drucken/partner-werden.html
+[post-portokasse]: https://portokasse.deutschepost.de/portokasse/#!/register/
