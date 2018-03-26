@@ -13,7 +13,7 @@ A node wrapper for the Internetmarke web service of the Deutsche Post
 ## Installation
 
 ```sh
-npm install internetmarke
+npm i internetmarke
 ```
 
 
@@ -48,7 +48,7 @@ const partner = factory.createPartner({
 });
 ```
 
-If your `keyPhase` is different that `1` please add it the the factory method.
+If your `keyPhase` is different that `1` please add it to the factory method.
 
 
 ### Create internetmarke instance
@@ -78,6 +78,8 @@ internetmarke.authenticateUser(user)
 ```
 
 The user holds all the information about your account including your wallet balance, which you can retrieve with `user.getBalance()` as soon as you authenticated the user. The user is passed by reference along the process so you can keep track of the balance with your instance after every checkout.
+
+In addition you can retrieve the order id of the latest order in this session with `user.getOrderId()`.
 
 
 ### Product list

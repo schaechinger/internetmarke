@@ -1,13 +1,15 @@
 {
   "name": "internetmarke",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "A node wrapper for the Internetmarke web service of the Deutsche Post.",
   "keywords": [
     "internetmarke",
     "stamp",
+    "voucher",
     "post",
     "letter",
     "1c4a",
+    "prod-ws",
     "deutsche-post"
   ],
   "main": "index.js",

@@ -1,4 +1,6 @@
+.github
 .vscode
+/docs/
 /test/
 .travis.yml
 yarn.lock
