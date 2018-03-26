@@ -77,6 +77,8 @@ internetmarke.authenticateUser(user)
   });
 ```
 
+The user holds all the information about your account including your wallet balance, which you can retrieve with `user.getBalance()` as soon as you authenticated the user. The user is passed by reference along the process so you can keep track of the balance with your instance after every checkout.
+
 
 ### Product list
 
