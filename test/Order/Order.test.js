@@ -29,15 +29,15 @@ describe('Order', () => {
 
       const product = {
         getId: sinon.stub().returns(1),
-        getPrice: sinon.stub().returned(70)
+        getPrice: sinon.stub().returns(70)
       };
 
-      order.addPosition({ product });
+      order.addPosition({ product, voucherLayout: 'FrankingZone' });
 
       product.getId.calledOnce.should.be.true();
       product.getPrice.calledOnce.should.be.true();
 
-      order._positions.length.should.have.length(1);
+      order._positions.should.have.length(1);
     });
   });
 

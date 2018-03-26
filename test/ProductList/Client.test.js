@@ -24,7 +24,7 @@ describe('Client', () => {
     client.getId().should.equal(args.id);
   });
   
-  it('should generate the client id if not given', () {
+  it('should generate the client id if not given', () => {
     const credentials = {
       username: 'myusername',
       password: '*****'
@@ -32,6 +32,6 @@ describe('Client', () => {
 
     const client = new Client(credentials);
 
-    client.getId().shoul.equal(credentials.username.toUpperCase());
+    client.getId().should.equal(credentials.username.toUpperCase());
   });
 });

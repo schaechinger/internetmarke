@@ -26,7 +26,7 @@ describe('Product', () => {
         product.getId().should.equal(data.gen.id);
         product.getPrice().should.equal(data.gen.price);
         product.getName().should.equal(data.gen.name);
-        product._dimensions.should.have.properties('length', 'weight', 'height');
+        product._dimensions.should.have.properties('length', 'width', 'height');
         product._dimensions.length.should.have.length(2);
         product._weight.should.have.length(2);
         product._ppl.should.equal(data.gen.ppl);
