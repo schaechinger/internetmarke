@@ -32,5 +32,15 @@ describe('Product', () => {
         product._ppl.should.equal(data.gen.ppl);
       });
     });
+
+    it('should skip optional information if not given', () => {
+      TEST_DATA.data.skipOptional.forEach(data => {
+        const product = new Product(data.raw);
+
+        product.isValid().should.be.true();
+        product._dimensions.should.be.empty();
+        product._weight.should.be.empty;
+      });
+    });
   });
 });

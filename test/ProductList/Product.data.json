@@ -69,6 +69,30 @@
           "name": "Standardbrief Integral + EINSCHREIBEN EINWURF"
         }
       }
+    ],
+    "skipOptional": [
+      {
+        "raw": {
+          "extendedIdentifier": {
+            "externIdentifier": {
+              "attributes": {
+                "id": "1002",
+                "name": "Standardbrief Integral + EINSCHREIBEN EINWURF",
+                "actualPPLVersion": "39"
+              }
+            }
+          },
+          "priceDefinition": {
+            "price": {
+              "calculatedGrossPrice": {
+                "attributes": {
+                  "value": "2.85"
+                }
+              }
+            }
+          }
+        }
+      }
     ]
   }
 }
