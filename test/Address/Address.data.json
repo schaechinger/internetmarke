@@ -30,5 +30,16 @@
       "zip": "80331",
       "city": "München"
     }
+  ],
+  "numberAddress": [
+    {
+      "street": "Marienplatz",
+      "houseNo": 1
+    },
+    {
+      "street": "Marienplatz",
+      "houseNo": "1",
+      "zip": 80331
+    }
   ]
 }
