@@ -18,8 +18,7 @@ describe('Product', () => {
       });
     });
 
-    if ('should load given the data', () => {
-      
+    it('should load given the data', () => {
       TEST_DATA.data.valid.forEach(data => {
         const product = new Product(data.raw);
 
