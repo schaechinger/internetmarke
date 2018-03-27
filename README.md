@@ -1,7 +1,7 @@
 # internetmarke
 
 [![Build Status][travis-svg]][travis-url]
-[![Build Status][coveralls-svg]][coveralls-url]
+[![Test Coverage][coveralls-svg]][coveralls-url]
 [![NPM version][npm-svg]][npm-url]
 
 ![License][license-svg]
