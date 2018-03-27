@@ -6,20 +6,38 @@ const TEST_DATA = require('./Order.data.json');
 describe('Order', () => {
   const ORDER_ID = 1234;
 
-  it('should add positions to the current order', () => {
-    const order = new Order();
+  describe('addPosition', () => {
+    it('should add positions to the current order', () => {
+      const order = new Order();
 
-    TEST_DATA.positions.forEach((position, i) => {
-      order.addPosition(position);
+      TEST_DATA.positions.forEach((position, i) => {
+        order.addPosition(position);
 
-      order._positions.should.have.length(i + 1);
-      const pos = order._positions[order._positions.length - 1];
-      
-      for (const key in position) {
-        if (position.hasOwnProperty(key)) {
-          pos[`_${key}`].should.equal(position[key]);
+        order._positions.should.have.length(i + 1);
+        const pos = order._positions[order._positions.length - 1];
+        
+        for (const key in position) {
+          if (position.hasOwnProperty(key)) {
+            pos[`_${key}`].should.equal(position[key]);
+          }
         }
-      }
+      });
+    });
+
+    it('should add a position with the product object', () => {
+      const order = new Order();
+
+      const product = {
+        getId: sinon.stub().returns(1),
+        getPrice: sinon.stub().returns(70)
+      };
+
+      order.addPosition({ product, voucherLayout: 'FrankingZone' });
+
+      product.getId.calledOnce.should.be.true();
+      product.getPrice.calledOnce.should.be.true();
+
+      order._positions.should.have.length(1);
     });
   });
 

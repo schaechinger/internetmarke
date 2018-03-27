@@ -1,13 +1,15 @@
 {
   "name": "internetmarke",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "A node wrapper for the Internetmarke web service of the Deutsche Post.",
   "keywords": [
     "internetmarke",
     "stamp",
+    "voucher",
     "post",
     "letter",
     "1c4a",
+    "prod-ws",
     "deutsche-post"
   ],
   "main": "index.js",
@@ -39,12 +41,10 @@
   "devDependencies": {
     "coveralls": "^3.0.0",
     "istanbul": "^0.4.5",
+    "jsdoc": "^3.5.5",
     "mocha": "^5.0.1",
     "mocha-lcov-reporter": "^1.3.0",
     "should": "^13.2.1",
     "sinon": "^4.2.2"
-  },
-  "optionalDependencies": {
-    "jsdoc": "^3.5.5"
   }
 }

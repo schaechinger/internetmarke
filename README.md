@@ -13,16 +13,23 @@ A node wrapper for the Internetmarke web service of the Deutsche Post
 ## Installation
 
 ```sh
-npm install internetmarke
+npm i internetmarke
 ```
 
 
 ## Required accounts
 
-To use the module you have to request a partner account.
-You can get one from the website of the Deutsche Post or via mail.
+To use the module you have to request a partner account from Deutsche Post for every web service you want to use and your payment account:
 
-Second, an account is required that is used to pay the vouchers.
+* **1C4A** (One Click For Application, required!) is used to order vouchers.
+
+  You can get the partner account from the website of [Deutsche Post][post-1c4a] or via mail: pcf-1click@deutschepost.de
+
+* **Prod WS** (Product List Web Service) is used to retrieve the list of available products (the distinct types of stamps for different dimensions etc.). This is optional if you know the ids and prices of the vouchers you want to order.
+
+  The client account can be requested via mail (see above) only.
+
+* Further you need your personal **Portokasse** account with payment info that is used on checkout. If you do not have one please create one at the web portal of [Deutsche Post][post-portokasse]
 
 
 ## Basic usage
@@ -33,16 +40,20 @@ Init the internetmarke object with your partner credentials.
 You can request them on the page of the Deutsche Post.
 
 ```javascript
-const Partner = require('internetmarke').Partner;
+const factory = require('internetmarke').factory;
 
-const partner = new Partner({
+const partner = factory.createPartner({
   id: 'PARTNER_ID',
   secret: 'SCHLUESSEL_DPWN_MARKTPLATZ'
 });
 ```
 
+If your `keyPhase` is different that `1` please add it to the factory method.
+
 
 ### Create internetmarke instance
+
+You can do so by handing the created partner to the Internetmarke constructor. This will connect you to the 1C4A service.
 
 ```javascript
 const Internetmarke = require('internetmarke');
@@ -53,20 +64,64 @@ const internermarke = new Internetmarke(partner);
 
 ### Authenticate user
 
-Once the partner credentials have been set, you can login with your account that should be used for the payment.
+Once the partner credentials have been set, you can login with your user account that should be used for the payment.
 
 ```javascript
-const User = require('internetmarke').User;
-
-const user = new User({
+const user = factory.createUser({
   username: 'user-account@example.com',
   password: '*****'
 });
 internetmarke.authenticateUser(user)
-  .then(() => {
+  .then(success => {
     // user is authenticated
   });
 ```
+
+The user holds all the information about your account including your wallet balance, which you can retrieve with `user.getBalance()` as soon as you authenticated the user. The user is passed by reference along the process so you can keep track of the balance with your instance after every checkout.
+
+In addition you can retrieve the order id of the latest order in this session with `user.getOrderId()`.
+
+
+### Product list
+
+The product list contains all available vouchers that can be ordered. They are cached and are get updated once a day.
+To access the product service (Prod WS) a dedicated client account is necessary!
+
+```javascript
+const client = factory.createClient({
+  username: 'USERNAME',
+  password: '********'
+});
+```
+
+If your id (`Mandant-ID`) differs from the upper case version of the username you can add it to the factory method.
+
+To enable the product service hand your client account to the internetmarke instance.
+
+```javascript
+internetmarke.enableProductService({ client })
+  .then(success => {
+    // you can now access the product list
+  });
+```
+
+Once the product service is enable you can retrieve the whole product list or a single product.
+
+```javascript
+internetmarke.getProductList()
+  .then(productList => {
+    // array of products
+  });
+
+internetmarke.findProduct({ id: 1})
+  .then(product => {
+    // product.getId() contains the id used to order a voucher
+    // product.getName() is the readable name of the product
+    // product.getPrice() contains the price in Euro Cents
+  });
+```
+
+You can get the minimal and maximal dimensions and weight informations of every product with the properties `_dimensions` and `_weight`. This will be used to match a product with given packet information to retrieve the best fitting product.
 
 
 ### Order vouchers
@@ -77,11 +132,23 @@ You can set the `productCode` and the `voucherLayout` (Default is Address Zone) 
 To determine the right voucher, you can use the product list.
 
 ```javascript
-internetmarke.orderVoucher({
-  productCode: 1,
-  price: 70
-});
+internetmarke.orderVoucher({ product });
 ```
+
+If you do not have a product from the product service you can use `productCode` and `price` instead to order a voucher.
+
+#### Voucher preview
+
+You can create a preview voucher before checkout.
+
+```javascript
+internetmarke.getVoucherPreview({ product })
+  .then({ link } => {
+    // link to the deutsche post service that contains the preview image for the product
+  });
+```
+
+Of course you can also use `productCode` instead of the `product` here.
 
 
 ### Checkout
@@ -110,15 +177,25 @@ internetmarke.retrieveOrder({ orderId: 1234 })
 ```
 
 
+### Retrieve older orders
+
+Every order can be re-downloaded with the order id.
+
+```javascript
+internetmarke.retrieveOrder({ orderId: 1234 })
+  .then(shoppingcart => {
+
+  });
+```
+
+
 ### Add addresses to a voucher
 
 Vouchers that are in `AddressZone` Layout can handle addresses.
 You can add a pair of sender / receiver addresses with the AddressFactory.
 
 ```javascript
-const AddressFactory = require('internetmarke').AddressFactory;
-
-const sender = AddressFactory.create({
+const sender = factory.createAddress({
   firstname: 'Max',
   lastname: 'Mustermann',
   street: 'Marienplatz',
@@ -126,7 +203,7 @@ const sender = AddressFactory.create({
   zip: 80331,
   city: 'München'
 });
-const receiver = AddressFactory.create({
+const receiver = factory.createAddress({
   company: 'Studio 42',
   firstname: 'John',
   lastname: 'Doe',
@@ -136,7 +213,7 @@ const receiver = AddressFactory.create({
   city: 'Edinburgh'
   country: 'GBR'
 });
-const addressBinding = AddressFactory.bind({ receiver, sender});
+const addressBinding = factory.bindAddresses({ receiver, sender});
 
 internetmarke.orderVoucher({
   addressBinding
@@ -158,3 +235,7 @@ internetmarke.orderVoucher({
 
 [coveralls-url]: https://coveralls.io/github/schaechinger/internetmarke
 [coveralls-svg]:  https://img.shields.io/coveralls/github/schaechinger/internetmarke.svg
+
+
+[post-1c4a]: https://www.deutschepost.de/de/i/internetmarke-porto-drucken/partner-werden.html
+[post-portokasse]: https://portokasse.deutschepost.de/portokasse/#!/register/

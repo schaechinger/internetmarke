@@ -50,4 +50,15 @@ describe('Address', () => {
     const data = address.getData();
     data.address.should.have.property('additional').and.equal(args.additional);
   });
+
+  it('should convert numbers to strings', () => {
+    TEST_DATA.numberAddress.forEach(args => {
+      const address = new Address(args);
+
+      const data = address.getData();
+
+      data.address.houseNo.should.be.type('string');
+      data.address.zip.should.be.type('string');
+    });
+  });
 });

@@ -20,7 +20,7 @@ describe('Soap Service', () => {
     });
 
     it('should create a new client if not existing', done => {
-      const service = new SoapService({ wsdl: WSDL.OneClickForApp });
+      const service = new SoapService({ wsdl: WSDL.ONECLICKFORAPP });
 
       service._getSoapClient()
         .then(client => {
