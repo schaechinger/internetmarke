@@ -33,18 +33,19 @@
   },
   "dependencies": {
     "md5": "^2.2.1",
-    "moment": "^2.20.1",
-    "moment-timezone": "^0.5.14",
-    "pino": "^4.11.0",
-    "soap": "^0.23.0"
+    "moment": "^2.24.0",
+    "moment-timezone": "^0.5.25",
+    "pino": "^5.12.6",
+    "pino-pretty": "^3.2.0",
+    "soap": "^0.28.0"
   },
   "devDependencies": {
-    "coveralls": "^3.0.0",
+    "coveralls": "^3.0.4",
     "istanbul": "^0.4.5",
-    "jsdoc": "^3.5.5",
-    "mocha": "^5.0.1",
+    "jsdoc": "^3.6.2",
+    "mocha": "^5.2.0",
     "mocha-lcov-reporter": "^1.3.0",
-    "should": "^13.2.1",
-    "sinon": "^4.2.2"
+    "should": "^13.2.3",
+    "sinon": "^4.5.0"
   }
 }
