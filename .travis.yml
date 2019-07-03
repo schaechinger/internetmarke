@@ -1,15 +1,13 @@
 language: node_js
 node_js:
-  - "lts/*"
   - "node"
+  - "lts/*"
+  - "lts/carbon"
   - "lts/boron"
-before_install:
-  - npm i -g npm@latest
-  - npm i -g yarn@latest
 script:
-  - yarn run cover
+  - npm run cover
 after_success:
-  - yarn run coveralls
+  - npm run coveralls
 deploy:
   provider: npm
   email: $NPM_EMAIL
