@@ -45,7 +45,7 @@ describe('Internetmarke', () => {
       internetmarke.authenticateUser(USER_STUB.user)
         .then(() => {
           SERVICE_1C4A_STUB.authenticateUser.calledOnce.should.be.true();
-          
+
           done();
         });
     });
@@ -73,10 +73,15 @@ describe('Internetmarke', () => {
       });
 
       it('should not checkout if wallet is empty', () => {
+        const getBalance = USER_STUB.user.getBalance;
+        USER_STUB.user.getBalance = sinon.stub().returns(0);
+
         internetmarke.authenticateUser(USER_STUB.user);
         (() => {
           internetmarke.checkout();
         }).should.throw(errors.internetmarke.walletEmpty);
+
+        USER_STUB.user.getBalance = getBalance;
       });
 
       it('should call service for checkout', done => {
@@ -110,7 +115,7 @@ describe('Internetmarke', () => {
         internetmarke.enableProductList({ client: CLIENT_STUB.client })
           .then(success => {
             internetmarke._productList.should.be.ok();
-            
+
             success.should.be.true();
 
             done();
@@ -134,7 +139,7 @@ describe('Internetmarke', () => {
     describe('getProductList', () => {
       it('should ', done => {
         internetmarke._checkProductList = sinon.stub().returns(true);
-        const fakeList = [ 1, 2, 3 ];
+        const fakeList = [1, 2, 3];
         internetmarke._productList = {
           _products: fakeList
         };
