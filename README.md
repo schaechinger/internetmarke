@@ -58,7 +58,7 @@ You can do so by handing the created partner to the Internetmarke constructor. T
 ```javascript
 const Internetmarke = require('internetmarke');
 
-const internermarke = new Internetmarke(partner);
+const internetmarke = new Internetmarke(partner);
 ```
 
 
