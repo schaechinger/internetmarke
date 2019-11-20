@@ -99,7 +99,7 @@ If your id (`Mandant-ID`) differs from the upper case version of the username yo
 To enable the product service hand your client account to the internetmarke instance.
 
 ```javascript
-internetmarke.enableProductService({ client })
+internetmarke.enableProductList({ client })
   .then(success => {
     // you can now access the product list
   });
