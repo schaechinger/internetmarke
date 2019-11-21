@@ -221,6 +221,91 @@ internetmarke.orderVoucher({
 });
 ```
 
+***
+### Full Example
+This is a full example of a exported function (orderStamp) that takes a adress-object and returns a Promise. 
+```javascript
+const Internetmarke = require('internetmarke');
+const request = require('request')
+const unzipper = require('unzipper');
+const getStream = require('get-stream');
+
+// Set API Credentials
+const partner = Internetmarke.factory.createPartner({
+    id: 'PARTNERID',
+    secret: 'PARTNERSECRET'
+});
+const internetmarke = new Internetmarke(partner);
+
+// Set sender Adress for all stamps
+const sender = Internetmarke.factory.createAddress({
+    company: 'Max Mustermann GmbH',
+    street: 'Reeperbahn',
+    houseNo: 1,
+    zip: 22767,
+    city: 'hamburg'
+});
+
+// Set "Portokasse" Credentials
+const user = Internetmarke.factory.createUser({
+    username: 'username',
+    password: 'mypassword'
+});
+
+/**
+ * Function to generate a new Stamp 
+ * @param {Object} adress
+ * @returns {Promise}
+ */
+const orderStamp = async (adress) => {
+
+    // 0,80€ for DE
+    const productCode = 1;
+    const price = 80;
+
+    // Create receiver Adress
+    const receiver = Internetmarke.factory.createAddress({
+        firstname: adress.firstname,
+        lastname: adress.lastname,
+        additional: adress.additional,
+        street: adress.street,
+        zip: adress.zip,
+        city: adress.city
+    });
+    // Create Adressbindung for this order
+    const addressBinding = Internetmarke.factory.bindAddresses({ receiver, sender});
+
+    // 0. Auth
+    await internetmarke.authenticateUser(user);
+    console.debug(`Account balance: ${user.getBalance()}`);
+
+    // 1. Buy Stamp
+    internetmarke.orderVoucher({ productCode, price, addressBinding });
+    const { orderId, link } = await internetmarke.checkout();
+
+    // 2. Download and unzip
+    const imageStream = request(link).pipe(unzipper.ParseOne());
+    const base64Image = await getStream(imageStream, {encoding: 'base64'});
+
+    // 3. Return PNG as data uri with base64 
+    return {
+        internetmarkeOrderId: orderId,
+        stamp: `data:image/png;base64,${base64Image}`
+    };
+
+};
+
+module.exports = { orderStamp };
+```
+sample result could be this (stamp is a base64 string of the png):
+```javascript
+{
+  stampOrderId: 1414141
+  data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAA+wAAAH8CAYAAABLkCU6AAAACXB....
+}
+```
+
+
 
 [npm-url]: https://npmjs.org/package/internetmarke
 [npm-svg]: https://img.shields.io/npm/v/internetmarke.svg
