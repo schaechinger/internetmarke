@@ -3,5 +3,7 @@
 /docs/
 /src/
 /test/
-.travis.yml
+.prettierrc
+commitlint.config.js
 package-lock.json
+tsconfig.json

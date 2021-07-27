@@ -4,12 +4,17 @@ import { DataStore } from '../services/DataStore';
 import { SoapService } from '../services/Soap';
 import { getLogger } from '../utils/logger';
 import { AddressBinding } from './address';
-import { CheckoutError, OneClickForAppError, UserError, VoucherLayoutError } from './Error';
+import {
+  CheckoutError,
+  OneClickForAppError,
+  PageFormatError,
+  UserError,
+  VoucherLayoutError
+} from './Error';
 import { GalleryItem, ImageItem, MotiveLink } from './gallery';
-import { Order, OrderPosition } from './order';
-import { PageFormat } from './pageFormat';
+import { Order, ShoppingCartItem, ShoppingCartSummary } from './order';
+import { PageFormat, PageFormatPosition } from './pageFormat';
 import { Partner, PartnerCredentials } from './Partner';
-import { ShoppingCartSummary } from './shoppingCart';
 import { User, UserCredentials, UserInfo } from './User';
 import { VoucherFormat, VoucherLayout } from './voucher';
 
@@ -29,6 +34,7 @@ export interface ShoppingCartOptions {
   imageItem?: ImageItem;
   voucherLayout?: VoucherLayout;
   addressBinding?: AddressBinding;
+  position?: PageFormatPosition;
 }
 
 export enum ShippingList {
@@ -42,8 +48,12 @@ export interface CheckoutShoppingCartOptions {
   pageFormat?: PageFormat;
   createManifest?: boolean;
   createShippingList?: ShippingList;
+  dryrun?: boolean;
 }
 
+/**
+ * The public definition of the OneClickForApplication service.
+ */
 export interface OneClickForApp {
   getUserInfo(): UserInfo;
   retrievePageFormats(): Promise<PageFormat[]>;
@@ -70,7 +80,7 @@ export class OneClickForAppService extends SoapService implements OneClickForApp
   private pageFormatStore: DataStore<PageFormat>;
   private publicGalleryStore: DataStore<GalleryItem>;
   private privateGalleryStore: DataStore<MotiveLink>;
-  private shoppingCart: OrderPosition[];
+  private shoppingCart: ShoppingCartItem[];
   private log: Debugger;
 
   constructor(partnerCredentials: PartnerCredentials) {
@@ -234,7 +244,7 @@ export class OneClickForAppService extends SoapService implements OneClickForApp
       );
     }
 
-    const position: OrderPosition | any = {
+    const position: ShoppingCartItem = {
       productCode: product.id
     };
     if (options.imageItem) {
@@ -249,7 +259,9 @@ export class OneClickForAppService extends SoapService implements OneClickForApp
     }
     position.price = product.price;
     position.voucherLayout = voucherLayout;
-    // TODO: position.position
+    if (options.position) {
+      position.position = options.position;
+    }
 
     this.shoppingCart.push(position);
   }
@@ -277,12 +289,15 @@ export class OneClickForAppService extends SoapService implements OneClickForApp
    * @param order The order information that hold the data about the vouchers.
    * @param outputFormat The format the voucher should have.
    */
-  public async checkoutShoppingCart(options: CheckoutShoppingCartOptions = {}): Promise<any> {
+  public async checkoutShoppingCart(
+    options: CheckoutShoppingCartOptions = {}
+  ): Promise<Order | null> {
     if (!this.shoppingCart.length) {
       throw new CheckoutError('Cannot checkout empty shopping cart');
     }
 
-    const voucherFormat = options.pageFormat ? VoucherFormat.PDF : VoucherFormat.PNG;
+    const isPdfVoucher = !!options.pageFormat;
+    const voucherFormat = isPdfVoucher ? VoucherFormat.PDF : VoucherFormat.PNG;
     const checkout = `checkoutShoppingCart${voucherFormat}Async`;
 
     const payload: any = {
@@ -294,31 +309,122 @@ export class OneClickForAppService extends SoapService implements OneClickForApp
     if (options.pageFormat) {
       payload.pageFormatId = options.pageFormat.id;
     }
-    // TODO: ppl, load from products?
+
+    let positionMap: number[] | null = null;
+
+    // initialize positions
+    let pageFormatX = 0;
+    let pageFormatY = 0;
+    if (isPdfVoucher && options.pageFormat?.pageLayout?.labelCount) {
+      positionMap = [];
+      pageFormatX = options.pageFormat!.pageLayout.labelCount.labelX;
+      pageFormatY = options.pageFormat!.pageLayout.labelCount.labelY;
+    }
+
     let total = 0;
-    payload.positions = this.shoppingCart.map(position => {
+    payload.positions = this.shoppingCart.map((position, i) => {
       total += position.price!.value * 100;
       delete position.price;
 
-      return position;
+      if (isPdfVoucher) {
+        if (!position.position) {
+          // cannot generatie positions
+          if (!positionMap) {
+            throw new CheckoutError(
+              'Position data is mandatory for shoppingCartItems if no pageFormat object is provided'
+            );
+          }
+
+          this.placeToFirstEmpty(positionMap, i);
+        } else if (positionMap) {
+          const { labelX, labelY, page } = position.position;
+          // check if position is in range
+          if (
+            1 > labelX ||
+            pageFormatX < labelX ||
+            1 > labelY ||
+            pageFormatY < labelY ||
+            1 > page!
+          ) {
+            throw new PageFormatError(
+              `PageFormat position is out of range. Range is 1:1 to ${pageFormatX}:${pageFormatY}, given is ${labelX}:${labelY} (page: ${page})`
+            );
+          }
+          // put item into map
+          const posIndex =
+            labelX -
+            1 +
+            pageFormatX * (labelY - 1) +
+            pageFormatX * pageFormatY * ((page || 1)! - 1);
+
+          let formerIndex = positionMap[posIndex];
+          positionMap[posIndex] = i;
+          // move former index to the next empty position
+          if (undefined !== formerIndex) {
+            this.placeToFirstEmpty(positionMap, formerIndex);
+          }
+        }
+      }
+
+      return position as ShoppingCartItem;
     });
+
+    if (positionMap?.length) {
+      const { labelX, labelY } = options.pageFormat!.pageLayout.labelCount;
+      const pageSize = labelX * labelY;
+
+      positionMap.forEach((itemIndex, posIndex) => {
+        const page = Math.floor(posIndex / pageSize) + 1;
+        const x = ((posIndex % pageSize) % labelX) + 1;
+        const y = Math.floor((posIndex % pageSize) / labelX) + 1;
+
+        payload.positions[itemIndex].position = {
+          labelX: x,
+          labelY: y,
+          page
+        } as PageFormatPosition;
+      });
+    }
+
     payload.total = total;
-    payload.createManifest = undefined === options.createManifest ? true : options.createManifest;
+    if (options.createManifest) {
+      payload.createManifest = options.createManifest;
+    }
     if (options.createShippingList) {
       payload.createShippingList = options.createShippingList;
     }
 
-    console.log(checkout, payload);
+    // dryrun, don't request checkout
+    if (options.dryrun) {
+      delete payload.userToken;
+      this.log('[dryrun] checkout request payload:', JSON.stringify(payload));
 
-    // return this.soapClient[checkout](payload).then(([response]: any) => {
-    //   this.user.load({
-    //     walletBalance: response.walletBallance || response.walletBalance,
-    //   });
+      return null;
+    }
 
-    //   // TODO: reset shoppingCart
+    return this.soapClient[checkout](payload)
+      .then(([response]: [Order]) => {
+        if (response) {
+          if (response.shoppingCart.shopOrderId) {
+            response.shoppingCart.shopOrderId = +response.shoppingCart.shopOrderId;
+          }
 
-    //   return response; // this.processShoppingCart(response);
-    // });
+          this.user.load({
+            walletBalance: response.walletBallance || (response as any).walletBalance
+          });
+          this.user.addOrderId(response.shoppingCart.shopOrderId!);
+
+          this.shoppingCart = [];
+        }
+
+        this.log('checkout successful, shopOrderId: %s', response.shoppingCart.shopOrderId);
+
+        return response;
+      })
+      .catch((e: any) => {
+        console.log('checkout error', e.root.Envelope.Body.Fault);
+        throw new OneClickForAppError(e.root.Envelope.Body.Fault);
+      });
   }
 
   /**
@@ -333,6 +439,8 @@ export class OneClickForAppService extends SoapService implements OneClickForApp
         shopOrderId
       })
       .then(([response]: any) => {
+        this.log('retrieveOrder response', JSON.stringify(response));
+
         return response || null;
       })
       .catch(() => {
@@ -343,6 +451,23 @@ export class OneClickForAppService extends SoapService implements OneClickForApp
 
   protected initSoapClient(): void {
     this.soapClient.addSoapHeader(this.partner.getSoapHeaders());
+  }
+
+  private placeToFirstEmpty(positionMap: number[], index: number): void {
+    let placed = false;
+
+    for (let i = 0; positionMap.length > i; i++) {
+      if (undefined === positionMap[i]) {
+        positionMap[i] = index;
+        placed = true;
+        this.log('  found place @ %d', i);
+        break;
+      }
+    }
+
+    if (!placed) {
+      positionMap.push(index);
+    }
   }
 
   private async updatePageFormats(): Promise<{ [id: number]: PageFormat }> {

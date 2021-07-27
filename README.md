@@ -27,20 +27,7 @@ To use the module you have to request a partner account from Deutsche Post for e
 
 - Further you need your personal **Portokasse** account with payment info that is used on checkout. If you do not have one please create one at the web portal of [Deutsche Post][post-portokasse]
 
-## Basic usage
-
-### Declare partner
-
-Init the internetmarke object with your partner credentials.
-You can request them on the page of the Deutsche Post.
-
-```javascript
-const factory = require('internetmarke').factory;
-
-const partner = factory.createPartner();
-```
-
-If your `keyPhase` is different than `1` please passit to the options.
+## Usage
 
 ### Create internetmarke instance
 
@@ -65,6 +52,7 @@ const options: OneClickForAppOptions = {
     username: 'user-account@example.com',
     password: '*****'
   }
+  //
 };
 await internetmarke.initOneClickForAppService(options);
 ```

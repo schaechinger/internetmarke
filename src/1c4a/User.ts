@@ -1,5 +1,6 @@
-import { Debugger } from "debug";
-import { getLogger } from "../utils/logger";
+// import { Debugger } from 'debug';
+import { Amount } from '../prodWs/product';
+// import { getLogger } from '../utils/logger';
 
 export interface UserCredentials {
   username: string;
@@ -15,40 +16,44 @@ export interface UserData {
 
 export interface UserInfo {
   isAuthenticated: boolean;
-  walletBalance?: number;
+  walletBalance?: Amount;
   orderIds?: number[];
 }
 
-const CREDENTIALS = Symbol("credentials"),
-  TOKEN = Symbol("token");
+const CREDENTIALS = Symbol('credentials'),
+  TOKEN = Symbol('token');
 
+/**
+ * The Portokasse user that is billed for ordered vouchers.
+ */
 export class User {
   private [CREDENTIALS]: UserCredentials;
   private [TOKEN]: string | null;
-  private walletBalance = 0;
+  private walletBalance: Amount;
   private infoMessage: string | null = null;
   private orderIds: number[] = [];
-  // private showTermsAndConditions = false;
-  private log: Debugger;
+  private showTermsAndConditions = false;
+  // private log: Debugger;
 
   constructor(credentials: UserCredentials) {
     this[CREDENTIALS] = credentials;
     this[TOKEN] = null;
 
-    this.log = getLogger("user");
+    // this.log = getLogger('user');
   }
 
   public load(data: UserData): void {
-    this.log("updating user data", data);
-
     if (data.userToken) {
       this[TOKEN] = data.userToken;
     }
     if (data.walletBalance) {
-      this.walletBalance = data.walletBalance;
+      this.walletBalance = {
+        value: +data.walletBalance / 100,
+        currency: 'EUR'
+      };
     }
     if (data.showTermsAndCondition) {
-      // this.showTermsAndConditions = data.showTermsAndCondition;
+      this.showTermsAndConditions = data.showTermsAndCondition;
     }
     if (data.infoMessage) {
       this.infoMessage = data.infoMessage;
@@ -64,11 +69,15 @@ export class User {
   }
 
   public getWalletBalance(): number {
-    return this.walletBalance;
+    return this.walletBalance.value;
   }
 
   public getInfoMessage(): string | null {
     return this.infoMessage;
+  }
+
+  public showsTermsAndConditions(): boolean {
+    return this.showTermsAndConditions;
   }
 
   public getOrderIds(): number[] {
@@ -92,7 +101,7 @@ export class User {
     const isAuthenticated = this.isAuthenticated();
 
     const info: UserInfo = {
-      isAuthenticated,
+      isAuthenticated
     };
     if (isAuthenticated) {
       info.walletBalance = this.walletBalance;

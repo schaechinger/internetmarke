@@ -6,7 +6,7 @@
 
 import { PartnerError } from './1c4a/Error';
 import { GalleryItem, MotiveLink } from './1c4a/gallery';
-import { Order } from './1c4a/order';
+import { Order, ShoppingCartSummary } from './1c4a/order';
 import { PageFormat } from './1c4a/pageFormat';
 import {
   CheckoutShoppingCartOptions,
@@ -16,7 +16,6 @@ import {
   PreviewVoucherOptions,
   ShoppingCartOptions
 } from './1c4a/Service';
-import { ShoppingCartSummary } from './1c4a/shoppingCart';
 import { UserInfo } from './1c4a/User';
 import { InternetmarkeError } from './Error';
 import { ClientError } from './prodWs/Error';
@@ -28,7 +27,7 @@ import { SoapService } from './services/Soap';
  * Main class of the internetmarke package with access to all available
  * functions.
  */
-export default class Internetmarke implements OneClickForApp, ProdWS {
+export class Internetmarke implements OneClickForApp, ProdWS {
   private oneClick4AppService: OneClickForAppService;
   private productService: ProductService;
 

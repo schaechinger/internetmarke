@@ -1,23 +1,33 @@
-import { ProductPrice } from "../prodWs/product";
-import { AddressBinding } from "./address";
-import { Voucher, VoucherLayout } from "./voucher";
+import { Amount } from '../prodWs/product';
+import { AddressBinding } from './address';
+import { PageFormatPosition } from './pageFormat';
+import { Voucher, VoucherLayout } from './voucher';
 
-export interface OrderPosition {
+export interface ShoppingCartItem {
   productCode: number;
-  voucherLayout: VoucherLayout;
+  voucherLayout?: VoucherLayout;
   addressBinding?: AddressBinding;
-  imageId?: number;
+  imageID?: number;
   additionalInfo?: string;
-  price?: ProductPrice;
+  position?: PageFormatPosition;
+  price?: Amount;
 }
 
 export interface ShoppingCart {
   shopOrderId?: number;
-  voucherList: Voucher[];
+  voucherList: {
+    voucher: Voucher[];
+  };
+}
+
+export interface ShoppingCartSummary {
+  positions: ShoppingCartItem[];
+  price: Amount;
 }
 
 export interface Order {
   link: string;
   manifestLink?: string;
+  walletBallance: number;
   shoppingCart: ShoppingCart;
 }

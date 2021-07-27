@@ -1,13 +1,13 @@
 export enum PageFormatPageType {
-  RegularPage = "REGULARPAGE",
-  Envelope = "ENVELOPE",
-  LabelPrinter = "LABELPRINTER",
-  LabelPage = "LABELPAGE",
+  RegularPage = 'REGULARPAGE',
+  Envelope = 'ENVELOPE',
+  LabelPrinter = 'LABELPRINTER',
+  LabelPage = 'LABELPAGE'
 }
 
 export enum PageFormatOrientation {
-  Portrait = "PORTRAIT",
-  Landscape = "LANDSCAPE",
+  Portrait = 'PORTRAIT',
+  Landscape = 'LANDSCAPE'
 }
 
 export interface PageFormatDimension {
@@ -18,6 +18,7 @@ export interface PageFormatDimension {
 export interface PageFormatPosition {
   labelX: number;
   labelY: number;
+  page?: number;
 }
 
 export interface PageFormatBorderDimension {

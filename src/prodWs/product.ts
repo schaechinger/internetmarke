@@ -4,7 +4,7 @@ export interface ProductDataRange {
   unit?: string;
 }
 
-export interface ProductPrice {
+export interface Amount {
   value: number;
   currency: string;
 }
@@ -12,7 +12,7 @@ export interface ProductPrice {
 export interface Product {
   name: string;
   id: number;
-  price: ProductPrice;
+  price: Amount;
   ppl: number;
   domestic: boolean;
   annotation?: string;
@@ -36,15 +36,12 @@ export const formatProducts = (rawData: any): { [id: number]: Product } => {
       const product: Product = {
         id: +data.extendedIdentifier.externIdentifier.attributes.id,
         name: data.extendedIdentifier.externIdentifier.attributes.name,
-        ppl: +data.extendedIdentifier.externIdentifier.attributes
-          .actualPPLVersion,
+        ppl: +data.extendedIdentifier.externIdentifier.attributes.actualPPLVersion,
         price: {
-          value:
-            +data.priceDefinition.price.calculatedGrossPrice.attributes.value,
-          currency:
-            data.priceDefinition.price.calculatedGrossPrice.attributes.currency,
+          value: +data.priceDefinition.price.calculatedGrossPrice.attributes.value,
+          currency: data.priceDefinition.price.calculatedGrossPrice.attributes.currency
         },
-        domestic: "national" === data.extendedIdentifier.destination,
+        domestic: 'national' === data.extendedIdentifier.destination
       };
 
       // dimensions
@@ -52,16 +49,15 @@ export const formatProducts = (rawData: any): { [id: number]: Product } => {
         product.dimensions = {
           length: {},
           width: {},
-          height: {},
+          height: {}
         };
 
         for (const key in data.dimensionList) {
-          const { minValue, maxValue, unit } =
-            data.dimensionList[key].attributes;
+          const { minValue, maxValue, unit } = data.dimensionList[key].attributes;
           (product.dimensions as any)[key] = {
             min: +minValue,
             max: +maxValue,
-            unit,
+            unit
           };
         }
       }
@@ -71,7 +67,7 @@ export const formatProducts = (rawData: any): { [id: number]: Product } => {
         product.weight = {
           min: +data.weight.attributes.minValue,
           max: +data.weight.attributes.maxValue,
-          unit: data.weight.attributes.unit,
+          unit: data.weight.attributes.unit
         };
       }
 
