@@ -1,11 +1,9 @@
 /*!
  * internetmarke
- * Copyright (c) 2018 Manuel Schächinger
+ * Copyright (c) 2018-2021 Manuel Schächinger
  * MIT Licensed
  */
 
 'use strict';
 
-const Internetmarke = require('./lib/Internetmarke');
-
-module.exports = Internetmarke;
+module.exports = require('./dist/Internetmarke');

@@ -60,4 +60,5 @@ typings/
 out/
 config/
 data/
+dist/
 scripts/

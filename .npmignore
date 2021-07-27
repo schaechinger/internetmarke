@@ -1,6 +1,7 @@
 .github
 .vscode
 /docs/
+/src/
 /test/
 .travis.yml
-yarn.lock
+package-lock.json
