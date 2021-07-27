@@ -16,7 +16,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Install packages
+      - name: Install dependencies
         run: npm install
 
       - name: Build dist files

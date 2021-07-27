@@ -1,6 +1,6 @@
 import { Client as SoapClient, createClientAsync } from 'soap';
 
-export default abstract class SoapService {
+export abstract class SoapService {
   protected abstract wsdl: string;
 
   protected soapClient: SoapClient;

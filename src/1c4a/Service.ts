@@ -1,7 +1,7 @@
 import { Debugger } from 'debug';
 import { Product } from '../prodWs/product';
 import { DataStore } from '../services/DataStore';
-import SoapService from '../services/Soap';
+import { SoapService } from '../services/Soap';
 import { getLogger } from '../utils/logger';
 import { AddressBinding } from './address';
 import { CheckoutError, OneClickForAppError, UserError, VoucherLayoutError } from './Error';
