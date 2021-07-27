@@ -1,0 +1,26 @@
+name: npm-publish
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  publish:
+    name: Publish on npm
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+      - run: npm install
+      - run: npm run build
+
+      - uses: JS-DevTools/npm-publish@v1
+        with:
+          token: ${{ secrets.NPM_TOKEN }}
+          dry-run: true
+      - if: steps.publish.outputs.type != 'none'
+        run: |
+          echo "Version updated: ${{ steps.publish.outputs.old-version }} -> ${{ steps.publish.outputs.version }}"
