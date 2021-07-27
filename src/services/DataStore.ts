@@ -3,14 +3,23 @@ import fs from 'fs';
 import { tmpdir } from 'os';
 import { join as joinPath } from 'path';
 import { getLogger } from '../utils/logger';
+// @ts-ignore
+import { version as packageVersion } from '../../package.json';
 
 const BASE_DIR = 'node-internetmarke';
+
+interface CacheFormat<T> {
+  date: string;
+  version: string;
+  content: { [id: number]: T };
+}
 
 /**
  * Creates a new temp instance to manage temporary files.
  */
 export class DataStore<T> {
   private file: string;
+  private name: string;
   private ttl = 24 * 3600;
   private data: { [id: number]: T };
   private lastUpdate: Date;
@@ -29,6 +38,7 @@ export class DataStore<T> {
     loadData: () => Promise<{ [id: number]: T }>,
     ttl?: number
   ): Promise<void> {
+    this.name = file.substr(0, file.lastIndexOf('.'));
     this.loadData = loadData;
     if (ttl) {
       this.ttl = ttl;
@@ -56,6 +66,11 @@ export class DataStore<T> {
     return Object.values(this.data);
   }
 
+  /**
+   * Retrieves one item with the given id if existing.
+   *
+   * @param id The id of the item.
+   */
   public async getItem(id: number): Promise<T | null> {
     await this.checkData();
 
@@ -71,8 +86,9 @@ export class DataStore<T> {
     this.data = content;
     this.lastUpdate = date;
 
-    const data = {
+    const data: CacheFormat<T> = {
       date: this.lastUpdate.toISOString(),
+      version: packageVersion,
       content: this.data
     };
 
@@ -84,8 +100,7 @@ export class DataStore<T> {
   }
 
   /**
-   * Remove the given file from the temp dir. This is not possible in single
-   * file mode!
+   * Remove the given file from the temp dir.
    */
   public remove(): Promise<boolean> {
     return new Promise(resolve => {
@@ -93,9 +108,12 @@ export class DataStore<T> {
     });
   }
 
+  /**
+   * Validates the data from the cache depending on the last update time.
+   */
   public isValid(): boolean {
     if (!this.lastUpdate || this.ttl * 1000 < Date.now() - this.lastUpdate.getTime()) {
-      this.log(`store %s is outdated`, this.file.substr(this.file.lastIndexOf('/') + 1));
+      this.log(`store %s is outdated`, this.name);
 
       return false;
     }
@@ -117,13 +135,13 @@ export class DataStore<T> {
     return new Promise(resolve => {
       fs.readFile(this.file, (err, content) => {
         if (!err && content && content.length) {
-          const data: { date: string; content: { [id: number]: T } } = JSON.parse(
-            content.toString()
-          );
+          const data: CacheFormat<T> = JSON.parse(content.toString());
 
           if (data) {
-            this.lastUpdate = new Date(data.date);
-            this.data = data.content;
+            if (data.version === packageVersion) {
+              this.lastUpdate = new Date(data.date);
+              this.data = data.content;
+            }
           }
         }
 

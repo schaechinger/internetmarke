@@ -5,3 +5,5 @@ export class InternetmarkeError extends Error {
     Error.captureStackTrace(this, this.constructor);
   }
 }
+
+export class SoapError extends InternetmarkeError {}

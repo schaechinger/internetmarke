@@ -1,13 +1,16 @@
 import { Debugger } from 'debug';
+import { SoapError } from '../Error';
 import { Product } from '../prodWs/product';
 import { DataStore } from '../services/DataStore';
 import { SoapService } from '../services/Soap';
 import { getLogger } from '../utils/logger';
-import { AddressBinding } from './address';
+import { parseAddress, SimpleAddress } from './address';
 import {
+  AddressError,
   CheckoutError,
   OneClickForAppError,
   PageFormatError,
+  ShoppingCartItemError,
   UserError,
   VoucherLayoutError
 } from './Error';
@@ -19,22 +22,64 @@ import { User, UserCredentials, UserInfo } from './User';
 import { VoucherFormat, VoucherLayout } from './voucher';
 
 export interface OneCLickForAppServiceOptions {
+  /** The partner credentials to pass to the service. */
   partner: PartnerCredentials;
+  /**
+   * The user credentials of the Portokasse account to authenticate at the
+   * service.
+   */
   user: UserCredentials;
+  /**
+   * The global default voucher layout that is used if no layout is passed with
+   * a voucher.
+   */
   voucherLayout?: VoucherLayout;
 }
 
 export interface PreviewVoucherOptions {
+  /**
+   * The desired page format as retreived from `retrievePageFormats()`. This
+   * will transform  the voucher into a pdf.
+   */
   pageFormat?: PageFormat;
+  /**
+   * The image item that should be displayed next to the voucher. Image items
+   * can only be dislayed in FrankingZone mode.
+   */
   imageItem?: ImageItem;
+  /** The voucher layout that should be used for the preview. */
   voucherLayout?: VoucherLayout;
 }
 
-export interface ShoppingCartOptions {
+export interface ShoppingCartItemOptions {
+  /**
+   * The image item attached to the voucher. This assumes the voucher layout to
+   * be FrankingZone.
+   */
   imageItem?: ImageItem;
+  /**
+   * The voucher layout that should be used. This is mandatory if the voucher
+   * layout has not been set during service init.
+   */
   voucherLayout?: VoucherLayout;
-  addressBinding?: AddressBinding;
+  /**
+   * The position of the voucher within the generated pdf. This will be ignores
+   * for PNG format vouchers. The position is mandatory if there is no complete
+   * pageFormat object passed to `checkoutShoppingCart()`.
+   */
   position?: PageFormatPosition;
+  /**
+   * The sender address including name and company in simple format. Sender
+   * expects receiver to also exist and will merge the valued into an address
+   * binding.
+   */
+  sender?: SimpleAddress;
+  /**
+   * The receiver address including name and company in simple format. Receiver
+   * expects sender to also exist and will merge the valued into an address
+   * binding.
+   */
+  receiver?: SimpleAddress;
 }
 
 export enum ShippingList {
@@ -44,15 +89,28 @@ export enum ShippingList {
 }
 
 export interface CheckoutShoppingCartOptions {
+  /** The order id that should be used. Will be generated if not set. */
   shopOrderId?: string;
+  /**
+   * The page format to use for all vouchers. This will turn the vouchers into a combined pdf file.
+   */
   pageFormat?: PageFormat;
+  /** If set there will be a generated a manifest pdf with the order information. */
   createManifest?: boolean;
+  /**
+   * ShippingList generates a pdf with all ordered vouchers on checkout
+   * depending on the selected option. Default is `NoList`.
+   */
   createShippingList?: ShippingList;
+  /**
+   * Dryrun will not send the request to the backend and will only validate the data locally and log
+   * the results to the debug namespace `internetmarke:1c4a`.
+   */
   dryrun?: boolean;
 }
 
 /**
- * The public definition of the OneClickForApplication service.
+ * The public definition of the OneClickForApp service.
  */
 export interface OneClickForApp {
   getUserInfo(): UserInfo;
@@ -62,14 +120,20 @@ export interface OneClickForApp {
   retrievePublicGallery(): Promise<GalleryItem[]>;
   retrievePrivateGallery(): Promise<MotiveLink[]>;
   retrievePreviewVoucher(product: Product, options: PreviewVoucherOptions): Promise<string | null>;
-  addToShoppingCart(product: Product, options: ShoppingCartOptions): void;
+  addItemToShoppingCart(product: Product, options: ShoppingCartItemOptions): number;
+  getItemFromShoppingCart(index: number): ShoppingCartItem | null;
+  removeItemFromShoppingCart(index: number): ShoppingCartItem | null;
   getShoppingCartSummary(): ShoppingCartSummary;
-  checkoutShoppingCart(options: CheckoutShoppingCartOptions): Promise<any>;
+  checkoutShoppingCart(options: CheckoutShoppingCartOptions): Promise<Order | null>;
   retrieveOrder(shopOrderId: number): Promise<Order | null>;
 }
 
 const WSDL = 'https://internetmarke.deutschepost.de/OneClickForAppV3/OneClickForAppServiceV3?wsdl';
 
+/**
+ * The implementation of the 1C4A / OneClickForApp service of the Deutsche Post
+ * that handles the voucher ordering process and access to related data.
+ */
 export class OneClickForAppService extends SoapService implements OneClickForApp {
   protected wsdl = WSDL;
   private partner: Partner;
@@ -80,7 +144,7 @@ export class OneClickForAppService extends SoapService implements OneClickForApp
   private pageFormatStore: DataStore<PageFormat>;
   private publicGalleryStore: DataStore<GalleryItem>;
   private privateGalleryStore: DataStore<MotiveLink>;
-  private shoppingCart: ShoppingCartItem[];
+  private shoppingCart: (ShoppingCartItem | null)[];
   private log: Debugger;
 
   constructor(partnerCredentials: PartnerCredentials) {
@@ -95,7 +159,8 @@ export class OneClickForAppService extends SoapService implements OneClickForApp
   }
 
   /**
-   * Authorizes an user to the api for check it's validity.
+   * Initializes the connection to the OneClickPerApp service and authenticates
+   * the user.
    */
   public async init(options: OneCLickForAppServiceOptions): Promise<void> {
     if (!options.user) {
@@ -119,8 +184,9 @@ export class OneClickForAppService extends SoapService implements OneClickForApp
 
         return !!response;
       })
-      .catch(() => {
-        return false;
+      .catch((e: any) => {
+        this.log('authenticateUser', e.root.Envelope.Body.Fault);
+        throw new SoapError(e.root.Envelope.Body.Fault.faultstring);
       });
 
     if (success) {
@@ -136,12 +202,15 @@ export class OneClickForAppService extends SoapService implements OneClickForApp
     }
   }
 
+  /**
+   * Retrieves all available information about the authenticated user.
+   */
   public getUserInfo(): UserInfo {
     return this.user.getInfo();
   }
 
   /**
-   * Retrieves the page formats available for pdf mode.
+   * Retrieves the page formats available for pdf voucher format.
    */
   public async retrievePageFormats(): Promise<PageFormat[]> {
     return this.pageFormatStore.getList();
@@ -155,7 +224,7 @@ export class OneClickForAppService extends SoapService implements OneClickForApp
   }
 
   /**
-   * Create a globally unique order id from the api.
+   * Creates a globally unique order id to pass during checkout.
    */
   public async createShopOrderId(): Promise<number | null> {
     return this.soapClient
@@ -173,13 +242,24 @@ export class OneClickForAppService extends SoapService implements OneClickForApp
         }
 
         return null;
+      })
+      .catch((e: any) => {
+        this.log('createShopOrderId', e.root.Envelope.Body.Fault);
+        throw new SoapError(e.root.Envelope.Body.Fault.faultstring);
       });
   }
 
+  /**
+   * Retrieves all available gallery categories and images from the public
+   * gallery provided by Deutsche Post.
+   */
   public async retrievePublicGallery(): Promise<GalleryItem[]> {
     return this.publicGalleryStore.getList();
   }
 
+  /**
+   * Retrieves all images from the private gallery of the authenticated user.
+   */
   public async retrievePrivateGallery(): Promise<MotiveLink[]> {
     return this.privateGalleryStore!.getList();
   }
@@ -188,6 +268,9 @@ export class OneClickForAppService extends SoapService implements OneClickForApp
    * Generates a preview what the voucher will look like. A pageFormat will
    * result in a pdf voucher. ImageItems can only be used in FrankingZone
    * layouts.
+   *
+   * @param product The product that shoud be previewed.
+   * @param options Additional formatting options to customize the voucher.
    */
   public async retrievePreviewVoucher(
     product: Product,
@@ -227,20 +310,29 @@ export class OneClickForAppService extends SoapService implements OneClickForApp
         return null;
       })
       .catch((e: any) => {
-        console.log('error', e.root.Envelope.Body.Fault);
-        return null;
+        this.log('retrievePreviewVoucher', e.root.Envelope.Body.Fault);
+        throw new SoapError(e.root.Envelope.Body.Fault.faultstring);
       });
   }
 
-  public addToShoppingCart(product: Product, options: ShoppingCartOptions = {}): void {
+  /**
+   * Adds the given product to virtual local shopping cart and attaches the
+   * given options to it. The shopping cart is used to store vouchers prior to
+   * checkout.
+   *
+   * @param product The product that should be ordered.
+   * @param options Options to customize the given product.
+   * @returns The index of the item within the shopping cart.
+   */
+  public addItemToShoppingCart(product: Product, options: ShoppingCartItemOptions = {}): number {
     if (!product) {
-      return;
+      throw new ShoppingCartItemError('Missing product, cannot only add products to shopping cart');
     }
 
     const voucherLayout = options.voucherLayout || this.defaults.voucherLayout;
     if (!voucherLayout) {
       throw new VoucherLayoutError(
-        'Missing voucherLayout. Please pass to addToShoppingCard options or during service init.'
+        'Missing voucherLayout. Please pass to addItemToShoppingCard options or during service init.'
       );
     }
 
@@ -248,14 +340,27 @@ export class OneClickForAppService extends SoapService implements OneClickForApp
       productCode: product.id
     };
     if (options.imageItem) {
-      if (VoucherLayout.AddressZone === this.defaults.voucherLayout) {
+      if (VoucherLayout.AddressZone === voucherLayout) {
         throw new VoucherLayoutError('Cannot add image to voucher in AddressZone mode');
       }
 
       position.imageID = options.imageItem.imageID;
     }
-    if (options.addressBinding) {
-      position.addressBinding = options.addressBinding;
+    if (options.sender || options.receiver) {
+      if (!options.sender || !options.receiver) {
+        throw new AddressError(
+          'Address muss be available for sender and receiver if one is given.'
+        );
+      }
+
+      if (VoucherLayout.FrankingZone === voucherLayout) {
+        throw new VoucherLayoutError('Cannot add address data to voucher in FrankingZone mode');
+      }
+
+      const sender = parseAddress(options.sender);
+      const receiver = parseAddress(options.receiver);
+
+      position.address = { sender, receiver };
     }
     position.price = product.price;
     position.voucherLayout = voucherLayout;
@@ -264,15 +369,50 @@ export class OneClickForAppService extends SoapService implements OneClickForApp
     }
 
     this.shoppingCart.push(position);
+
+    return this.shoppingCart.length - 1;
   }
 
+  /**
+   * Retrieves a copy of the shopping cart item at the give index if existing.
+   *
+   * @param index The index of the desired shopping cart item.
+   */
+  public getItemFromShoppingCart(index: number): ShoppingCartItem | null {
+    return this.shoppingCart[index] ? { ...this.shoppingCart[index]! } : null;
+  }
+
+  /**
+   * Removes the shopping cart item from the list if available. This will not
+   * change affect other item indices.
+   *
+   * @param index The index of the item that should be removed
+   * @returns The removed item if found.
+   */
+  public removeItemFromShoppingCart(index: number): ShoppingCartItem | null {
+    const item = this.shoppingCart[index];
+
+    if (item) {
+      this.shoppingCart[index] = null;
+    }
+
+    return item;
+  }
+
+  /**
+   * Generates a brief summary of the items in the shopping cart.
+   */
   public getShoppingCartSummary(): any {
     let total = 0;
-    const positions: any = this.shoppingCart.map(position => {
-      total += position.price!.value;
+    const positions: any = this.shoppingCart
+      .map(position => {
+        if (position) {
+          total += position.price!.value;
+        }
 
-      return position;
-    });
+        return position;
+      })
+      .filter(position => !!position);
 
     return {
       positions,
@@ -285,9 +425,11 @@ export class OneClickForAppService extends SoapService implements OneClickForApp
 
   /**
    * Performs a checkout and retrieves the ordered vouchers.
+   * This will charge your Portokasse account (User) if successful!
+   * Add the dryrun option to simulate the checkout only and validate the
+   * shopping cart.
    *
-   * @param order The order information that hold the data about the vouchers.
-   * @param outputFormat The format the voucher should have.
+   * @param options The checkout options to customize the vouchers.
    */
   public async checkoutShoppingCart(
     options: CheckoutShoppingCartOptions = {}
@@ -322,53 +464,58 @@ export class OneClickForAppService extends SoapService implements OneClickForApp
     }
 
     let total = 0;
-    payload.positions = this.shoppingCart.map((position, i) => {
-      total += position.price!.value * 100;
-      delete position.price;
+    payload.positions = this.shoppingCart
+      .filter(position => !!position)
+      .map((position, i) => {
+        if (position) {
+          total += position.price!.value * 100;
+          delete position.price;
 
-      if (isPdfVoucher) {
-        if (!position.position) {
-          // cannot generatie positions
-          if (!positionMap) {
-            throw new CheckoutError(
-              'Position data is mandatory for shoppingCartItems if no pageFormat object is provided'
-            );
-          }
+          if (isPdfVoucher) {
+            if (!position.position) {
+              // cannot generatie positions
+              if (!positionMap) {
+                throw new CheckoutError(
+                  'Position data is mandatory for shoppingCartItems if no pageFormat object is provided'
+                );
+              }
 
-          this.placeToFirstEmpty(positionMap, i);
-        } else if (positionMap) {
-          const { labelX, labelY, page } = position.position;
-          // check if position is in range
-          if (
-            1 > labelX ||
-            pageFormatX < labelX ||
-            1 > labelY ||
-            pageFormatY < labelY ||
-            1 > page!
-          ) {
-            throw new PageFormatError(
-              `PageFormat position is out of range. Range is 1:1 to ${pageFormatX}:${pageFormatY}, given is ${labelX}:${labelY} (page: ${page})`
-            );
-          }
-          // put item into map
-          const posIndex =
-            labelX -
-            1 +
-            pageFormatX * (labelY - 1) +
-            pageFormatX * pageFormatY * ((page || 1)! - 1);
+              this.placeToFirstEmpty(positionMap, i);
+            } else if (positionMap) {
+              const { labelX, labelY, page } = position.position;
+              // check if position is in range
+              if (
+                1 > labelX ||
+                pageFormatX < labelX ||
+                1 > labelY ||
+                pageFormatY < labelY ||
+                1 > page!
+              ) {
+                throw new PageFormatError(
+                  `PageFormat position is out of range. Range is 1:1 to ${pageFormatX}:${pageFormatY}, given is ${labelX}:${labelY} (page: ${page})`
+                );
+              }
+              // put item into map
+              const posIndex =
+                labelX -
+                1 +
+                pageFormatX * (labelY - 1) +
+                pageFormatX * pageFormatY * ((page || 1)! - 1);
 
-          let formerIndex = positionMap[posIndex];
-          positionMap[posIndex] = i;
-          // move former index to the next empty position
-          if (undefined !== formerIndex) {
-            this.placeToFirstEmpty(positionMap, formerIndex);
+              let formerIndex = positionMap[posIndex];
+              positionMap[posIndex] = i;
+              // move former index to the next empty position
+              if (undefined !== formerIndex) {
+                this.placeToFirstEmpty(positionMap, formerIndex);
+              }
+            }
           }
         }
-      }
 
-      return position as ShoppingCartItem;
-    });
+        return position as ShoppingCartItem;
+      });
 
+    // set missing position information for given pageFormat
     if (positionMap?.length) {
       const { labelX, labelY } = options.pageFormat!.pageLayout.labelCount;
       const pageSize = labelX * labelY;
@@ -417,13 +564,17 @@ export class OneClickForAppService extends SoapService implements OneClickForApp
           this.shoppingCart = [];
         }
 
-        this.log('checkout successful, shopOrderId: %s', response.shoppingCart.shopOrderId);
+        this.log(
+          'checkout successful, shopOrderId: %s with %d vouchers',
+          response.shoppingCart.shopOrderId,
+          response.shoppingCart.voucherList.voucher.length
+        );
 
         return response;
       })
       .catch((e: any) => {
-        console.log('checkout error', e.root.Envelope.Body.Fault);
-        throw new OneClickForAppError(e.root.Envelope.Body.Fault);
+        this.log('checkoutShoppingCart', e.root.Envelope.Body.Fault);
+        throw new SoapError(e.root.Envelope.Body.Fault.faultstring);
       });
   }
 
@@ -439,13 +590,17 @@ export class OneClickForAppService extends SoapService implements OneClickForApp
         shopOrderId
       })
       .then(([response]: any) => {
-        this.log('retrieveOrder response', JSON.stringify(response));
+        this.log(
+          'retrieved order %s with %d vouchers',
+          response.shoppingCart.shopOrderId,
+          response.shoppingCart.voucherList.voucher.length
+        );
 
         return response || null;
       })
-      .catch(() => {
-        // order not found
-        return null;
+      .catch((e: any) => {
+        this.log('retrieve order error', e.root.Envelope.Body.Fault);
+        throw new SoapError(e.root.Envelope.Body.Fault.faultstring);
       });
   }
 
@@ -474,13 +629,19 @@ export class OneClickForAppService extends SoapService implements OneClickForApp
     const content: { [id: number]: PageFormat } = {};
     await this.checkSoapClient();
 
-    await this.soapClient.retrievePageFormatsAsync({}).then(([response]: any) => {
-      if (response) {
-        response.pageFormat.forEach((pageFormat: PageFormat) => {
-          content[+pageFormat.id] = pageFormat;
-        });
-      }
-    });
+    await this.soapClient
+      .retrievePageFormatsAsync({})
+      .then(([response]: any) => {
+        if (response) {
+          response.pageFormat.forEach((pageFormat: PageFormat) => {
+            content[+pageFormat.id] = pageFormat;
+          });
+        }
+      })
+      .catch((e: any) => {
+        this.log('retrievePageFormats', e.root.Envelope.Body.Fault);
+        // throw new SoapError(e.root.Envelope.Body.Fault.faultstring);
+      });
 
     return content;
   }
@@ -488,13 +649,19 @@ export class OneClickForAppService extends SoapService implements OneClickForApp
   private async updatePublicGallery(): Promise<{ [id: number]: GalleryItem }> {
     const content: { [id: number]: GalleryItem } = {};
 
-    await this.soapClient.retrievePublicGalleryAsync({}).then(([response]: any) => {
-      if (response) {
-        response.items.forEach((item: GalleryItem) => {
-          content[+item.categoryId] = item;
-        });
-      }
-    });
+    await this.soapClient
+      .retrievePublicGalleryAsync({})
+      .then(([response]: any) => {
+        if (response) {
+          response.items.forEach((item: GalleryItem) => {
+            content[+item.categoryId] = item;
+          });
+        }
+      })
+      .catch((e: any) => {
+        this.log('retrievePublicGallery', e.root.Envelope.Body.Fault);
+        // throw new SoapError(e.root.Envelope.Body.Fault.faultstring);
+      });
 
     return content;
   }
@@ -510,6 +677,10 @@ export class OneClickForAppService extends SoapService implements OneClickForApp
             content[link.link] = link;
           });
         }
+      })
+      .catch((e: any) => {
+        this.log('retrievePrivateGallery', e.root.Envelope.Body.Fault);
+        // throw new SoapError(e.root.Envelope.Body.Fault.faultstring);
       });
 
     return content;

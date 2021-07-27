@@ -1,8 +1,10 @@
 .github
 .vscode
 /docs/
+/examples/
 /src/
 /test/
+.gitignore
 .prettierrc
 commitlint.config.js
 package-lock.json

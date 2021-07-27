@@ -6,7 +6,7 @@ import { Voucher, VoucherLayout } from './voucher';
 export interface ShoppingCartItem {
   productCode: number;
   voucherLayout?: VoucherLayout;
-  addressBinding?: AddressBinding;
+  address?: AddressBinding;
   imageID?: number;
   additionalInfo?: string;
   position?: PageFormatPosition;

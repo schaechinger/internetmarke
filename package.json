@@ -21,7 +21,7 @@
     "url": "https://github.com/schaechinger/internetmarke/issues"
   },
   "scripts": {
-    "clean": "rm -rf dist",
+    "clean": "rm -rf lib",
     "build": "npm run clean && tsc -p ./tsconfig.json",
     "test": "NODE_ENV=test mocha $(find test -name '*.test.js')",
     "cover": "./node_modules/.bin/istanbul cover mocha $(find test -name '*.test.js') --report lcovonly -- -R spec",

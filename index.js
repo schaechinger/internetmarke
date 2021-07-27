@@ -6,4 +6,4 @@
 
 'use strict';
 
-module.exports = require('./dist/Internetmarke');
+module.exports = require('./lib/Internetmarke');
