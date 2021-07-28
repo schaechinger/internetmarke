@@ -1,11 +1,13 @@
 import { AddressError } from './Error';
 
-export interface SimpleAddress {
-  company?: string;
+export interface SimpleName {
   firstname?: string;
   lastname?: string;
   title?: string;
   salutation?: string;
+}
+export interface SimpleAddress extends SimpleName {
+  company?: string;
 
   street: string;
   houseNo: string;
@@ -309,9 +311,9 @@ export enum CountryCode {
 export const parseAddress = (data: SimpleAddress): NamedAddress => {
   // address
   const address: Address = {
+    additional: (data.additional || '').substr(0, 50),
     street: data.street?.substr(0, 50),
     houseNo: data.houseNo?.substr(0, 10),
-    additional: (data.additional || '').substr(0, 50),
     zip: data.zip?.substr(0, 10),
     city: data.city?.substr(0, 35),
     country: data.country || CountryCode.DEU
@@ -327,19 +329,7 @@ export const parseAddress = (data: SimpleAddress): NamedAddress => {
   }
 
   // name
-  let name: PersonName | null = null;
-  if (data.firstname && data.lastname) {
-    name = {
-      firstname: data.firstname.substr(0, 35),
-      lastname: data.lastname.substr(0, 35)
-    };
-    if (data.salutation) {
-      name.salutation = data.salutation.substr(0, 10);
-    }
-    if (data.title) {
-      name.title = data.title.substr(0, 10);
-    }
-  }
+  const name = parseName(data);
 
   // company address
   if (data.company) {
@@ -352,6 +342,7 @@ export const parseAddress = (data: SimpleAddress): NamedAddress => {
       address
     };
 
+    // named company address
     if (name) {
       companyAddress.name.companyName.personName = name;
     }
@@ -372,4 +363,25 @@ export const parseAddress = (data: SimpleAddress): NamedAddress => {
   throw new AddressError(
     'Missing address name, at least company or firstname and lastname must be provided.'
   );
+};
+
+export const parseName = (data: SimpleName): PersonName | null => {
+  let name: PersonName | null = null;
+
+  if (data.firstname && data.lastname) {
+    name = {
+      salutation: (data.salutation || '').substr(0, 10),
+      title: (data.title || '').substr(0, 10),
+      firstname: data.firstname.substr(0, 35),
+      lastname: data.lastname.substr(0, 35)
+    };
+    if (!name.salutation) {
+      delete name.salutation;
+    }
+    if (!name.title) {
+      delete name.title;
+    }
+  }
+
+  return name;
 };
