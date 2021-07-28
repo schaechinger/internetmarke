@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { parseName, PersonName, SimpleName } from '../../../src/1c4a/address';
 
-describe('Name', () => {
+describe('PersonName', () => {
   it('should parse a person name', () => {
     const name: SimpleName = {
       title: 'Dr.',

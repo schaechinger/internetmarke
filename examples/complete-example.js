@@ -1,10 +1,9 @@
+const { CountryCode } = require('../lib/1c4a/address');
 const { VoucherLayout } = require('../lib/1c4a/voucher');
 const { Internetmarke } = require('../lib/Internetmarke');
 
-// !
 // To start this example directly make sure to build the project first:
 // npm i && npm run build
-// !
 
 (async () => {
   const internetmarke = new Internetmarke();

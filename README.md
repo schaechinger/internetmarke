@@ -7,10 +7,6 @@
 
 A node wrapper for the Internetmarke web service of the Deutsche Post
 
-<!-- Run `npm run gen:toc` to update below section -->
-<!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-
 - [Install](#install)
 - [Prerequisites / Required Accounts](#prerequisites--required-accounts)
 - [Usage](#usage)
@@ -27,8 +23,6 @@ A node wrapper for the Internetmarke web service of the Deutsche Post
   - [Addresses](#addresses)
 - [ProdWS (Product Service)](#prodws-product-service)
   - [Retrieve Product List](#retrieve-product-list)
-
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## Install
 
@@ -289,7 +283,7 @@ const namedAddress: NamedAddress = {
   },
   address: {
     street: 'Marienplatz',
-    houseNo: '1',
+    houseNo: '8',
     zip: '80331',
     city: 'München',
     country: 'DEU'
