@@ -22,7 +22,7 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
         directory: ./coverage/
-          files: ./lcov.info # optional
-          flags: unittests # optional
-          name: codecov-umbrella # optional
-          verbose: true # optional (default = false)
+          files: ./lcov.info
+          flags: unittests
+          name: codecov-umbrella
+          verbose: true
