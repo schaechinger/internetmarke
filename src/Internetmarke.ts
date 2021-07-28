@@ -264,13 +264,13 @@ export class Internetmarke implements OneClickForApp, ProdWS {
   /**
    * Retrieves the list of available products from the service.
    */
-  public getProductList(): Promise<Product[]> {
+  public getProductList(date?: Date): Promise<Product[]> {
     this.checkServiceInit(
       this.productService,
       'Cannot get product list before initializing product service'
     );
 
-    return this.productService.getProductList();
+    return this.productService.getProductList(date);
   }
 
   /**

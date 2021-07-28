@@ -1,4 +1,4 @@
-const { CountryCode } = require('../lib/1c4a/address');
+const CountryCode = require('../lib/1c4a/countryCode');
 const { VoucherLayout } = require('../lib/1c4a/voucher');
 const { Internetmarke } = require('../lib/Internetmarke');
 

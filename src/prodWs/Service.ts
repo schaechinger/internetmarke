@@ -20,7 +20,7 @@ export interface ProductServiceOptions {
 }
 
 export interface ProdWS {
-  getProductList(): Promise<Product[]>;
+  getProductList(date?: Date): Promise<Product[]>;
   getProduct(id: number): Promise<Product | null>;
 }
 
@@ -59,8 +59,15 @@ export class ProductService extends SoapService implements ProdWS {
   /**
    * Retrieves the list of available products from the service.
    */
-  public getProductList(): Promise<Product[]> {
-    return this.productStore.getList();
+  public getProductList(date?: Date): Promise<Product[]> {
+    // only use cache for the latest product data
+    if (!date) {
+      return this.productStore.getList();
+    }
+
+    return this.updateProducts(date).then(products => {
+      return Object.values(products);
+    });
   }
 
   /**
@@ -72,13 +79,26 @@ export class ProductService extends SoapService implements ProdWS {
     return this.productStore.getItem(id);
   }
 
-  private async updateProducts(): Promise<{ [id: number]: Product }> {
+  private async updateProducts(date?: Date): Promise<{ [id: number]: Product }> {
+    const payload: any = {
+      mandantID: this.client.getId()
+    };
+
+    if (date) {
+      const timestamp = date.toISOString().split('T');
+      payload.timestamp = {
+        attributes: {
+          date: timestamp[0],
+          time: `${timestamp[1].substr(0, 12)}+00:00`
+        }
+      };
+    }
+
+    payload.dedicatedProducts = true;
+    payload.responseMode = 0;
+
     return this.soapClient
-      .getProductListAsync({
-        mandantID: this.client.getId(),
-        dedicatedProducts: true,
-        responseMode: 0
-      })
+      .getProductListAsync(payload)
       .then(([response]: any) => {
         if (!response || 'true' !== response.attributes.success) {
           return {};

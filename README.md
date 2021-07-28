@@ -23,6 +23,7 @@ A node wrapper for the Internetmarke web service of the Deutsche Post
   - [Addresses](#addresses)
 - [ProdWS (Product Service)](#prodws-product-service)
   - [Retrieve Product List](#retrieve-product-list)
+    - [Retrieve Oudated Products](#retrieve-outdated-products)
 
 ## Install
 
@@ -324,6 +325,20 @@ if you know the specific product id.
 ```typescript
 const products = await internetmarke.getProductList();
 const product = await internetmarke.getProduct({ id: 1 });
+```
+
+#### Retrieve Outdated Products
+
+If you however want to retrieve an older product list you can optionally pass a
+date that defines the historical date of product list on this date.
+If you request an outdated product list this will disable the cache for this
+request and request the list on every request which can take a few seconds to
+load the data. As of now you cannot request an old product by id so if you look
+for a special product of an older date just request the whole list and iterate
+through it afterwards and find the right product.
+
+```typescript
+const oldProducts = await internetmarke.getProductList(new Date('2018-02-01'));
 ```
 
 [npm-url]: https://npmjs.org/package/internetmarke
