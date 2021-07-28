@@ -57,8 +57,8 @@ export class Internetmarke implements OneClickForApp, ProdWS {
   /**
    * Retrieves all available information about the authenticated user.
    */
-  getUserInfo(): UserInfo {
-    this.checkService(
+  public getUserInfo(): UserInfo {
+    this.checkServiceInit(
       this.oneClick4AppService,
       'Cannot get user info before initializing OneClickForApp service'
     );
@@ -70,7 +70,7 @@ export class Internetmarke implements OneClickForApp, ProdWS {
    * Retrieves the page formats available for pdf voucher format.
    */
   public retrievePageFormats(): Promise<PageFormat[]> {
-    this.checkService(
+    this.checkServiceInit(
       this.oneClick4AppService,
       'Cannot retrieve page formats before initializing OneClickForApp service'
     );
@@ -82,7 +82,7 @@ export class Internetmarke implements OneClickForApp, ProdWS {
    * Retrieves the page formats with the given id if existing.
    */
   public retrievePageFormat(id: number): Promise<PageFormat | null> {
-    this.checkService(
+    this.checkServiceInit(
       this.oneClick4AppService,
       'Cannot retrieve page format before initializing OneClickForApp service'
     );
@@ -94,7 +94,7 @@ export class Internetmarke implements OneClickForApp, ProdWS {
    * Creates a globally unique order id to pass during checkout.
    */
   public createShopOrderId(): Promise<number | null> {
-    this.checkService(
+    this.checkServiceInit(
       this.oneClick4AppService,
       'Cannot create shop order id before initializing OneClickForApp service'
     );
@@ -106,8 +106,8 @@ export class Internetmarke implements OneClickForApp, ProdWS {
    * Retrieves all available gallery categories and images from the public
    * gallery provided by Deutsche Post.
    */
-  public async retrievePublicGallery(): Promise<GalleryItem[]> {
-    this.checkService(
+  public retrievePublicGallery(): Promise<GalleryItem[]> {
+    this.checkServiceInit(
       this.oneClick4AppService,
       'Cannot retrieve public gallery before initializing OneClickForApp service'
     );
@@ -118,8 +118,8 @@ export class Internetmarke implements OneClickForApp, ProdWS {
   /**
    * Retrieves all images from the private gallery of the authenticated user.
    */
-  public async retrievePrivateGallery(): Promise<MotiveLink[]> {
-    this.checkService(
+  public retrievePrivateGallery(): Promise<MotiveLink[]> {
+    this.checkServiceInit(
       this.oneClick4AppService,
       'Cannot retrieve private gallery before initializing OneClickForApp service'
     );
@@ -139,7 +139,7 @@ export class Internetmarke implements OneClickForApp, ProdWS {
     product: Product,
     options: PreviewVoucherOptions = {}
   ): Promise<string | null> {
-    this.checkService(
+    this.checkServiceInit(
       this.oneClick4AppService,
       'Cannot preview voucher before initializing OneClickForApp service'
     );
@@ -157,7 +157,7 @@ export class Internetmarke implements OneClickForApp, ProdWS {
    * @returns The index of the item within the shopping cart.
    */
   public addItemToShoppingCart(product: Product, options: ShoppingCartItemOptions = {}): number {
-    this.checkService(
+    this.checkServiceInit(
       this.oneClick4AppService,
       'Cannot add item to shopping cart before initializing OneClickForApp service'
     );
@@ -171,7 +171,7 @@ export class Internetmarke implements OneClickForApp, ProdWS {
    * @param index The index of the desired shopping cart item.
    */
   public getItemFromShoppingCart(index: number): ShoppingCartItem | null {
-    this.checkService(
+    this.checkServiceInit(
       this.oneClick4AppService,
       'Cannot get item from shopping cart before initializing OneClickForApp service'
     );
@@ -187,7 +187,7 @@ export class Internetmarke implements OneClickForApp, ProdWS {
    * @returns The removed item if found.
    */
   public removeItemFromShoppingCart(index: number): ShoppingCartItem | null {
-    this.checkService(
+    this.checkServiceInit(
       this.oneClick4AppService,
       'Cannot remove item from shopping cart before initializing OneClickForApp service'
     );
@@ -199,7 +199,7 @@ export class Internetmarke implements OneClickForApp, ProdWS {
    * Generates a brief summary of the items in the shopping cart.
    */
   public getShoppingCartSummary(): ShoppingCartSummary {
-    this.checkService(
+    this.checkServiceInit(
       this.oneClick4AppService,
       'Cannot get shopping cart summary before initializing OneClickForApp service'
     );
@@ -216,7 +216,7 @@ export class Internetmarke implements OneClickForApp, ProdWS {
    * @param options The checkout options to customize the vouchers.
    */
   public checkoutShoppingCart(options: CheckoutShoppingCartOptions = {}): Promise<Order | null> {
-    this.checkService(
+    this.checkServiceInit(
       this.oneClick4AppService,
       'Cannot checkout shopping cart before initializing OneClickForApp service'
     );
@@ -229,8 +229,8 @@ export class Internetmarke implements OneClickForApp, ProdWS {
    *
    * @param shopOrderId The order information that hold the data about the vouchers.
    */
-  public async retrieveOrder(shopOrderId: number): Promise<Order | null> {
-    this.checkService(
+  public retrieveOrder(shopOrderId: number): Promise<Order | null> {
+    this.checkServiceInit(
       this.oneClick4AppService,
       'Cannot retrieve order before initializing OneClickForApp service'
     );
@@ -265,7 +265,7 @@ export class Internetmarke implements OneClickForApp, ProdWS {
    * Retrieves the list of available products from the service.
    */
   public getProductList(): Promise<Product[]> {
-    this.checkService(
+    this.checkServiceInit(
       this.productService,
       'Cannot get product list before initializing product service'
     );
@@ -279,7 +279,7 @@ export class Internetmarke implements OneClickForApp, ProdWS {
    * @param id The id of the product that should be retrieved.
    */
   public getProduct(id: number): Promise<Product | null> {
-    this.checkService(
+    this.checkServiceInit(
       this.productService,
       'Cannot get product before initializing product service'
     );
@@ -287,7 +287,7 @@ export class Internetmarke implements OneClickForApp, ProdWS {
     return this.productService.getProduct(id);
   }
 
-  private checkService(service: SoapService, message: string): void {
+  private checkServiceInit(service: SoapService, message: string): void {
     if (!service) {
       throw new InternetmarkeError(message);
     }

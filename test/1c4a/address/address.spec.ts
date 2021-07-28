@@ -1,10 +1,10 @@
 import { expect } from 'chai';
-import { SimpleName } from '../../../lib/1c4a/address';
 import {
   CompanyAddress,
   parseAddress,
   PersonAddress,
-  SimpleAddress
+  SimpleAddress,
+  SimpleName
 } from '../../../src/1c4a/address';
 import CountryCode from '../../../src/1c4a/countryCode';
 import { AddressError } from '../../../src/1c4a/Error';
