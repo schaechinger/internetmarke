@@ -24,7 +24,7 @@
     "clean": "rm -rf lib",
     "build": "npm run clean && tsc -p ./tsconfig.json",
     "test": "NODE_ENV=test mocha -r ts-node/register 'test/**/*.spec.ts'",
-    "test:codecov": "nyc --reporter=lcov npm run test",
+    "test:codecov": "nyc --reporter=cobertura npm run test",
     "test:coverage": "nyc npm run test"
   },
   "engines": {

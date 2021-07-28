@@ -21,8 +21,7 @@ jobs:
       - uses: codecov/codecov-action@v2
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          directory: ./coverage/
-          files: ./lcov.info
+          files: ./coverage/cobertura-coverage.xml
           flags: unittests
           name: codecov-umbrella
           verbose: true
