@@ -24,7 +24,7 @@ export interface Product {
   weight?: ProductDataRange;
 }
 
-export const formatProducts = (rawData: any): { [id: number]: Product } => {
+export const parseProducts = (rawData: any): { [id: number]: Product } => {
   if (!rawData) {
     return {};
   }

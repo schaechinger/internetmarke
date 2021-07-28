@@ -1,4 +1,4 @@
-name: QA Stage
+name: qa
 
 on:
   push:
@@ -9,8 +9,8 @@ on:
       - develop
 
 jobs:
-  build:
-    name: Build package
+  test:
+    name: Build and test package
 
     runs-on: ubuntu-latest
 
@@ -26,3 +26,4 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - run: npm ci
       - run: npm run build --if-present
+      - run: npm run test

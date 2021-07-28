@@ -22,8 +22,10 @@
       "./node_modules/@types",
     ]
   },
-  "include": [
-    "src",
-    "./package.json"
+  "exclude": [
+    "./examples/",
+    "./node_modules/",
+    "./lib/",
+    "./test/",
   ]
 }

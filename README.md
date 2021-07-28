@@ -2,11 +2,37 @@
 
 [![NPM version][npm-svg]][npm-url]
 ![License][license-svg]
+[![Workflow Status][workflow-svg]][workflow-url]
 ![Dependencies][dependencies-svg]
 
 A node wrapper for the Internetmarke web service of the Deutsche Post
 
-## Installation
+<!-- Run `npm run gen:toc` to update below section -->
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+
+- [Install](#install)
+- [Prerequisites / Required Accounts](#prerequisites--required-accounts)
+- [Usage](#usage)
+- [1C4A (One Click For Application Service)](#1c4a-one-click-for-application-service)
+  - [User Info](#user-info)
+  - [Page Formats (PDF only)](#page-formats-pdf-only)
+  - [Create Order Id](#create-order-id)
+  - [Public Gallery Images](#public-gallery-images)
+  - [Private Gallery Images](#private-gallery-images)
+  - [Voucher Preview](#voucher-preview)
+  - [Managing the Shopping Cart](#managing-the-shopping-cart)
+  - [Checkout Shopping Cart and Place Order](#checkout-shopping-cart-and-place-order)
+  - [Retrieve Older Orders](#retrieve-older-orders)
+  - [Addresses](#addresses)
+- [ProdWS (Product Service)](#prodws-product-service)
+  - [Retrieve Product List](#retrieve-product-list)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+## Install
+
+To add internetmarke to your project run:
 
 ```sh
 npm install internetmarke
@@ -20,7 +46,9 @@ every web service you want to use and your payment account:
 - **1C4A** (One Click For Application, required!) is used to order vouchers.
 
   You can get the partner account from the website of [Deutsche Post][post-1c4a]
-  or via mail: pcf-1click@deutschepost.de
+  or via mail: `pcf-1click@deutschepost.de`
+
+  This account credentials refer to `PartnerCredentials`.
 
 - **Prod WS** (Product List Web Service) is used to retrieve the list of
   available products (the distinct types of stamps for different dimensions
@@ -28,10 +56,15 @@ every web service you want to use and your payment account:
   want to order.
 
   The client account can be requested via mail (see above) only.
+  This account credentials refer to `ClientCredentials`.
 
 - Further you need your personal **Portokasse** account with payment info that
   is used on checkout. If you do not have one please create one at the web
-  ortal of [Deutsche Post][post-portokasse]
+  ortal of [Deutsche Post][post-portokasse].
+
+  This account credentials refer to `UserCredentials`. For testing uses you can
+  request a test account via the above email address to test voucher generation
+  without charging your own account for three months.
 
 ## Usage
 
@@ -40,20 +73,28 @@ that handles the voucher checkout process and the Product Service (ProdWS) that
 is capable of available products (types of vouchers).
 
 Each service can be used separately and has therefore to be initialized with a
-specific method call before it can be used.
+specific method call before it can be used. Afterwards you can use the returned
+service instance or the internetmarke instance to call the supported service
+methods.
 
 **Examples:** Can be found in the `examples` directory.
-
-### Create internetmarke instance
 
 ```typescript
 import { Internetmarke } from 'internetmarke';
 // or: const { Internetmarke } = require('internetmarke');
 
 const internetmarke = new Internetmarke();
+
+// use 1C4A service
+// const options = { partner: ..., user: ... }
+await internetmarke.initOneClickForAppService(options);
+
+// use ProdWS service
+// const options = { client: ... }
+await internetmarke.initProductService(options);
 ```
 
-### Connect to 1C4A (One Click For Application Service)
+## 1C4A (One Click For Application Service)
 
 To setup the 1C4A service, call the method `initOneClickForAppService(options)`
 of the Internetmarke main instance.
@@ -81,7 +122,7 @@ const options: OneClickForAppOptions = {
 await internetmarke.initOneClickForAppService(options);
 ```
 
-#### User Info
+### User Info
 
 As soon as this initialization is done you can access all the resources of the
 1C4A service. In addtion to that you also have access to a few user properties
@@ -95,7 +136,7 @@ The user info holds all the information about your account including your wallet
 balance.
 In addition you can retrieve the order id of the latest order in this session.
 
-#### Page Formats (PDF only)
+### Page Formats (PDF only)
 
 If you wish to generate vouchers in PDF format you may want to list all the
 available page templates from the service.
@@ -107,7 +148,7 @@ const pageFormats = await internetmarke.retrievePageFormats();
 const pageFormat = await internetmarke.retrievePageFormat(1);
 ```
 
-#### Create Order Id
+### Create Order Id
 
 In some cases it might be useful to generate the order id for the next order
 before the checkout. This is what the method `createShopOrderId()` is for:
@@ -119,7 +160,7 @@ const orderId = await internetmarke.createOrderId();
 This order id can be passed to the `checkoutShoppingCart()` method in the
 options object.
 
-#### Public Gallery Images
+### Public Gallery Images
 
 The Deutsche Post provides a list of image categories with a few images that
 can be access for everyone and add to a voucher in FrankingZone mode.
@@ -128,7 +169,7 @@ can be access for everyone and add to a voucher in FrankingZone mode.
 const gallery = await internetmarke.retrievePublicGallery();
 ```
 
-#### Private Gallery Images
+### Private Gallery Images
 
 Same as with the public gallery you can access the images of your private
 gallery that have been uploaded to Deutsche Post before. There are no
@@ -138,7 +179,7 @@ categories but only a list of images.
 const gallery = await internetmarke.retrievePrivateGallery();
 ```
 
-#### Voucher Preview
+### Voucher Preview
 
 You can create a preview voucher before checkout to check if the result matches
 your imaginations.
@@ -155,7 +196,7 @@ const options: PreviewVoucherOptions = {
 const previeLink = await internetmarke.retrievePreviewVoucher(product, options);
 ```
 
-#### Managing the Shopping Cart
+### Managing the Shopping Cart
 
 Before the checkout you have to add items to the local shopping cart. This can
 be achieved with this method.
@@ -209,7 +250,7 @@ const options: CheckoutShoppingCartOptions = {
 const order = await internetmarke.checkoutShoppingCart(options);
 ```
 
-#### Retrieve Older Orders
+### Retrieve Older Orders
 
 Every order can be re-downloaded with their unique order id. The output is the
 same as from the `checkoutShoppingCart()` method.
@@ -218,7 +259,7 @@ same as from the `checkoutShoppingCart()` method.
 const order = await internetmarke.retrieveOrder(orderId);
 ```
 
-#### Addresses
+### Addresses
 
 Addresses can be passed in `SimpleAddress` format that is flat and does not
 contain the structure for the backend services. This will be used to generate
@@ -256,7 +297,7 @@ const namedAddress: NamedAddress = {
 };
 ```
 
-### ProdWS (Product List Service)
+## ProdWS (Product Service)
 
 The product list contains all available vouchers that can be ordered. They are
 cached and are get updated once a week if not configured otherwise.
@@ -280,6 +321,8 @@ await internetmarke.initProductService(options);
 If your id (`Mandant-ID`) differs from the upper case version of the username
 you can add it to the client credentials.
 
+### Retrieve Product List
+
 Once the product service is initialized you can retrieve the whole product list
 or a single product from the webservice. You can also query one single product
 if you know the specific product id.
@@ -292,6 +335,8 @@ const product = await internetmarke.getProduct({ id: 1 });
 [npm-url]: https://npmjs.org/package/internetmarke
 [npm-svg]: https://img.shields.io/npm/v/internetmarke.svg
 [npm-downloads-svg]: https://img.shields.io/npm/dm/internetmarke.svg
+[workflow-url]: https://github.com/schaechinger/internetmarke/actions/workflows/qa.yml
+[workflow-svg]: https://img.shields.io/github/workflow/status/schaechinger/internetmarke/qa
 [license-svg]: https://img.shields.io/npm/l/internetmarke.svg
 [dependencies-svg]: https://img.shields.io/david/schaechinger/internetmarke.svg
 [post-1c4a]: https://www.deutschepost.de/de/i/internetmarke-porto-drucken/partner-werden.html
