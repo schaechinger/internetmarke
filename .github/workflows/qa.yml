@@ -32,7 +32,7 @@ jobs:
 
       - name: test and coverage
         run: npm run test:codecov
-        uses: codecov/codecov-action@v2
+      - uses: codecov/codecov-action@v2
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: true
