@@ -20,7 +20,7 @@ interface CacheFormat<T> {
 export class DataStore<T> {
   private file: string;
   private name: string;
-  private ttl = 24 * 3600;
+  private ttl = 7 * 24 * 3600;
   private data: { [id: number]: T };
   private lastUpdate: Date;
   private log: Debugger;

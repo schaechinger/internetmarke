@@ -1,8 +1,8 @@
 # internetmarke
 
 [![NPM version][npm-svg]][npm-url]
-![License][license-svg]
 [![Workflow Status][workflow-svg]][workflow-url]
+[![Test Coverage][codecov-svg]][codecov-url]
 ![Dependencies][dependencies-svg]
 
 A node wrapper for the Internetmarke web service of the Deutsche Post
@@ -346,6 +346,8 @@ const oldProducts = await internetmarke.getProductList(new Date('2018-02-01'));
 [npm-downloads-svg]: https://img.shields.io/npm/dm/internetmarke.svg
 [workflow-url]: https://github.com/schaechinger/internetmarke/actions/workflows/qa.yml
 [workflow-svg]: https://img.shields.io/github/workflow/status/schaechinger/internetmarke/qa
+[codecov-svg]: https://codecov.io/gh/schaechinger/internetmarke/branch/master/graph/badge.svg?token=44611cZi5g
+[codecov-url]: https://codecov.io/gh/schaechinger/internetmarke
 [license-svg]: https://img.shields.io/npm/l/internetmarke.svg
 [dependencies-svg]: https://img.shields.io/david/schaechinger/internetmarke.svg
 [post-1c4a]: https://www.deutschepost.de/de/i/internetmarke-porto-drucken/partner-werden.html

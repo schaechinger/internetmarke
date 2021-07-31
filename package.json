@@ -58,10 +58,10 @@
     "typescript": "^4.3.5"
   },
   "nyc": {
-    "branches": "&gt;20",
-    "lines": "&gt;20",
-    "functions": "&gt;20",
-    "statements": "&gt;20"
+    "branches": "&gt;80",
+    "lines": "&gt;80",
+    "functions": "&gt;80",
+    "statements": "&gt;80"
   },
   "husky": {
     "hooks": {
