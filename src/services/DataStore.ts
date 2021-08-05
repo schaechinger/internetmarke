@@ -22,7 +22,7 @@ export class DataStore<T> {
   private name: string;
   private ttl = 7 * 24 * 3600;
   private data: { [id: number]: T };
-  private lastUpdate: Date;
+  private lastUpdate: Date | null = null;
   private log: Debugger;
   private loadData: () => Promise<{ [id: number]: T }>;
 
@@ -100,11 +100,16 @@ export class DataStore<T> {
   }
 
   /**
-   * Remove the given file from the temp dir.
+   * Removes the given file from the temp dir.
    */
   public remove(): Promise<boolean> {
-    return new Promise(resolve => {
+    return new Promise<boolean>(resolve => {
       fs.unlink(this.file, err => resolve(!err));
+    }).then(success => {
+      this.data = {};
+      this.lastUpdate = null;
+
+      return success;
     });
   }
 
@@ -137,11 +142,9 @@ export class DataStore<T> {
         if (!err && content && content.length) {
           const data: CacheFormat<T> = JSON.parse(content.toString());
 
-          if (data) {
-            if (data.version === packageVersion) {
-              this.lastUpdate = new Date(data.date);
-              this.data = data.content;
-            }
+          if (data.version === packageVersion) {
+            this.lastUpdate = new Date(data.date);
+            this.data = data.content;
           }
         }
 

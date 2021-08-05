@@ -2,41 +2,83 @@ import { expect } from 'chai';
 import { accessSync, unlinkSync } from 'fs';
 import { tmpdir } from 'os';
 import { join as joinPath } from 'path';
+import { sync as rmdirSync } from 'rimraf';
+import { stub } from 'sinon';
 import { DataStore } from '../../src/services/DataStore';
-
-const loadData = async () => {
-  return {
-    1: 'test1',
-    2: 'test2',
-    3: 'test3'
-  };
-};
 
 describe('DataStore', () => {
   let store: DataStore<any>;
   const tmpFile = 'test.json';
-  const tmpPath = joinPath(tmpdir(), 'node-internetmarke', tmpFile);
+  const rootPath = joinPath(tmpdir(), 'node-internetmarke');
+  const tmpPath = joinPath(rootPath, tmpFile);
+
+  let loadData: any;
 
   beforeEach(() => {
-    try {
-      unlinkSync(tmpFile);
-    } catch {}
     store = new DataStore();
+
+    loadData = stub().returns(
+      Promise.resolve({
+        1: 'test1',
+        2: 'test2',
+        3: 'test3'
+      })
+    );
+  });
+
+  afterEach(() => {
+    try {
+      unlinkSync(tmpPath);
+    } catch {}
+  });
+
+  it('should create the root temp dir if not existing', async () => {
+    rmdirSync(rootPath, {});
+
+    await store.init(tmpFile, loadData);
+
+    expect(() => accessSync(tmpPath)).to.not.throw();
   });
 
   it('should load test data', async () => {
     await store.init(tmpFile, loadData);
 
-    expect(() => accessSync(tmpPath)).to.not.throw;
-    // expect(loadData).to.have.been.called, stub
+    expect(() => accessSync(tmpPath)).to.not.throw();
+    expect(loadData.calledOnce).to.be.true;
   });
 
-  it('should store data', async () => {
+  it('should load test data from cache', async () => {
     await store.init(tmpFile, loadData);
 
-    const list = await store.getList();
+    await store.getList();
 
-    expect(list).to.have.length(3);
+    await store.init(tmpFile, loadData);
+
+    expect(() => accessSync(tmpPath)).to.not.throw;
+    expect(loadData.calledOnce).to.be.true;
+  });
+
+  it('should reload the data after they are expired', async () => {
+    await store.init(tmpFile, loadData, 0.01);
+
+    await new Promise<void>(resolve => {
+      setTimeout(async () => {
+        console.log('async timer');
+
+        await store.getList();
+
+        expect(loadData.calledTwice).to.be.true;
+        resolve();
+      }, 11);
+    });
+  });
+
+  it('should remove cached data', async () => {
+    await store.init(tmpFile, loadData);
+
+    await store.remove();
+
+    expect(() => accessSync(tmpPath)).to.throw();
   });
 
   it('should retrieve data item by id', async () => {
