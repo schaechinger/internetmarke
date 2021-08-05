@@ -5,9 +5,9 @@
 [![Test Coverage][codecov-svg]][codecov-url]
 ![Dependencies][dependencies-svg]
 
-A node wrapper for the Internetmarke web service of the Deutsche Post
+A node implementation to use the Internetmarke web service of Deutsche Post.
 
-- [Install](#install)
+- [Installation](#installation)
 - [Prerequisites / Required Accounts](#prerequisites--required-accounts)
 - [Usage](#usage)
 - [1C4A (One Click For Application Service)](#1c4a-one-click-for-application-service)
@@ -25,11 +25,11 @@ A node wrapper for the Internetmarke web service of the Deutsche Post
   - [Retrieve Product List](#retrieve-product-list)
     - [Retrieve Oudated Products](#retrieve-outdated-products)
 
-## Install
+## Installation
 
-To add internetmarke to your project run:
+To add internetmarke to your project use npm:
 
-```sh
+```bash
 npm install internetmarke
 ```
 
@@ -38,28 +38,31 @@ npm install internetmarke
 To use the module you have to request a partner account from Deutsche Post for
 every web service you want to use and your payment account:
 
-- **1C4A** (One Click For Application, required!) is used to order vouchers.
+- **1C4A** (One Click For Application, required!) is used to order and preview
+  vouchers.
 
   You can get the partner account from the website of [Deutsche Post][post-1c4a]
-  or via mail: `pcf-1click@deutschepost.de`
+  or request one via mail: `pcf-1click@deutschepost.de`
 
   This account credentials refer to `PartnerCredentials`.
 
 - **Prod WS** (Product List Web Service) is used to retrieve the list of
   available products (the distinct types of stamps for different dimensions
   etc.). This is optional if you know the ids and prices of the vouchers you
-  want to order.
+  want to order but recommended as it is easier and supports automatic voucher
+  updates when prices change.
 
   The client account can be requested via mail (see above) only.
   This account credentials refer to `ClientCredentials`.
 
-- Further you need your personal **Portokasse** account with payment info that
-  is used on checkout. If you do not have one please create one at the web
+- Further you need your personal **Portokasse** account with payment information
+  that is used on checkout. If you do not have one please create one at the web
   ortal of [Deutsche Post][post-portokasse].
 
-  This account credentials refer to `UserCredentials`. For testing uses you can
+  This account credentials refer to `UserCredentials`. For testing use you can
   request a test account via the above email address to test voucher generation
-  without charging your own account for three months.
+  without charging your own account for three months. These generated vouchers
+  are then not valid to be used in production!
 
 ## Usage
 
@@ -72,7 +75,10 @@ specific method call before it can be used. Afterwards you can use the returned
 service instance or the internetmarke instance to call the supported service
 methods.
 
-**Examples:** Can be found in the `examples` directory.
+**Examples:** Can be found in the `examples` directory for easy adoption.
+
+All the examples here are written in TypeScript but of course the package can be
+used with JavaScript as well. See `examples/complete-example.js`.
 
 ```typescript
 import { Internetmarke } from 'internetmarke';
@@ -81,12 +87,12 @@ import { Internetmarke } from 'internetmarke';
 const internetmarke = new Internetmarke();
 
 // use 1C4A service
-// const options = { partner: ..., user: ... }
-await internetmarke.initOneClickForAppService(options);
+// const oneC4Aoptions = { partner: ..., user: ... }
+await internetmarke.initOneClickForAppService(oneC4AOptions);
 
 // use ProdWS service
-// const options = { client: ... }
-await internetmarke.initProductService(options);
+// const prodWsOptions = { client: ... }
+await internetmarke.initProductService(prodWsOptions);
 ```
 
 ## 1C4A (One Click For Application Service)
@@ -94,7 +100,7 @@ await internetmarke.initProductService(options);
 To setup the 1C4A service, call the method `initOneClickForAppService(options)`
 of the Internetmarke main instance.
 
-Pass the credentials of your partner and user (Portokasse) account to connect
+Pass the credentials of your partner and user (Portokasse) accounts to connect
 to the 1C4A service.
 
 You can optionally add the default voucher layout for the following orders.
@@ -158,7 +164,7 @@ options object.
 ### Public Gallery Images
 
 The Deutsche Post provides a list of image categories with a few images that
-can be access for everyone and add to a voucher in FrankingZone mode.
+can be accessed by everyone and added to a voucher in FrankingZone mode.
 
 ```typescript
 const gallery = await internetmarke.retrievePublicGallery();
@@ -227,7 +233,7 @@ const cart = this.getShoppingCartSummary();
 
 As soon as you have items in your shopping cart you can order those.
 This is the main method where the virtual shopping cart is pushed to the
-service, the vouchers ar getting generated and your Portokasse account gets
+service, the vouchers are being generated and your Portokasse account gets
 charged with the total shopping cart amount.
 
 However you can use the `dryrun` option to just validate the shopping cart and
@@ -256,7 +262,7 @@ const order = await internetmarke.retrieveOrder(orderId);
 
 ### Addresses
 
-Addresses can be passed in `SimpleAddress` format that is flat and does not
+Addresses can be passed in `SimpleAddress` format which is flat and does not
 contain the structure for the backend services. This will be used to generate
 the final address objects
 
@@ -324,7 +330,7 @@ if you know the specific product id.
 
 ```typescript
 const products = await internetmarke.getProductList();
-const product = await internetmarke.getProduct({ id: 1 });
+const product = await internetmarke.getProduct(1);
 ```
 
 #### Retrieve Outdated Products

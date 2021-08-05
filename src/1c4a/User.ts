@@ -16,8 +16,11 @@ export interface UserData {
 
 export interface UserInfo {
   isAuthenticated: boolean;
+  username?: string;
   walletBalance?: Amount;
   orderIds?: number[];
+  infoMessage?: string;
+  showTermsAndCondition?: boolean;
 }
 
 const CREDENTIALS = Symbol('credentials'),
@@ -30,9 +33,9 @@ export class User {
   private [CREDENTIALS]: UserCredentials;
   private [TOKEN]: string | null;
   private walletBalance: Amount;
-  private infoMessage: string | null = null;
+  private infoMessage?: string;
   private orderIds: number[] = [];
-  private showTermsAndConditions = false;
+  private showTermsAndCondition = false;
   // private log: Debugger;
 
   constructor(credentials: UserCredentials) {
@@ -46,14 +49,20 @@ export class User {
     if (data.userToken) {
       this[TOKEN] = data.userToken;
     }
+
+    // only update data for authenticated users
+    if (!this[TOKEN]) {
+      return;
+    }
+
     if (data.walletBalance) {
       this.walletBalance = {
         value: +data.walletBalance / 100,
         currency: 'EUR'
       };
     }
-    if (data.showTermsAndCondition) {
-      this.showTermsAndConditions = data.showTermsAndCondition;
+    if (undefined !== data.showTermsAndCondition) {
+      this.showTermsAndCondition = data.showTermsAndCondition;
     }
     if (data.infoMessage) {
       this.infoMessage = data.infoMessage;
@@ -66,22 +75,6 @@ export class User {
 
   public isAuthenticated(): boolean {
     return !!this.getToken();
-  }
-
-  public getWalletBalance(): number {
-    return this.walletBalance.value;
-  }
-
-  public getInfoMessage(): string | null {
-    return this.infoMessage;
-  }
-
-  public showsTermsAndConditions(): boolean {
-    return this.showTermsAndConditions;
-  }
-
-  public getOrderIds(): number[] {
-    return this.orderIds;
   }
 
   /**
@@ -104,7 +97,10 @@ export class User {
       isAuthenticated
     };
     if (isAuthenticated) {
+      info.username = this[CREDENTIALS].username;
       info.walletBalance = this.walletBalance;
+      info.infoMessage = this.infoMessage;
+      info.showTermsAndCondition = this.showTermsAndCondition;
       info.orderIds = this.orderIds;
     }
 

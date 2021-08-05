@@ -438,6 +438,11 @@ export class OneClickForAppService extends SoapService implements OneClickForApp
       throw new CheckoutError('Cannot checkout empty shopping cart');
     }
 
+    // enble dryrun as default in test env
+    if (undefined === options.dryrun && 'test' === process.env.NODE_ENV) {
+      options.dryrun = true;
+    }
+
     const isPdfVoucher = !!options.pageFormat;
     const voucherFormat = isPdfVoucher ? VoucherFormat.PDF : VoucherFormat.PNG;
     const checkout = `checkoutShoppingCart${voucherFormat}Async`;

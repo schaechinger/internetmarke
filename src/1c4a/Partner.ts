@@ -1,5 +1,5 @@
-import md5 from "md5";
-import { formatDate } from "./date";
+import md5 from 'md5';
+import { formatDate } from './date';
 
 export interface PartnerCredentials {
   id: string;
@@ -7,7 +7,7 @@ export interface PartnerCredentials {
   keyPhase?: number;
 }
 
-const CREDENTIALS = Symbol("credentials");
+const CREDENTIALS = Symbol('credentials');
 
 export interface PartnerSoapHeader {
   PARTNER_ID: string;
@@ -16,14 +16,18 @@ export interface PartnerSoapHeader {
   PARTNER_SIGNATURE: string;
 }
 
-const SIGNATURE_SEPARATOR = "::";
-const SIGNATURE_EMPTY = "::::";
+const SIGNATURE_SEPARATOR = '::';
+// const SIGNATURE_EMPTY = '::::';
 
 export class Partner {
   private [CREDENTIALS]: PartnerCredentials;
 
   constructor(credentials: PartnerCredentials) {
     this[CREDENTIALS] = credentials;
+
+    if (!this[CREDENTIALS].keyPhase) {
+      this[CREDENTIALS].keyPhase = 1;
+    }
   }
 
   /**
@@ -33,8 +37,8 @@ export class Partner {
     return {
       PARTNER_ID: this[CREDENTIALS].id,
       REQUEST_TIMESTAMP: formatDate(),
-      KEY_PHASE: this[CREDENTIALS].keyPhase || 1,
-      PARTNER_SIGNATURE: this.generateSignature(),
+      KEY_PHASE: this[CREDENTIALS].keyPhase!,
+      PARTNER_SIGNATURE: this.generateSignature()
     };
   }
 
@@ -45,10 +49,10 @@ export class Partner {
    */
   private generateSignature(date?: Date): string {
     const signature = [
-      this[CREDENTIALS].id || SIGNATURE_EMPTY,
-      formatDate(date) || SIGNATURE_EMPTY,
-      this[CREDENTIALS].keyPhase || SIGNATURE_EMPTY,
-      this[CREDENTIALS].secret || SIGNATURE_EMPTY,
+      this[CREDENTIALS].id,
+      formatDate(date),
+      this[CREDENTIALS].keyPhase,
+      this[CREDENTIALS].secret
     ].join(SIGNATURE_SEPARATOR);
 
     return md5(signature).substr(0, 8);

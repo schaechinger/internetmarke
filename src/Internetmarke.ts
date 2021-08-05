@@ -55,7 +55,7 @@ export class Internetmarke implements OneClickForApp, ProdWS {
   }
 
   /**
-   * Retrieves all available information about the authenticated user.
+   * Retrieves all available information about the Portokasse user.
    */
   public getUserInfo(): UserInfo {
     this.checkServiceInit(
