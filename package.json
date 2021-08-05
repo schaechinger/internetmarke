@@ -21,7 +21,7 @@
     "url": "https://github.com/schaechinger/internetmarke/issues"
   },
   "scripts": {
-    "clean": "rm -rf lib",
+    "clean": "rm -rf lib .nyc_output coverage",
     "build": "npm run clean && tsc -p ./tsconfig.json",
     "test": "NODE_ENV=test mocha -r ts-node/register 'test/**/*.spec.ts'",
     "test:codecov": "nyc --reporter=cobertura npm run test",
@@ -51,7 +51,6 @@
     "chai": "^4.3.4",
     "husky": "^7.0.1",
     "mocha": "^9.0.3",
-    "nodemon": "^2.0.12",
     "nyc": "^15.1.0",
     "prettier": "^2.3.2",
     "ts-node": "^10.1.0",
