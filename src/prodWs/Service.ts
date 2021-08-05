@@ -4,7 +4,7 @@ import { DataStore } from '../services/DataStore';
 import { SoapService } from '../services/Soap';
 import { getLogger } from '../utils/logger';
 import { Client, ClientCredentials } from './Client';
-import { parseProducts, Product } from './product';
+import { parseSalesProduct, Product } from './product';
 
 export interface ProductServiceOptions {
   /**
@@ -104,7 +104,17 @@ export class ProductService extends SoapService implements ProdWS {
           return {};
         }
 
-        return parseProducts(response.Response);
+        const products: { [id: number]: Product } = {};
+
+        response.Response.salesProductList.SalesProduct.forEach((data: any) => {
+          const product = parseSalesProduct(data);
+
+          if (product) {
+            products[product.id] = product;
+          }
+        });
+
+        return products;
       })
       .catch((e: any) => {
         this.log('getProductList', e.root.Envelope.Body.Fault);

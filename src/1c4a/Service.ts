@@ -362,7 +362,17 @@ export class OneClickForAppService extends SoapService implements OneClickForApp
 
       position.address = { sender, receiver };
     }
-    position.price = product.price;
+
+    if (product.price) {
+      if ('number' === typeof product.price) {
+        position.price = {
+          value: +product.price / 100,
+          currency: 'EUR'
+        };
+      } else {
+        position.price = product.price;
+      }
+    }
     position.voucherLayout = voucherLayout;
     if (options.position) {
       position.position = options.position;

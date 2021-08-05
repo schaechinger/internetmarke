@@ -1,9 +1,8 @@
 # internetmarke
 
-[![NPM version][npm-svg]][npm-url]
 [![Workflow Status][workflow-svg]][workflow-url]
 [![Test Coverage][codecov-svg]][codecov-url]
-![Dependencies][dependencies-svg]
+[![NPM version][npm-svg]][npm-url]
 
 A node implementation to use the Internetmarke web service of Deutsche Post.
 

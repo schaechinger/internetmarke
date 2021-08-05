@@ -1,7 +1,7 @@
 {
   "name": "internetmarke",
-  "version": "0.4.2",
-  "description": "A node wrapper for the Internetmarke web service of the Deutsche Post.",
+  "version": "0.4.3",
+  "description": "A node implementation to use the Internetmarke web service of Deutsche Post.",
   "keywords": [
     "internetmarke",
     "stamp",
