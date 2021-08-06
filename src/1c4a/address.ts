@@ -15,6 +15,7 @@ export interface SimpleAddress extends SimpleName {
   additional?: string;
   zip: string;
   city: string;
+  state?: string;
   country?: CountryCode;
 }
 
@@ -62,11 +63,15 @@ export interface AddressBinding {
 
 export const parseAddress = (data: SimpleAddress): NamedAddress => {
   // address
+  let zip = data.zip || '';
+  if (data.state) {
+    zip = `${data.state.toUpperCase()} ${zip}`.trim();
+  }
   const address: Address = {
     additional: (data.additional || '').substr(0, 50),
     street: data.street?.substr(0, 50),
     houseNo: data.houseNo?.substr(0, 10),
-    zip: data.zip?.substr(0, 10),
+    zip: zip.substr(0, 10),
     city: data.city?.substr(0, 35),
     country: (data.country || CountryCode.DEU).toUpperCase() as CountryCode
   };

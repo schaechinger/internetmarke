@@ -18,7 +18,7 @@ A node implementation to use the Internetmarke web service of Deutsche Post.
   - [Addresses](#addresses)
 - [ProdWS (Product Service)](#prodws-product-service)
   - [Retrieve Product List](#retrieve-product-list)
-    - [Retrieve Oudated Products](#retrieve-outdated-products)
+  - [Retrieve Oudated Products](#retrieve-outdated-products)
 
 ## Installation
 
@@ -328,7 +328,7 @@ const products = await internetmarke.getProductList();
 const product = await internetmarke.getProduct(1);
 ```
 
-#### Retrieve Outdated Products
+### Retrieve Outdated Products
 
 If you however want to retrieve an older product list you can optionally pass a
 date that defines the historical date of product list on this date.

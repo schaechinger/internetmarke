@@ -130,9 +130,7 @@ export class DataStore<T> {
     if (!this.isValid()) {
       const content = await this.loadData();
 
-      if (content) {
-        await this.update(content);
-      }
+      await this.update(content);
     }
   }
 
