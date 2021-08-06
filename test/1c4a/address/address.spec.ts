@@ -11,9 +11,9 @@ import { AddressError } from '../../../src/1c4a/Error';
 
 describe('Address', () => {
   const address: SimpleAddress = {
-    street: 'Marienplatz',
-    houseNo: '8',
-    zip: '80331',
+    street: 'Landsberger Straße',
+    houseNo: '31-35',
+    zip: '80339',
     city: 'München'
   };
 
@@ -22,9 +22,9 @@ describe('Address', () => {
       ...address,
       title: 'Dr.',
       salutation: 'Herrn',
-      firstname: 'Max',
-      lastname: 'Mustermann',
-      additional: 'Stadtverwaltung'
+      firstname: 'Martin',
+      lastname: 'Leibhard',
+      additional: 'Leitung'
     };
 
     const personAddress = parseAddress(namedAddress) as PersonAddress;
@@ -49,7 +49,7 @@ describe('Address', () => {
   it('should parse a company address', () => {
     const compAddress = {
       ...address,
-      company: 'Landeshauptstadt München'
+      company: 'Augustiner-Bräu Wagner KG'
     };
     const companyAddress = parseAddress(compAddress) as CompanyAddress;
 
@@ -66,9 +66,9 @@ describe('Address', () => {
   it('should parse a named company address', () => {
     const compAddress: SimpleAddress = {
       ...address,
-      company: 'Landeshauptstadt München',
-      firstname: 'Max',
-      lastname: 'Mustermann'
+      company: 'Augustiner-Bräu Wagner KG',
+      firstname: 'Martin',
+      lastname: 'Leibhard'
     };
 
     const companyAddress = parseAddress(compAddress) as CompanyAddress;
@@ -84,7 +84,7 @@ describe('Address', () => {
     const compAddress: SimpleAddress = {
       ...address,
       state: 'by',
-      company: 'Landeshauptstadt München'
+      company: 'Augustiner-Bräu Wagner KG'
     };
 
     const companyAddress = parseAddress(compAddress) as CompanyAddress;
@@ -94,8 +94,8 @@ describe('Address', () => {
 
   it('should throw an error for missing address data', () => {
     const name: SimpleName = {
-      firstname: 'Max',
-      lastname: 'Mustermann'
+      firstname: 'Martin',
+      lastname: 'Leibhard'
     };
 
     const parts = Object.keys(address);
@@ -119,42 +119,39 @@ describe('Address', () => {
   describe('CountryCode', () => {
     it('should accept valid country codes', () => {
       const foreignAddress: SimpleAddress = {
-        firstname: 'John',
-        lastname: 'Doe',
-        street: 'Morningside Road',
-        houseNo: '44',
-        zip: 'EH10 4BF',
-        city: 'Edinburgh',
-        country: CountryCode.GBR
+        company: 'Other Half Brewing Co.',
+        street: 'Centre St.',
+        houseNo: '191',
+        zip: '11231',
+        city: 'Brooklyn',
+        country: CountryCode.USA
       };
 
       const address = parseAddress(foreignAddress);
 
       expect(address).to.exist;
-      expect(address.address.country).to.equal(CountryCode.GBR);
+      expect(address.address.country).to.equal(CountryCode.USA);
     });
 
     it('should accept valid lower case country codes', () => {
       const foreignAddress: SimpleAddress = {
-        firstname: 'John',
-        lastname: 'Doe',
-        street: 'Morningside Road',
-        houseNo: '44',
-        zip: 'EH10 4BF',
-        city: 'Edinburgh',
-        country: 'gbr' as CountryCode
+        company: 'Goose Island Beer Co.',
+        street: 'West Fulton St.',
+        houseNo: '1800',
+        zip: '60612',
+        city: 'Chicago',
+        country: 'usa' as CountryCode
       };
 
       const address = parseAddress(foreignAddress);
 
       expect(address).to.exist;
-      expect(address.address.country).to.equal(CountryCode.GBR);
+      expect(address.address.country).to.equal(CountryCode.USA);
     });
 
     it('should throw an error for invalid country codes', () => {
       const invalidAddress: SimpleAddress = {
         ...address,
-        company: 'Landeshauptstadt München',
         country: 'XXX' as CountryCode
       };
 

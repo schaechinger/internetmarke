@@ -263,12 +263,15 @@ the final address objects
 
 ```typescript
 const simple: SimpleAddress = {
-  company: 'Landeshauptstadt München',
-  firstname: 'Max',
-  lastname: 'Mustermann',
-  street: 'Marienplatz',
-  houseNo: '8',
-  zip: '80331',
+  company: 'Augustiner-Bräu Wagner KG',
+  salutation: 'Herrn',
+  title: 'Dr.',
+  firstname: 'Martin',
+  lastname: 'Leibhard',
+  additional: 'Leitung',
+  street: 'Landsberger Straße',
+  houseNo: '31-35',
+  zip: '80339',
   city: 'München'
 };
 
@@ -276,17 +279,20 @@ const simple: SimpleAddress = {
 const namedAddress: NamedAddress = {
   name: {
     companyName: {
-      company: 'Landeshauptstadt München',
+      company: 'Augustiner-Bräu Wagner KG',
       personName: {
-        firstname: 'Max',
-        lastname: 'Mustermann'
+        salutation: 'Herrn',
+        title: 'Dr.',
+        firstname: 'Martin',
+        lastname: 'Leibhard'
       }
     }
   },
   address: {
-    street: 'Marienplatz',
-    houseNo: '8',
-    zip: '80331',
+    additional: 'Leitung',
+    street: 'Landsberger Straße',
+    houseNo: '31-35',
+    zip: '80339',
     city: 'München',
     country: 'DEU'
   }

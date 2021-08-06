@@ -40,7 +40,7 @@ export class DataStore<T> {
   ): Promise<void> {
     this.name = file.substr(0, file.lastIndexOf('.'));
     this.loadData = loadData;
-    if (ttl) {
+    if (undefined !== ttl) {
       this.ttl = ttl;
     }
 

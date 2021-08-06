@@ -1,26 +1,22 @@
 import { expect } from 'chai';
-import { Client, ClientCredentials } from '../../src/prodWs/Client';
+import { Client } from '../../src/prodWs/Client';
+import { clientCredentials } from './helper';
 
 describe('Client', () => {
   let client: Client;
-  const credentials: ClientCredentials = {
-    username: 'username',
-    id: 'clientid',
-    password: 'password'
-  };
 
   beforeEach(() => {
-    client = new Client(credentials);
+    client = new Client(clientCredentials);
   });
 
   it('should return credentials', () => {
-    expect(client.getId()).to.equal(credentials.id);
-    expect(client.getUsername()).to.equal(credentials.username);
-    expect(client.getPassword()).to.equal(credentials.password);
+    expect(client.getId()).to.equal(clientCredentials.id);
+    expect(client.getUsername()).to.equal(clientCredentials.username);
+    expect(client.getPassword()).to.equal(clientCredentials.password);
   });
 
   it('should generate the client id if non is provided', () => {
-    const cred = { ...credentials };
+    const cred = { ...clientCredentials };
     delete cred.id;
     client = new Client(cred);
 

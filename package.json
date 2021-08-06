@@ -32,7 +32,8 @@
   },
   "directories": {
     "lib": "./lib",
-    "test": "./test"
+    "test": "./test",
+    "example": "./examples"
   },
   "dependencies": {
     "debug": "^4.3.2",

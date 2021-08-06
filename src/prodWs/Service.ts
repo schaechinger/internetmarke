@@ -24,7 +24,7 @@ export interface ProdWS {
   getProduct(id: number): Promise<Product | null>;
 }
 
-const WSDL = 'https://prodws.deutschepost.de:8443/ProdWSProvider_1_1/prodws?wsdl';
+export const WSDL = 'https://prodws.deutschepost.de:8443/ProdWSProvider_1_1/prodws?wsdl';
 
 export class ProductService extends SoapService implements ProdWS {
   protected wsdl = WSDL;
