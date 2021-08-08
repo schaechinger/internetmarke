@@ -17,8 +17,8 @@ describe('ProdWS Service', () => {
     service = new ProductService(clientStub, store, getLoggerStub, getProdWsStub);
   });
 
-  it('should prevent init without client credentials', () => {
-    expect(() => service.init({} as any)).to.throw(ClientError);
+  it('should prevent init without client credentials', async () => {
+    await expect(service.init({} as any)).to.eventually.be.rejectedWith(ClientError);
   });
 
   it('should load product list', async () => {
