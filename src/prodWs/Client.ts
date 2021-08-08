@@ -1,15 +1,23 @@
+import { injectable } from 'inversify';
+
 export interface ClientCredentials {
   username: string;
   password: string;
   id?: string;
 }
 
-const CREDENTIALS = Symbol("credentials");
+const CREDENTIALS = Symbol('credentials');
 
+@injectable()
 export class Client {
   private [CREDENTIALS]: ClientCredentials;
 
-  constructor(credentials: ClientCredentials) {
+  /**
+   * Set the credentials to use the services.
+   *
+   * @param credentials The credentials that authenticate the client.
+   */
+  setCredentials(credentials: ClientCredentials): void {
     this[CREDENTIALS] = credentials;
   }
 

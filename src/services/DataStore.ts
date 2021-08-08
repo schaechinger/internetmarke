@@ -1,10 +1,11 @@
 import { Debugger } from 'debug';
 import fs from 'fs';
+import { inject, injectable } from 'inversify';
 import { tmpdir } from 'os';
 import { join as joinPath } from 'path';
-import { getLogger } from '../utils/logger';
 // @ts-ignore
 import { version as packageVersion } from '../../package.json';
+import { TYPES } from '../di/types';
 
 const BASE_DIR = 'node-internetmarke';
 
@@ -14,10 +15,19 @@ interface CacheFormat<T> {
   content: { [id: number]: T };
 }
 
+export interface IDataStore<T> {
+  init(file: string, loadData: () => Promise<{ [id: number]: T }>, ttl?: number): Promise<void>;
+  getList(): Promise<T[]>;
+  getItem(id: number): Promise<T | null>;
+  update(content: { [id: number]: T }, date?: Date): Promise<boolean>;
+  remove(): Promise<boolean>;
+}
+
 /**
  * Creates a new temp instance to manage temporary files.
  */
-export class DataStore<T> {
+@injectable()
+export class DataStore<T> implements IDataStore<T> {
   private file: string;
   private name: string;
   private ttl = 7 * 24 * 3600;
@@ -26,7 +36,7 @@ export class DataStore<T> {
   private log: Debugger;
   private loadData: () => Promise<{ [id: number]: T }>;
 
-  constructor() {
+  constructor(@inject(TYPES.LoggerFactory) getLogger: Function) {
     this.log = getLogger('dataStore');
   }
 
@@ -63,7 +73,7 @@ export class DataStore<T> {
   public async getList(): Promise<T[]> {
     await this.checkData();
 
-    return Object.values(this.data);
+    return (this.data && Object.values(this.data)) || [];
   }
 
   /**
@@ -116,8 +126,8 @@ export class DataStore<T> {
   /**
    * Validates the data from the cache depending on the last update time.
    */
-  public isValid(): boolean {
-    if (!this.lastUpdate || this.ttl * 1000 < Date.now() - this.lastUpdate.getTime()) {
+  protected isValid(): boolean {
+    if (!this.lastUpdate || !this.ttl || this.ttl * 1000 < Date.now() - this.lastUpdate.getTime()) {
       this.log(`store %s is outdated`, this.name);
 
       return false;

@@ -14,11 +14,11 @@ export const validProducts = [
       externIdentifier: {
         attributes: {
           source: 'PPL',
-          id: '1002',
-          name: 'Standardbrief Integral + EINSCHREIBEN EINWURF',
-          firstPPLVersion: '35',
-          lastPPLVersion: '39',
-          actualPPLVersion: '39'
+          id: '1',
+          name: 'Standardbrief',
+          firstPPLVersion: '1',
+          lastPPLVersion: '47',
+          actualPPLVersion: '47'
         }
       }
     },
@@ -26,7 +26,7 @@ export const validProducts = [
       price: {
         calculatedGrossPrice: {
           attributes: {
-            value: '2.85',
+            value: '0.80',
             currency: 'EUR',
             calculated: 'true'
           }

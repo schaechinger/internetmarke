@@ -6,7 +6,8 @@ describe('Client', () => {
   let client: Client;
 
   beforeEach(() => {
-    client = new Client(clientCredentials);
+    client = new Client();
+    client.setCredentials(clientCredentials);
   });
 
   it('should return credentials', () => {
@@ -18,7 +19,7 @@ describe('Client', () => {
   it('should generate the client id if non is provided', () => {
     const cred = { ...clientCredentials };
     delete cred.id;
-    client = new Client(cred);
+    client.setCredentials(cred);
 
     expect(client.getId()).to.equal(cred.username.toUpperCase());
   });

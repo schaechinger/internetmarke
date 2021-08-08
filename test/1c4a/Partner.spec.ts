@@ -10,7 +10,8 @@ describe('Partner', () => {
   };
 
   beforeEach(() => {
-    partner = new Partner(credentials);
+    partner = new Partner();
+    partner.setCredentials(credentials);
   });
 
   it('should generate the soap header', () => {
@@ -26,7 +27,7 @@ describe('Partner', () => {
   it('should generate the soap header without keyPhase', () => {
     const cred = { ...credentials };
     delete cred.keyPhase;
-    partner = new Partner(cred);
+    partner.setCredentials(cred);
 
     const header = partner.getSoapHeaders();
 

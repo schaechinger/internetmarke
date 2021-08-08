@@ -1,3 +1,4 @@
+import { injectable } from 'inversify';
 import md5 from 'md5';
 import { formatDate } from './date';
 
@@ -19,10 +20,16 @@ export interface PartnerSoapHeader {
 const SIGNATURE_SEPARATOR = '::';
 // const SIGNATURE_EMPTY = '::::';
 
+@injectable()
 export class Partner {
   private [CREDENTIALS]: PartnerCredentials;
 
-  constructor(credentials: PartnerCredentials) {
+  /**
+   * Set the credentials to use the services.
+   *
+   * @param credentials The credentials that authenticate the partner.
+   */
+  public setCredentials(credentials: PartnerCredentials): void {
     this[CREDENTIALS] = credentials;
 
     if (!this[CREDENTIALS].keyPhase) {

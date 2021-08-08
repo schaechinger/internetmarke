@@ -1,15 +1,16 @@
-import { Debugger } from 'debug';
+import { inject, injectable } from 'inversify';
+import { TYPES } from '../di/types';
 import { SoapError } from '../Error';
 import { Product } from '../prodWs/product';
 import { DataStore } from '../services/DataStore';
 import { SoapService } from '../services/Soap';
-import { getLogger } from '../utils/logger';
 import { parseAddress, SimpleAddress } from './address';
 import {
   AddressError,
   CheckoutError,
   OneClickForAppError,
   PageFormatError,
+  PartnerError,
   ShoppingCartItemError,
   UserError,
   VoucherLayoutError
@@ -134,26 +135,25 @@ const WSDL = 'https://internetmarke.deutschepost.de/OneClickForAppV3/OneClickFor
  * The implementation of the 1C4A / OneClickForApp service of the Deutsche Post
  * that handles the voucher ordering process and access to related data.
  */
+@injectable()
 export class OneClickForAppService extends SoapService implements OneClickForApp {
   protected wsdl = WSDL;
-  private partner: Partner;
-  private user: User;
   private defaults: { voucherLayout: VoucherLayout | null } = {
     voucherLayout: null
   };
-  private pageFormatStore: DataStore<PageFormat>;
-  private publicGalleryStore: DataStore<GalleryItem>;
-  private privateGalleryStore: DataStore<MotiveLink>;
   private shoppingCart: (ShoppingCartItem | null)[];
-  private log: Debugger;
 
-  constructor(partnerCredentials: PartnerCredentials) {
-    super();
+  constructor(
+    @inject(TYPES.Partner) private partner: Partner,
+    @inject(TYPES.User) private user: User,
+    @inject(TYPES.PageFormatStore) private pageFormatStore: DataStore<PageFormat>,
+    @inject(TYPES.MotiveLinkStore) private privateGalleryStore: DataStore<MotiveLink>,
+    @inject(TYPES.GalleryItemStore) private publicGalleryStore: DataStore<GalleryItem>,
+    @inject(TYPES.LoggerFactory) getLogger: any,
+    @inject(TYPES.SoapClientFactory) getSoapClient: any
+  ) {
+    super(getSoapClient);
 
-    this.partner = new Partner(partnerCredentials);
-    this.pageFormatStore = new DataStore<PageFormat>();
-    this.privateGalleryStore = new DataStore<MotiveLink>();
-    this.publicGalleryStore = new DataStore<GalleryItem>();
     this.shoppingCart = [];
     this.log = getLogger('1c4a');
   }
@@ -163,11 +163,16 @@ export class OneClickForAppService extends SoapService implements OneClickForApp
    * the user.
    */
   public async init(options: OneCLickForAppServiceOptions): Promise<void> {
+    if (!options.partner) {
+      throw new PartnerError('Missing partner credentials for OneClickForApp service init.');
+    }
     if (!options.user) {
       throw new UserError('Missing user credentials for OneClickForApp service init.');
     }
 
-    this.user = new User(options.user);
+    this.partner.setCredentials(options.partner);
+    this.user.setCredentials(options.user);
+
     if (options.voucherLayout) {
       this.defaults.voucherLayout = options.voucherLayout;
     }

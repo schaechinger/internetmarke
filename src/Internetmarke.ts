@@ -4,7 +4,7 @@
  * MIT Licensed
  */
 
-import { PartnerError } from './1c4a/Error';
+import { injectable } from 'inversify';
 import { GalleryItem, MotiveLink } from './1c4a/gallery';
 import { Order, ShoppingCartItem, ShoppingCartSummary } from './1c4a/order';
 import { PageFormat } from './1c4a/pageFormat';
@@ -17,8 +17,9 @@ import {
   ShoppingCartItemOptions
 } from './1c4a/Service';
 import { UserInfo } from './1c4a/User';
+import container from './di/inversify-config';
+import { TYPES } from './di/types';
 import { InternetmarkeError } from './Error';
-import { ClientError } from './prodWs/Error';
 import { Product } from './prodWs/product';
 import { ProductService, ProductServiceOptions, ProdWS } from './prodWs/Service';
 import { SoapService } from './services/Soap';
@@ -26,9 +27,15 @@ import { SoapService } from './services/Soap';
 /**
  * Main class of the internetmarke package with access to all available methods.
  */
+@injectable()
 export class Internetmarke implements OneClickForApp, ProdWS {
   private oneClick4AppService: OneClickForAppService;
   private productService: ProductService;
+
+  constructor() {
+    this.oneClick4AppService = container.get<OneClickForAppService>(TYPES.OneClickForAppService);
+    this.productService = container.get<ProductService>(TYPES.ProductService);
+  }
 
   //
   // 1C4A
@@ -41,15 +48,7 @@ export class Internetmarke implements OneClickForApp, ProdWS {
   public async initOneClickForAppService(
     options: OneCLickForAppServiceOptions
   ): Promise<OneClickForAppService> {
-    if (!this.oneClick4AppService) {
-      if (!options.partner) {
-        throw new PartnerError('Missing partner credentials for OneClickForApp service init.');
-      }
-
-      this.oneClick4AppService = new OneClickForAppService(options.partner);
-
-      await this.oneClick4AppService.init(options);
-    }
+    await this.oneClick4AppService.init(options);
 
     return this.oneClick4AppService;
   }
@@ -249,14 +248,7 @@ export class Internetmarke implements OneClickForApp, ProdWS {
    * @param options Product service options to manipulate the default behaviour.
    */
   public async initProductService(options: ProductServiceOptions): Promise<ProductService> {
-    if (!this.productService) {
-      if (!options.client) {
-        throw new ClientError('Missing client credentials for product service');
-      }
-      this.productService = new ProductService(options.client);
-
-      await this.productService.init(options);
-    }
+    await this.productService.init(options);
 
     return this.productService;
   }
@@ -288,7 +280,7 @@ export class Internetmarke implements OneClickForApp, ProdWS {
   }
 
   private checkServiceInit(service: SoapService, message: string): void {
-    if (!service) {
+    if (!service.isInitialized()) {
       throw new InternetmarkeError(message);
     }
   }

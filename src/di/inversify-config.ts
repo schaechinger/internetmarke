@@ -1,0 +1,52 @@
+import 'reflect-metadata';
+import debug, { Debugger } from 'debug';
+import { Container, interfaces } from 'inversify';
+import { Client as SoapClient, createClientAsync } from 'soap';
+import { TYPES } from './types';
+import { Partner } from '../1c4a/Partner';
+import { OneClickForAppService } from '../1c4a/Service';
+import { User } from '../1c4a/User';
+import { Internetmarke } from '../Internetmarke';
+import { Client } from '../prodWs/Client';
+import { ProductService } from '../prodWs/Service';
+import { DataStore } from '../services/DataStore';
+import { PageFormat } from '../1c4a/pageFormat';
+import { GalleryItem, MotiveLink } from '../1c4a/gallery';
+import { Product } from '../prodWs/product';
+
+const container = new Container();
+
+// factories
+container
+  .bind<interfaces.Factory<Debugger>>(TYPES.LoggerFactory)
+  .toFactory<Debugger>((_context: interfaces.Context) => {
+    return (logId?: string): Debugger => {
+      return debug(`internetmarke${logId ? `:${logId}` : ''}`);
+    };
+  });
+container
+  .bind<interfaces.Factory<SoapClient>>(TYPES.SoapClientFactory)
+  .toFactory<Promise<SoapClient>>((_context: interfaces.Context) => {
+    return (wsdl: string): Promise<SoapClient> => {
+      return createClientAsync(wsdl, {
+        disableCache: true
+      });
+    };
+  });
+
+// 1C4A
+container.bind<Partner>(TYPES.Partner).to(Partner);
+container.bind<User>(TYPES.User).to(User);
+container.bind<DataStore<PageFormat>>(TYPES.PageFormatStore).to(DataStore).inSingletonScope();
+container.bind<DataStore<MotiveLink>>(TYPES.MotiveLinkStore).to(DataStore).inSingletonScope();
+container.bind<DataStore<GalleryItem>>(TYPES.GalleryItemStore).to(DataStore).inSingletonScope();
+container.bind<OneClickForAppService>(TYPES.OneClickForAppService).to(OneClickForAppService);
+
+// ProdWS
+container.bind<Client>(TYPES.Client).to(Client);
+container.bind<DataStore<Product>>(TYPES.ProductStore).to(DataStore).inSingletonScope();
+container.bind<ProductService>(TYPES.ProductService).to(ProductService);
+
+container.bind<Internetmarke>(TYPES.Internetmarke).to(Internetmarke);
+
+export default container;

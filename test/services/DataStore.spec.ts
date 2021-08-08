@@ -5,6 +5,7 @@ import { join as joinPath } from 'path';
 import { sync as rmdirSync } from 'rimraf';
 import { stub } from 'sinon';
 import { DataStore } from '../../src/services/DataStore';
+import { getLoggerStub } from '../stubs/logger.stub';
 
 describe('DataStore', () => {
   let store: DataStore<any>;
@@ -15,7 +16,7 @@ describe('DataStore', () => {
   let loadData: any;
 
   beforeEach(() => {
-    store = new DataStore();
+    store = new DataStore(getLoggerStub);
 
     loadData = stub().returns(
       Promise.resolve({
@@ -63,14 +64,19 @@ describe('DataStore', () => {
 
     await new Promise<void>(resolve => {
       setTimeout(async () => {
-        console.log('async timer');
-
         await store.getList();
 
         expect(loadData.calledTwice).to.be.true;
         resolve();
       }, 11);
     });
+  });
+
+  it('should reload the data with disabled cache', async () => {
+    await store.init(tmpFile, loadData, 0);
+    await store.getList();
+
+    expect(loadData.calledTwice).to.be.true;
   });
 
   it('should remove cached data', async () => {

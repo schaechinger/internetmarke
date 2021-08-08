@@ -1,9 +1,10 @@
-import { Debugger } from 'debug';
+import { inject, injectable } from 'inversify';
 import { WSSecurity } from 'soap';
+import { TYPES } from '../di/types';
 import { DataStore } from '../services/DataStore';
 import { SoapService } from '../services/Soap';
-import { getLogger } from '../utils/logger';
 import { Client, ClientCredentials } from './Client';
+import { ClientError } from './Error';
 import { parseSalesProduct, Product } from './product';
 
 export interface ProductServiceOptions {
@@ -26,17 +27,21 @@ export interface ProdWS {
 
 export const WSDL = 'https://prodws.deutschepost.de:8443/ProdWSProvider_1_1/prodws?wsdl';
 
+/**
+ * The implementation of the ProdWS service that handles product information
+ */
+@injectable()
 export class ProductService extends SoapService implements ProdWS {
   protected wsdl = WSDL;
-  private client: Client;
-  private productStore: DataStore<Product>;
-  private log: Debugger;
 
-  constructor(clientCredentials: ClientCredentials) {
-    super();
+  constructor(
+    @inject(TYPES.Client) private client: Client,
+    @inject(TYPES.ProductStore) private productStore: DataStore<Product>,
+    @inject(TYPES.LoggerFactory) getLogger: any,
+    @inject(TYPES.SoapClientFactory) getSoapClient: any
+  ) {
+    super(getSoapClient);
 
-    this.client = new Client(clientCredentials);
-    this.productStore = new DataStore<Product>();
     this.log = getLogger('prodws');
   }
 
@@ -47,12 +52,18 @@ export class ProductService extends SoapService implements ProdWS {
    * @param options Product service options to manipulate the default behaviour.
    */
   public async init(options: ProductServiceOptions): Promise<void> {
+    if (!options.client) {
+      throw new ClientError('Missing client credentials for ProdWS service init.');
+    }
+
+    this.client.setCredentials(options.client);
+
     await this.checkSoapClient();
 
     await this.productStore.init(
       'product-list.json',
       this.updateProducts.bind(this),
-      options.ttl || 7 * 24 * 3600
+      undefined !== options.ttl ? options.ttl : 7 * 24 * 3600
     );
   }
 
@@ -117,7 +128,7 @@ export class ProductService extends SoapService implements ProdWS {
         return products;
       })
       .catch((e: any) => {
-        this.log('getProductList', e.root.Envelope.Body.Fault);
+        this.log('getProductList', e.root?.Envelope.Body.Fault || e);
         // throw new SoapError(e.root.Envelope.Body.Fault.faultstring);
       });
   }

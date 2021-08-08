@@ -15,7 +15,8 @@ describe('User', () => {
   };
 
   beforeEach(() => {
-    user = new User(credentials);
+    user = new User();
+    user.setCredentials(credentials);
   });
 
   it('should get user data before loading', () => {

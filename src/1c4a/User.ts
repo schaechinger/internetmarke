@@ -1,6 +1,5 @@
-// import { Debugger } from 'debug';
+import { injectable } from 'inversify';
 import { Amount } from '../prodWs/product';
-// import { getLogger } from '../utils/logger';
 
 export interface UserCredentials {
   username: string;
@@ -29,6 +28,7 @@ const CREDENTIALS = Symbol('credentials'),
 /**
  * The Portokasse user that is billed for ordered vouchers.
  */
+@injectable()
 export class User {
   private [CREDENTIALS]: UserCredentials;
   private [TOKEN]: string | null;
@@ -36,15 +36,22 @@ export class User {
   private infoMessage?: string;
   private orderIds: number[] = [];
   private showTermsAndCondition = false;
-  // private log: Debugger;
 
-  constructor(credentials: UserCredentials) {
+  /**
+   * Set the credentials to use the services.
+   *
+   * @param credentials The credentials that authenticate the user.
+   */
+  public setCredentials(credentials: UserCredentials): void {
     this[CREDENTIALS] = credentials;
     this[TOKEN] = null;
-
-    // this.log = getLogger('user');
   }
 
+  /**
+   * Update the user data as retrieved from the service.
+   *
+   * @param data The user data from the service.
+   */
   public load(data: UserData): void {
     if (data.userToken) {
       this[TOKEN] = data.userToken;
