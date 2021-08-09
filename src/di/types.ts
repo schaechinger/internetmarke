@@ -5,8 +5,9 @@ export const TYPES = {
   Partner: Symbol('Partner'),
   User: Symbol('User'),
   // services
-  ProductService: Symbol('ProductService'),
   OneClickForAppService: Symbol('OneClickForAppService'),
+  PortokasseService: Symbol('PortokasseService'),
+  ProductService: Symbol('ProductService'),
   // stores
   PageFormatStore: Symbol('DataStore<PageFormat>'),
   MotiveLinkStore: Symbol('DataStore<MotiveLink>'),

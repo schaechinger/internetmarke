@@ -16,6 +16,9 @@ A node implementation to use the Internetmarke web service of Deutsche Post.
   - [Checkout Shopping Cart and Place Order](#checkout-shopping-cart-and-place-order)
   - [Retrieve Older Orders](#retrieve-older-orders)
   - [Addresses](#addresses)
+- [Portokasse Service](#portokasse-service)
+  - [Get Balance](#get-balance)
+  - [Top Up Account](#top-up-account)
 - [ProdWS (Product Service)](#prodws-product-service)
   - [Retrieve Product List](#retrieve-product-list)
   - [Retrieve Oudated Products](#retrieve-outdated-products)
@@ -61,9 +64,10 @@ every web service you want to use and your payment account:
 
 ## Usage
 
-Internetmarke so far handles two services, the One Click For App (1C4A) Service
-that handles the voucher checkout process and the Product Service (ProdWS) that
-is capable of available products (types of vouchers).
+Internetmarke so far handles three services, the One Click For App (1C4A)
+Service that handles the voucher checkout process, the Product Service (ProdWS)
+that is capable of available products (types of vouchers) and the Portokasse
+service to top up the user account to order more vouchers.
 
 Each service can be used separately and has therefore to be initialized with a
 specific method call before it can be used. Afterwards you can use the returned
@@ -110,7 +114,7 @@ const options: OneClickForAppOptions = {
     username: 'user-account@example.com',
     password: '*****'
   },
-  voucherLayout: VoucherLayout.AddressZone // optional: default voucher layout for all vouchers
+  voucherLayout: VoucherLayout.AddressZone // optional, the default voucher layout for all vouchers
 };
 
 // this method returns the 1C4A service instance which can be used for all
@@ -298,6 +302,12 @@ const namedAddress: NamedAddress = {
   }
 };
 ```
+
+## Portokasse Service
+
+### Get Balance
+
+### Top Up Account
 
 ## ProdWS (Product Service)
 

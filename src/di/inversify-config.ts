@@ -5,7 +5,7 @@ import { Client as SoapClient, createClientAsync } from 'soap';
 import { TYPES } from './types';
 import { Partner } from '../1c4a/Partner';
 import { OneClickForAppService } from '../1c4a/Service';
-import { User } from '../1c4a/User';
+import { User } from '../User';
 import { Internetmarke } from '../Internetmarke';
 import { Client } from '../prodWs/Client';
 import { ProductService } from '../prodWs/Service';
@@ -13,6 +13,7 @@ import { DataStore } from '../services/DataStore';
 import { PageFormat } from '../1c4a/pageFormat';
 import { GalleryItem, MotiveLink } from '../1c4a/gallery';
 import { Product } from '../prodWs/product';
+import { PortokasseService } from '../portokasse/Service';
 
 const container = new Container();
 
@@ -34,9 +35,12 @@ container
     };
   });
 
+// Portokasse
+container.bind<User>(TYPES.User).to(User);
+container.bind<PortokasseService>(TYPES.PortokasseService).to(PortokasseService);
+
 // 1C4A
 container.bind<Partner>(TYPES.Partner).to(Partner);
-container.bind<User>(TYPES.User).to(User);
 container.bind<DataStore<PageFormat>>(TYPES.PageFormatStore).to(DataStore).inSingletonScope();
 container.bind<DataStore<MotiveLink>>(TYPES.MotiveLinkStore).to(DataStore).inSingletonScope();
 container.bind<DataStore<GalleryItem>>(TYPES.GalleryItemStore).to(DataStore).inSingletonScope();

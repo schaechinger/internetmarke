@@ -5,12 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.5.0] - Unreleased
 
 ### Added
 
+- Portokasse service support to top up your account
 - Dependency injection with inversify
 - Addresses now support state codes that get added in front of the zip code
+
+## [0.4.3] - 2021-08-05
+
+### Added
+
+- Shopping car items support product price in cents together with the product
+  code if the ProdWS is not used
+- dryrun checkout is default in test environment
+- Added user data information
+
+### Changed
+
+- User info can only be updated once the user is authenticated
+
+### Fixed
+
+- User info `showTermsAndConditions` is now updated if false is provided
 
 ## [0.4.2] - 2021-07-28
 
@@ -76,7 +94,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- `internetmarke.orderVoucher` now takes a productCode or product from the product service
+- `internetmarke.orderVoucher` now takes a productCode or product from the
+  product service
 
 ## [0.2.1] - 2018-02-25
 

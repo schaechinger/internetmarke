@@ -1,6 +1,6 @@
 import { inject, injectable } from 'inversify';
 import { TYPES } from '../di/types';
-import { SoapError } from '../Error';
+import { SoapError, UserError } from '../Error';
 import { Product } from '../prodWs/product';
 import { DataStore } from '../services/DataStore';
 import { SoapService } from '../services/Soap';
@@ -12,14 +12,13 @@ import {
   PageFormatError,
   PartnerError,
   ShoppingCartItemError,
-  UserError,
   VoucherLayoutError
 } from './Error';
 import { GalleryItem, ImageItem, MotiveLink } from './gallery';
 import { Order, ShoppingCartItem, ShoppingCartSummary } from './order';
 import { PageFormat, PageFormatPosition } from './pageFormat';
 import { Partner, PartnerCredentials } from './Partner';
-import { User, UserCredentials, UserInfo } from './User';
+import { User, UserCredentials, UserInfo } from '../User';
 import { VoucherFormat, VoucherLayout } from './voucher';
 
 export interface OneCLickForAppServiceOptions {

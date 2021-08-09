@@ -1,5 +1,5 @@
 import { injectable } from 'inversify';
-import { Amount } from '../prodWs/product';
+import { Amount } from './prodWs/product';
 
 export interface UserCredentials {
   username: string;

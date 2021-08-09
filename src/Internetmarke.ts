@@ -16,24 +16,32 @@ import {
   PreviewVoucherOptions,
   ShoppingCartItemOptions
 } from './1c4a/Service';
-import { UserInfo } from './1c4a/User';
+import { UserInfo } from './User';
 import container from './di/inversify-config';
 import { TYPES } from './di/types';
 import { InternetmarkeError } from './Error';
-import { Product } from './prodWs/product';
+import { Amount, Product } from './prodWs/product';
 import { ProductService, ProductServiceOptions, ProdWS } from './prodWs/Service';
 import { SoapService } from './services/Soap';
+import {
+  PaymentMethod,
+  Portokasse,
+  PortokasseService,
+  PortokasseServiceOptions
+} from './portokasse/Service';
 
 /**
  * Main class of the internetmarke package with access to all available methods.
  */
 @injectable()
-export class Internetmarke implements OneClickForApp, ProdWS {
+export class Internetmarke implements OneClickForApp, Portokasse, ProdWS {
   private oneClick4AppService: OneClickForAppService;
+  private portokasseService: PortokasseService;
   private productService: ProductService;
 
   constructor() {
     this.oneClick4AppService = container.get<OneClickForAppService>(TYPES.OneClickForAppService);
+    this.portokasseService = container.get<PortokasseService>(TYPES.PortokasseService);
     this.productService = container.get<ProductService>(TYPES.ProductService);
   }
 
@@ -226,7 +234,8 @@ export class Internetmarke implements OneClickForApp, ProdWS {
   /**
    * Retrieves the order information of an existing order with the given id.
    *
-   * @param shopOrderId The order information that hold the data about the vouchers.
+   * @param shopOrderId The order information that hold the data about the
+   *  vouchers.
    */
   public retrieveOrder(shopOrderId: number): Promise<Order | null> {
     this.checkServiceInit(
@@ -279,7 +288,44 @@ export class Internetmarke implements OneClickForApp, ProdWS {
     return this.productService.getProduct(id);
   }
 
-  private checkServiceInit(service: SoapService, message: string): void {
+  //
+  // Portokasse
+  //
+
+  /**
+   * Initializes the portokasse service and makes it ready to use with the
+   * registered user account.
+   *
+   * @param options Portokasse service options to manipulate the default
+   *  behaviour.
+   */
+  public async initPortokasseService(
+    options: PortokasseServiceOptions
+  ): Promise<PortokasseService> {
+    await this.portokasseService.init(options);
+
+    return this.portokasseService;
+  }
+
+  public getBalance(): Promise<Amount | false> {
+    this.checkServiceInit(
+      this.portokasseService,
+      'Cannot get balance before initializing portokasse service'
+    );
+
+    return this.portokasseService.getBalance();
+  }
+
+  public topUp(amount: Amount | number, paymentMethod: PaymentMethod): Promise<Amount | false> {
+    this.checkServiceInit(
+      this.portokasseService,
+      'Cannot get balance before initializing portokasse service'
+    );
+
+    return this.portokasseService.topUp(amount, paymentMethod);
+  }
+
+  private checkServiceInit(service: SoapService | PortokasseService, message: string): void {
     if (!service.isInitialized()) {
       throw new InternetmarkeError(message);
     }

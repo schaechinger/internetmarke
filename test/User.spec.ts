@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { User, UserCredentials, UserData } from '../../src/1c4a/User';
+import { User, UserCredentials, UserData } from '../src/User';
 
 describe('User', () => {
   let user: User;

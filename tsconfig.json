@@ -7,7 +7,6 @@
     "target": "es6",
     "noImplicitAny": false,
     "resolveJsonModule": true,
-    "removeComments": true,
     "noUnusedLocals": true,
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,

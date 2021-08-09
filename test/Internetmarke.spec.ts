@@ -1,6 +1,7 @@
 import { expect } from 'chai';
 import { InternetmarkeError } from '../src/Error';
 import { Internetmarke } from '../src/Internetmarke';
+import { PaymentMethod } from '../src/portokasse/Service';
 import { Product } from '../src/prodWs/product';
 
 let internetmarke: Internetmarke;
@@ -24,6 +25,11 @@ describe('Internetmarke', () => {
     expect(() => internetmarke.getShoppingCartSummary()).to.throw(InternetmarkeError);
     expect(() => internetmarke.checkoutShoppingCart()).to.throw(InternetmarkeError);
     expect(() => internetmarke.retrieveOrder(0)).to.throw(InternetmarkeError);
+  });
+
+  it('should throw errors when accessing Portokasse services before init', () => {
+    expect(() => internetmarke.getBalance()).to.throw(InternetmarkeError);
+    expect(() => internetmarke.topUp(0, PaymentMethod.GiroPay)).to.throw(InternetmarkeError);
   });
 
   it('should throw errors when accessing ProdWS services before init', () => {

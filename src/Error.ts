@@ -7,3 +7,4 @@ export class InternetmarkeError extends Error {
 }
 
 export class SoapError extends InternetmarkeError {}
+export class UserError extends InternetmarkeError {}
