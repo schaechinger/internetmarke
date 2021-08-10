@@ -321,6 +321,31 @@ from the Portokasse service.
 
 ### Top Up Account
 
+Top up is the main method of the Portokasse service. There are two different
+payment methods: PayPal and Giropay. Giropay expects a BIC string to be also
+passed to the method. Both methods will result in a `redirect` link that should
+be called by the user to finish the top up request.
+
+**Info:** The minimum amount to top up is EUR 10,00 which can be defined as an
+`Amount` object or a raw number in Euro Cents.
+
+**PayPal top up**
+
+```typescript
+const amount = { value: 10, currency: 'EUR' }; // or: const amount = 1000;
+const payment = await internetmarke.topUp(amount, PaymentMethod.PayPal);
+// payment: { code: 'OK', redirect: 'https://paypal.com/...' }
+```
+
+**GiroPay top up**
+
+```typescript
+const amount = { value: 10, currency: 'EUR' }; // or: const amount = 1000;
+const bic = 'HOLVDEB1XXX';
+const payment = await internetmarke.topUp(amount, PaymentMethod.GiroPay, bic);
+// payment: { code: 'OK', redirect: 'https://giropay.de/...' }
+```
+
 ## ProdWS (Product Service)
 
 The product list contains all available vouchers that can be ordered. They are

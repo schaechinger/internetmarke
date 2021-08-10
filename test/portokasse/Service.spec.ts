@@ -4,6 +4,7 @@ import { UserError } from '../../src/Error';
 import { PaymentMethod, PortokasseService } from '../../src/portokasse/Service';
 import { userCredentials } from '../1c4a/helper';
 import { User } from '../../src/User';
+import { PortokasseError } from '../../src/portokasse/Error';
 
 describe('Portokasse Service', () => {
   let service: PortokasseService;
@@ -38,7 +39,7 @@ describe('Portokasse Service', () => {
     });
 
     it('should init with minimal options', async () => {
-      expect(service.init({ user: userCredentials })).to.eventually.be.fulfilled;
+      await service.init({ user: userCredentials });
       expect(service.isInitialized()).to.be.true;
     });
   });
@@ -53,9 +54,7 @@ describe('Portokasse Service', () => {
         }
       });
 
-      const info = await service.getUserInfo();
-
-      expect(info.isAuthenticated).to.be.false;
+      expect(service.getUserInfo()).to.eventually.be.rejectedWith(PortokasseError);
     });
 
     it('should retrieve user balance', async () => {
@@ -77,10 +76,34 @@ describe('Portokasse Service', () => {
   });
 
   describe('topUp', () => {
-    it('should add tests once topup is implemented', async () => {
-      const res = await service.topUp(1000, PaymentMethod.GiroPay);
+    it('should top up with GiroPay', async () => {
+      moxios.stubOnce('post', /\/payments$/, {
+        status: 200,
+        headers: {},
+        response: {
+          code: 'OK',
+          redirect: 'http://localhost'
+        }
+      });
 
-      expect(res).to.be.false;
+      const res = await service.topUp(1000, PaymentMethod.GiroPay, 'XXXXDEXXXX');
+
+      expect(res).to.exist;
+    });
+
+    it('should top up with Paypal', async () => {
+      moxios.stubOnce('post', /\/payments$/, {
+        status: 200,
+        headers: {},
+        response: {
+          code: 'OK',
+          redirect: 'http://localhost'
+        }
+      });
+
+      const res = await service.topUp(1000, PaymentMethod.Paypal);
+
+      expect(res).to.exist;
     });
   });
 });

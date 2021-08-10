@@ -4,6 +4,7 @@ import { inject, injectable } from 'inversify';
 import { CookieJar } from 'tough-cookie';
 import { TYPES } from '../di/types';
 import { UserError } from '../Error';
+import { PortokasseError } from './Error';
 import { Amount } from '../prodWs/product';
 import { RestService } from '../services/Rest';
 import { User, UserCredentials, UserInfo } from '../User';
@@ -13,15 +14,25 @@ export enum PaymentMethod {
   Paypal = 'PAYPAL'
 }
 
+export interface PaymentResponse {
+  code: string; // 'OK'
+  redirect: string; // paypal url
+}
+
 export interface PortokasseServiceOptions {
   user: UserCredentials;
 }
 
 export interface Portokasse {
-  topUp(amount: Amount | number, paymentMethod: PaymentMethod): Promise<Amount | false>;
+  getUserInfo(): Promise<UserInfo>;
+  topUp(
+    amount: Amount | number,
+    paymentMethod: PaymentMethod,
+    bic?: string
+  ): Promise<PaymentResponse>;
 }
 
-export const BASE_URL = 'https://portokasse.deutschepost.de/portokasse';
+const BASE_URL = 'https://portokasse.deutschepost.de/portokasse';
 
 @injectable()
 export class PortokasseService extends RestService implements Portokasse {
@@ -45,7 +56,7 @@ export class PortokasseService extends RestService implements Portokasse {
   }
 
   public isInitialized(): boolean {
-    return !!this.cookieJar;
+    return this.user.isAuthenticated();
   }
 
   public async getUserInfo(): Promise<UserInfo> {
@@ -61,10 +72,20 @@ export class PortokasseService extends RestService implements Portokasse {
   }
 
   public async topUp(
-    _amount: Amount | number,
-    _paymentMethod: PaymentMethod
-  ): Promise<Amount | false> {
-    return false;
+    amount: Amount | number,
+    paymentMethod: PaymentMethod,
+    bic?: string
+  ): Promise<PaymentResponse> {
+    const data: any = {
+      amount: 'number' === typeof amount ? amount : (amount as Amount).value * 100,
+      paymentMethod
+    };
+
+    if (PaymentMethod.GiroPay === paymentMethod) {
+      data.bic = bic;
+    }
+
+    return this.request('POST', '/api/v1/payments', data);
   }
 
   private async login(): Promise<boolean> {
@@ -84,19 +105,30 @@ export class PortokasseService extends RestService implements Portokasse {
       withCredentials: true
     };
 
-    if (data) {
-      const encodedData: string[] = [];
-      for (let prop in data) {
-        encodedData.push(`${prop}=${encodeURIComponent(data[prop])}`);
-      }
+    const isLogin = '/login' === path;
 
-      options.data = encodedData.join('&');
+    if (data) {
+      if (isLogin) {
+        const encodedData: string[] = [];
+        for (let prop in data) {
+          encodedData.push(`${prop}=${encodeURIComponent(data[prop])}`);
+        }
+
+        options.data = encodedData.join('&');
+      } else {
+        options.data = data;
+      }
     }
     if (this.csrf) {
       options.headers = {
-        'X-CSRF-TOKEN': this.csrf,
-        'Content-Type': 'application/x-www-form-urlencoded'
+        'X-CSRF-TOKEN': this.csrf
       };
+
+      if (data) {
+        options.headers['Content-Type'] = isLogin
+          ? 'application/x-www-form-urlencoded'
+          : 'application/json';
+      }
     }
 
     try {
@@ -112,7 +144,12 @@ export class PortokasseService extends RestService implements Portokasse {
 
       return res.data;
     } catch (e) {
-      return e.response?.data || null;
+      const error = new PortokasseError(
+        `Error from Portokasse: ${e.response?.data.code || 'Unknown'}`
+      );
+      (error as any).response = e.response || e.message;
+
+      throw error;
     }
   }
 }

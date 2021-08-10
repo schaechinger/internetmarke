@@ -23,6 +23,7 @@ import { Amount, Product } from './prodWs/product';
 import { ProductService, ProductServiceOptions, ProdWS } from './prodWs/Service';
 import {
   PaymentMethod,
+  PaymentResponse,
   Portokasse,
   PortokasseService,
   PortokasseServiceOptions
@@ -318,13 +319,17 @@ export class Internetmarke implements OneClickForApp, Portokasse, ProdWS {
     return this.portokasseService;
   }
 
-  public topUp(amount: Amount | number, paymentMethod: PaymentMethod): Promise<Amount | false> {
+  public topUp(
+    amount: Amount | number,
+    paymentMethod: PaymentMethod,
+    bic?: string
+  ): Promise<PaymentResponse> {
     this.checkServiceInit(
       this.portokasseService,
       'Cannot get balance before initializing portokasse service'
     );
 
-    return this.portokasseService.topUp(amount, paymentMethod);
+    return this.portokasseService.topUp(amount, paymentMethod, bic);
   }
 
   protected init(): void {
