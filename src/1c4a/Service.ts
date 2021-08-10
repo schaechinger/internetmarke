@@ -113,7 +113,7 @@ export interface CheckoutShoppingCartOptions {
  * The public definition of the OneClickForApp service.
  */
 export interface OneClickForApp {
-  getUserInfo(): UserInfo;
+  getUserInfo(): Promise<UserInfo>;
   retrievePageFormats(): Promise<PageFormat[]>;
   retrievePageFormat(id: number): Promise<PageFormat | null>;
   createShopOrderId(): Promise<number | null>;
@@ -209,7 +209,7 @@ export class OneClickForAppService extends SoapService implements OneClickForApp
   /**
    * Retrieves all available information about the authenticated user.
    */
-  public getUserInfo(): UserInfo {
+  public async getUserInfo(): Promise<UserInfo> {
     return this.user.getInfo();
   }
 

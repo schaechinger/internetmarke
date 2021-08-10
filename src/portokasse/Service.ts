@@ -5,7 +5,8 @@ import { CookieJar } from 'tough-cookie';
 import { TYPES } from '../di/types';
 import { UserError } from '../Error';
 import { Amount } from '../prodWs/product';
-import { User, UserCredentials } from '../User';
+import { RestService } from '../services/Rest';
+import { User, UserCredentials, UserInfo } from '../User';
 
 export enum PaymentMethod {
   GiroPay = 'GIROPAY',
@@ -17,18 +18,19 @@ export interface PortokasseServiceOptions {
 }
 
 export interface Portokasse {
-  getBalance(): Promise<Amount | false>;
   topUp(amount: Amount | number, paymentMethod: PaymentMethod): Promise<Amount | false>;
 }
 
 const BASE_URL = 'https://portokasse.deutschepost.de/portokasse';
 
 @injectable()
-export class PortokasseService implements Portokasse {
+export class PortokasseService extends RestService implements Portokasse {
   private cookieJar: CookieJar;
   private csrf?: string;
 
-  constructor(@inject(TYPES.User) private user: User) {}
+  constructor(@inject(TYPES.User) private user: User) {
+    super();
+  }
 
   public async init(options: PortokasseServiceOptions): Promise<boolean> {
     if (!this.cookieJar) {
@@ -48,17 +50,16 @@ export class PortokasseService implements Portokasse {
     return !!this.cookieJar;
   }
 
-  public async getBalance(): Promise<Amount | false> {
+  public async getUserInfo(): Promise<UserInfo> {
     const res = await this.request('GET', '/api/v1/wallet-overviews/me');
 
     if (res?.balance) {
-      return {
-        value: res.balance / 100,
-        currency: 'EUR'
-      };
+      this.user.load({
+        walletBalance: res.balance
+      });
     }
 
-    return false;
+    return this.user.getInfo();
   }
 
   public async topUp(
@@ -72,7 +73,9 @@ export class PortokasseService implements Portokasse {
     await this.request('GET', '/login');
     const info = await this.request('POST', '/login', this.user.getCredentials());
 
-    return info?.email === this.user.getCredentials().username;
+    this.user.load(info);
+
+    return this.user.isAuthenticated();
   }
 
   private async request(method: Method, path: string = '', data?: any): Promise<any> {
@@ -84,12 +87,12 @@ export class PortokasseService implements Portokasse {
     };
 
     if (data) {
-      const formData: string[] = [];
+      const encodedData: string[] = [];
       for (let prop in data) {
-        formData.push(`${prop}=${encodeURIComponent(data[prop])}`);
+        encodedData.push(`${prop}=${encodeURIComponent(data[prop])}`);
       }
 
-      options.data = formData.join('&');
+      options.data = encodedData.join('&');
     }
     if (this.csrf) {
       options.headers = {

@@ -17,7 +17,7 @@ A node implementation to use the Internetmarke web service of Deutsche Post.
   - [Retrieve Older Orders](#retrieve-older-orders)
   - [Addresses](#addresses)
 - [Portokasse Service](#portokasse-service)
-  - [Get Balance](#get-balance)
+  - [Wallet Overview](#wallet-overview)
   - [Top Up Account](#top-up-account)
 - [ProdWS (Product Service)](#prodws-product-service)
   - [Retrieve Product List](#retrieve-product-list)
@@ -86,8 +86,12 @@ import { Internetmarke } from 'internetmarke';
 const internetmarke = new Internetmarke();
 
 // use 1C4A service
-// const oneC4Aoptions = { partner: ..., user: ... }
+// const oneC4AOptions = { partner: ..., user: ... }
 await internetmarke.initOneClickForAppService(oneC4AOptions);
+
+// use Portokasse service
+// const portokasseOptions = { user: ... }
+await internetmarke.initOneClickForAppService(portokasseOptions);
 
 // use ProdWS service
 // const prodWsOptions = { client: ... }
@@ -129,7 +133,7 @@ As soon as this initialization is done you can access all the resources of the
 of your Portokasse account:
 
 ```typescript
-const userInfo = internetmarke.getUserInfo();
+const userInfo = await internetmarke.getUserInfo();
 ```
 
 The user info holds all the information about your account including your wallet
@@ -305,7 +309,15 @@ const namedAddress: NamedAddress = {
 
 ## Portokasse Service
 
-### Get Balance
+### Wallet Overview
+
+The `wallet-overview` api endpoint retrieves the wallet balance same as the user
+account provided by the 1C4A service. To retrieve this information use the same
+method `getUserInfo` as you do to retrieve [1C4A user informtion](#user-info)
+mentioned above. Depending of which services you enabled this will return the
+data from the 1C4A or the Portokasse service. If you however initialized both
+accounts it will merge the information from 1C4A with the live wallet balance
+from the Portokasse service.
 
 ### Top Up Account
 

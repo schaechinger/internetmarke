@@ -4,7 +4,6 @@
  * MIT Licensed
  */
 
-import { injectable } from 'inversify';
 import { GalleryItem, MotiveLink } from './1c4a/gallery';
 import { Order, ShoppingCartItem, ShoppingCartSummary } from './1c4a/order';
 import { PageFormat } from './1c4a/pageFormat';
@@ -22,27 +21,24 @@ import { TYPES } from './di/types';
 import { InternetmarkeError } from './Error';
 import { Amount, Product } from './prodWs/product';
 import { ProductService, ProductServiceOptions, ProdWS } from './prodWs/Service';
-import { SoapService } from './services/Soap';
 import {
   PaymentMethod,
   Portokasse,
   PortokasseService,
   PortokasseServiceOptions
 } from './portokasse/Service';
+import { PostService } from './services/service';
 
 /**
  * Main class of the internetmarke package with access to all available methods.
  */
-@injectable()
 export class Internetmarke implements OneClickForApp, Portokasse, ProdWS {
-  private oneClick4AppService: OneClickForAppService;
-  private portokasseService: PortokasseService;
-  private productService: ProductService;
+  protected oneClick4AppService: OneClickForAppService;
+  protected portokasseService: PortokasseService;
+  protected productService: ProductService;
 
   constructor() {
-    this.oneClick4AppService = container.get<OneClickForAppService>(TYPES.OneClickForAppService);
-    this.portokasseService = container.get<PortokasseService>(TYPES.PortokasseService);
-    this.productService = container.get<ProductService>(TYPES.ProductService);
+    this.init();
   }
 
   //
@@ -64,13 +60,28 @@ export class Internetmarke implements OneClickForApp, Portokasse, ProdWS {
   /**
    * Retrieves all available information about the Portokasse user.
    */
-  public getUserInfo(): UserInfo {
-    this.checkServiceInit(
-      this.oneClick4AppService,
-      'Cannot get user info before initializing OneClickForApp service'
-    );
+  public async getUserInfo(): Promise<UserInfo> {
+    let info: UserInfo | null = null;
 
-    return this.oneClick4AppService.getUserInfo();
+    if (this.portokasseService.isInitialized()) {
+      info = await this.portokasseService.getUserInfo();
+    }
+
+    if (!info) {
+      this.checkServiceInit(
+        this.oneClick4AppService,
+        'Cannot get user info before initializing OneClickForApp service'
+      );
+    }
+
+    if (this.oneClick4AppService.isInitialized()) {
+      const extended = await this.oneClick4AppService.getUserInfo();
+      extended.walletBalance = info?.walletBalance;
+
+      info = extended;
+    }
+
+    return info!;
   }
 
   /**
@@ -307,15 +318,6 @@ export class Internetmarke implements OneClickForApp, Portokasse, ProdWS {
     return this.portokasseService;
   }
 
-  public getBalance(): Promise<Amount | false> {
-    this.checkServiceInit(
-      this.portokasseService,
-      'Cannot get balance before initializing portokasse service'
-    );
-
-    return this.portokasseService.getBalance();
-  }
-
   public topUp(amount: Amount | number, paymentMethod: PaymentMethod): Promise<Amount | false> {
     this.checkServiceInit(
       this.portokasseService,
@@ -325,7 +327,13 @@ export class Internetmarke implements OneClickForApp, Portokasse, ProdWS {
     return this.portokasseService.topUp(amount, paymentMethod);
   }
 
-  private checkServiceInit(service: SoapService | PortokasseService, message: string): void {
+  protected init(): void {
+    this.oneClick4AppService = container.get<OneClickForAppService>(TYPES.OneClickForAppService);
+    this.portokasseService = container.get<PortokasseService>(TYPES.PortokasseService);
+    this.productService = container.get<ProductService>(TYPES.ProductService);
+  }
+
+  private checkServiceInit(service: PostService, message: string): void {
     if (!service.isInitialized()) {
       throw new InternetmarkeError(message);
     }

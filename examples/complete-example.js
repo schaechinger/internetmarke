@@ -53,7 +53,7 @@ const { Internetmarke } = require('../lib/Internetmarke');
   });
 
   // user info (walletBalance, orderIds purchased during this app run, etc.)
-  console.log('user info', internetmarke.getUserInfo());
+  console.log('user info', await internetmarke.getUserInfo());
 
   // page formats / retrievePageFormats
   const pageFormats = await internetmarke.retrievePageFormats();

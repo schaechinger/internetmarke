@@ -2,12 +2,13 @@ import { Debugger } from 'debug';
 import { inject, injectable } from 'inversify';
 import { Client as SoapClient } from 'soap';
 import { TYPES } from '../di/types';
+import { PostService } from './service';
 
 /**
  * Parent class of each soap service that provides basic connection functions.
  */
 @injectable()
-export abstract class SoapService {
+export abstract class SoapService implements PostService {
   /** The wsdl url to define the service endpoints. */
   protected abstract wsdl: string;
   /** The soap client used to request the service. */

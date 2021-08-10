@@ -7,10 +7,18 @@ export interface UserCredentials {
 }
 
 export interface UserData {
+  // 1C4A
   userToken?: string;
   walletBalance?: number;
   showTermsAndCondition?: boolean;
   infoMessage?: string;
+
+  // portokasse
+  email?: string;
+  marketplace?: boolean;
+  anonymous?: boolean;
+  postpaid?: boolean;
+  showBannerFooter?: boolean;
 }
 
 export interface UserInfo {
@@ -53,8 +61,8 @@ export class User {
    * @param data The user data from the service.
    */
   public load(data: UserData): void {
-    if (data.userToken) {
-      this[TOKEN] = data.userToken;
+    if (data.userToken || data.email) {
+      this[TOKEN] = data.userToken || data.email || null;
     }
 
     // only update data for authenticated users
