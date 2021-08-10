@@ -10,6 +10,6 @@ const chaiAsPromised = require('chai-as-promised');
 chai.use(chaiAsPromised);
 
 module.exports = {
-  timeout: 10000,
+  timeout: 5000,
   recursive: true,
 };

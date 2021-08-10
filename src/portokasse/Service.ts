@@ -21,7 +21,7 @@ export interface Portokasse {
   topUp(amount: Amount | number, paymentMethod: PaymentMethod): Promise<Amount | false>;
 }
 
-const BASE_URL = 'https://portokasse.deutschepost.de/portokasse';
+export const BASE_URL = 'https://portokasse.deutschepost.de/portokasse';
 
 @injectable()
 export class PortokasseService extends RestService implements Portokasse {
@@ -33,15 +33,13 @@ export class PortokasseService extends RestService implements Portokasse {
   }
 
   public async init(options: PortokasseServiceOptions): Promise<boolean> {
-    if (!this.cookieJar) {
-      if (!options.user) {
-        throw new UserError('Missing user credentials for Portokasse service init.');
-      }
-
-      axiosCookieJarSupport(axios);
-      this.user.setCredentials(options.user);
-      this.cookieJar = new CookieJar();
+    if (!options.user) {
+      throw new UserError('Missing user credentials for Portokasse service init.');
     }
+
+    axiosCookieJarSupport(axios);
+    this.user.setCredentials(options.user);
+    this.cookieJar = new CookieJar();
 
     return this.login();
   }
@@ -104,19 +102,16 @@ export class PortokasseService extends RestService implements Portokasse {
     try {
       const res = await axios(options);
 
-      if (res.headers['set-cookie']) {
+      if (res.headers && res.headers['set-cookie']) {
         res.headers['set-cookie'].forEach((cookie: string) => {
           if (cookie.startsWith('CSRF-TOKEN')) {
             this.csrf = cookie.substr(11, 36);
           }
         });
       }
-      console.log(res.status, res.data);
 
       return res.data;
     } catch (e) {
-      console.log(e.response?.data || e);
-
       return e.response?.data || null;
     }
   }
