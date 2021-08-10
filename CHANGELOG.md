@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Dependency injection with inversify
 - Addresses now support state codes that get added in front of the zip code
 
+### Fixed
+
+- Run scripts work on Windows as well
+
 ## [0.4.3] - 2021-08-05
 
 ### Added

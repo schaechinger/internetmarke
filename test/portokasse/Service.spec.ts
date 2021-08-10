@@ -105,5 +105,21 @@ describe('Portokasse Service', () => {
 
       expect(res).to.exist;
     });
+
+    it('should detect too small amount as error', async () => {
+      const errorCode = 'InvalidPaymentAmount';
+      moxios.stubOnce('post', /\/payments$/, {
+        status: 422,
+        headers: {},
+        response: {
+          code: errorCode,
+          arguments: null
+        }
+      });
+
+      expect(service.topUp(500, PaymentMethod.Paypal)).to.eventually.be.rejectedWith(
+        `Error from Portokasse: ${errorCode}`
+      );
+    });
   });
 });

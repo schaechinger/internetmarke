@@ -45,7 +45,7 @@ jobs:
           node-version: 'lts/*'
       - run: npm ci
       - run: npm run build --if-present
-      - run: npm run test:coverage
+      - run: npm run test:codecov
       - uses: codecov/codecov-action@v2
         with:
           token: ${{ secrets.CODECOV_TOKEN }}

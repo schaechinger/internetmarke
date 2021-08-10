@@ -1,4 +1,4 @@
-# Internetmarke [![NPM version][npm-svg]][npm-url] [![Workflow Status][workflow-svg]][workflow-url] [![Test Coverage][codecov-svg]][codecov-url]
+# Internetmarke [![NPM version][npm-svg]][npm-url] [![Workflow Status][workflow-svg-gh]][workflow-url] [![Test Coverage][codecov-svg]][codecov-url]
 
 A node implementation to use the Internetmarke web service of Deutsche Post.
 
@@ -400,6 +400,7 @@ const oldProducts = await internetmarke.getProductList(new Date('2018-02-01'));
 [npm-downloads-svg]: https://img.shields.io/npm/dm/internetmarke.svg
 [workflow-url]: https://github.com/schaechinger/internetmarke/actions/workflows/qa.yml
 [workflow-svg]: https://img.shields.io/github/workflow/status/schaechinger/internetmarke/qa
+[workflow-svg-gh]: https://github.com/schaechinger/internetmarke/actions/workflows/qa.yml/badge.svg
 [codecov-svg]: https://codecov.io/gh/schaechinger/internetmarke/branch/master/graph/badge.svg?token=44611cZi5g
 [codecov-url]: https://codecov.io/gh/schaechinger/internetmarke
 [license-svg]: https://img.shields.io/npm/l/internetmarke.svg
