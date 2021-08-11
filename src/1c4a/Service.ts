@@ -375,6 +375,10 @@ export class OneClickForAppService extends SoapService implements OneClickForApp
       position.address = { sender, receiver };
     }
 
+    if (product.ppl) {
+      position.ppl = product.ppl;
+    }
+
     if (product.price) {
       position.price = parseAmount(product.price);
     } else {
@@ -487,12 +491,18 @@ export class OneClickForAppService extends SoapService implements OneClickForApp
     }
 
     let total = 0;
+    payload.ppl = 0;
     payload.positions = this.shoppingCart
       .filter(position => !!position)
       .map((position, i) => {
         if (position) {
-          total += Math.round(position.price!.value * 100);
+          total += amountToCents(position.price!);
           delete position.price;
+
+          if (position.ppl && position.ppl > payload.ppl) {
+            payload.ppl = position.ppl;
+            delete position.ppl;
+          }
 
           if (isPdfVoucher) {
             if (!position.position) {
@@ -538,6 +548,10 @@ export class OneClickForAppService extends SoapService implements OneClickForApp
         return position as ShoppingCartItem;
       });
 
+    if (!payload.ppl) {
+      delete payload.ppl;
+    }
+
     // set missing position information for given pageFormat
     if (positionMap?.length) {
       const { labelX, labelY } = options.pageFormat!.pageLayout.labelCount;
@@ -569,7 +583,7 @@ export class OneClickForAppService extends SoapService implements OneClickForApp
       delete payload.userToken;
       this.log('[dryrun] checkout request payload:', JSON.stringify(payload));
 
-      return null;
+      return payload;
     }
 
     return this.soapClient[checkout](payload)
@@ -596,7 +610,11 @@ export class OneClickForAppService extends SoapService implements OneClickForApp
         return response;
       })
       .catch((e: any) => {
-        this.log('checkoutShoppingCart', e.root.Envelope.Body.Fault);
+        this.log(
+          'checkoutShoppingCart',
+          e.root.Envelope.Body.Fault,
+          e.root.Envelope.Body.Fault.detail.ShoppingCartValidationException
+        );
         throw new SoapError(e.root.Envelope.Body.Fault.faultstring);
       });
   }
@@ -615,13 +633,6 @@ export class OneClickForAppService extends SoapService implements OneClickForApp
         shopOrderId
       })
       .then(([response]: any) => {
-        this.log(
-          'retrieved order %s with %d voucher%s',
-          response.shoppingCart.shopOrderId,
-          response.shoppingCart.voucherList.voucher.length,
-          1 === response.shoppingCart.voucherList.voucher.length ? '' : 's'
-        );
-
         return response || null;
       })
       .catch((e: any) => {

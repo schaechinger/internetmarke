@@ -196,7 +196,7 @@ export class Internetmarke implements OneClickForApp, Portokasse, ProdWS {
    * @param shopOrderId The order information that hold the data about the
    *  vouchers.
    */
-  public retrieveOrder(shopOrderId: number): Promise<Order | null> {
+  public async retrieveOrder(shopOrderId: number): Promise<Order | null> {
     return this.oneClick4AppService.retrieveOrder(shopOrderId);
   }
 

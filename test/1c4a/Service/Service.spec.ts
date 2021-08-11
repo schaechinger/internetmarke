@@ -68,21 +68,17 @@ describe('1C4A Service', () => {
     });
 
     it('should prevent init without client credentials', async () => {
-      expect(internetmarke.initOneClickForAppService({} as any)).to.eventually.be.rejectedWith(
-        PartnerError
-      );
+      expect(service.init({} as any)).to.eventually.be.rejectedWith(PartnerError);
     });
 
     it('should prevent init without client credentials', async () => {
-      expect(
-        internetmarke.initOneClickForAppService({ partner: partnerCredentials } as any)
-      ).to.eventually.be.rejectedWith(UserError);
+      expect(service.init({ partner: partnerCredentials } as any)).to.eventually.be.rejectedWith(
+        UserError
+      );
     });
 
-    xit('should init with minimal options', async () => {
-      const myService = await internetmarke.initOneClickForAppService(options);
-
-      expect(myService).to.exist;
+    it('should init with minimal options', async () => {
+      expect(service.init(options)).to.eventually.be.fulfilled;
     });
   });
 
@@ -405,6 +401,50 @@ describe('1C4A Service', () => {
       });
 
       expect(promise).to.eventually.be.fulfilled;
+    });
+
+    it('should use ppl version for checkout', async () => {
+      await service.init(options);
+      service.addItemToShoppingCart({ id: 1, price: 80, ppl: 49 } as Product, {
+        voucherLayout: VoucherLayout.FrankingZone
+      });
+
+      const payload = (await service.checkoutShoppingCart({
+        dryrun: true
+      })) as any;
+
+      expect(payload.ppl).to.equal(49);
+    });
+
+    it('should ignore ppl if not passed to shopping cart', async () => {
+      await service.init(options);
+      service.addItemToShoppingCart({ id: 1, price: 80 } as Product, {
+        voucherLayout: VoucherLayout.FrankingZone
+      });
+
+      const payload = (await service.checkoutShoppingCart({
+        dryrun: true
+      })) as any;
+
+      expect(payload.ppl).to.not.exist;
+    });
+  });
+
+  describe('retrieveOrder', () => {
+    it('should retrieve the order for the given id', async () => {
+      await service.init(options);
+
+      const order = await service.retrieveOrder(12345);
+
+      expect(order).to.exist;
+    });
+
+    it('should detect invalid order id', async () => {
+      await service.init(options);
+
+      const order = await service.retrieveOrder(512);
+
+      expect(order).to.be.null;
     });
   });
 });
