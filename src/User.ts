@@ -1,5 +1,5 @@
 import { injectable } from 'inversify';
-import { Amount } from './prodWs/product';
+import { Amount, parseAmount } from './utils/amount';
 
 export interface UserCredentials {
   username: string;
@@ -73,10 +73,7 @@ export class User {
     }
 
     if (data.walletBalance) {
-      this.walletBalance = {
-        value: +data.walletBalance / 100,
-        currency: 'EUR'
-      };
+      this.walletBalance = parseAmount(data.walletBalance);
     }
     if (undefined !== data.showTermsAndCondition) {
       this.showTermsAndCondition = data.showTermsAndCondition;

@@ -3,13 +3,17 @@ import axiosCookieJarSupport from 'axios-cookiejar-support';
 import { inject, injectable } from 'inversify';
 import { CookieJar } from 'tough-cookie';
 import { TYPES } from '../di/types';
-import { InternetmarkeError, UserError } from '../Error';
-import { PortokasseError } from './Error';
-import { Amount } from '../prodWs/product';
 import { RestService } from '../services/Rest';
+import { Amount } from '../utils/amount';
 import { User, UserCredentials, UserInfo } from '../User';
+import { parseAmount } from '../utils/amount';
+import { InternetmarkeError, UserError } from '../Error';
+import { JournalError, PortokasseError } from './Error';
+import { formatDate } from './date';
+import { Journal, JournalEntry, JournalOptions, parseJournalEntry } from './journal';
 
 export enum PaymentMethod {
+  DirectDebit = 'DIRECTDEBIT',
   GiroPay = 'GIROPAY',
   Paypal = 'PAYPAL'
 }
@@ -30,6 +34,7 @@ export interface Portokasse {
     paymentMethod: PaymentMethod,
     bic?: string
   ): Promise<PaymentResponse>;
+  getJournal(daysOrDateRange: JournalOptions): Promise<Journal>;
 }
 
 const BASE_URL = 'https://portokasse.deutschepost.de/portokasse';
@@ -92,6 +97,40 @@ export class PortokasseService extends RestService implements Portokasse {
     }
 
     return this.request('POST', '/api/v1/payments', data);
+  }
+
+  public async getJournal(daysOrDateRange: JournalOptions): Promise<Journal> {
+    await this.checkServiceInit('Cannot get journal before initializing Portokasse service');
+
+    const params: string[] = ['offset=0', 'rows=10'];
+
+    let type = 'DAYS';
+
+    if ('number' === typeof daysOrDateRange) {
+      params.push(`selectionDays=${daysOrDateRange}`);
+    } else if (daysOrDateRange.startDate && daysOrDateRange.endDate) {
+      type = 'RANGE';
+      params.push(`selectionStart=${formatDate(daysOrDateRange.startDate)}`);
+      params.push(`selectionEnd=${formatDate(daysOrDateRange.endDate)}`);
+    } else {
+      throw new JournalError(
+        'Start date and end date need to be passed as a pair or with an amount of days from today'
+      );
+    }
+
+    params.push(`selectionType=${type}`);
+
+    const journal: Journal = await this.request('GET', `/api/v1/journals?${params.join('&')}`);
+
+    if (journal) {
+      journal.newBalance = parseAmount(journal.newBalance);
+      journal.oldBalance = parseAmount(journal.oldBalance);
+      journal.journalEntries = journal.journalEntries
+        .map(parseJournalEntry)
+        .filter(entry => !!entry) as JournalEntry[];
+    }
+
+    return journal;
   }
 
   private async login(): Promise<boolean> {
@@ -160,6 +199,8 @@ export class PortokasseService extends RestService implements Portokasse {
 
       return res.data;
     } catch (e) {
+      console.log(path, data);
+
       const error = new PortokasseError(
         `Error from Portokasse: ${e.response?.data.code || 'Unknown'}`
       );

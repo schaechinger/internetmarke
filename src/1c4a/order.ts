@@ -1,4 +1,4 @@
-import { Amount } from '../prodWs/product';
+import { Amount } from '../utils/amount';
 import { AddressBinding } from './address';
 import { PageFormatPosition } from './pageFormat';
 import { Voucher, VoucherLayout } from './voucher';

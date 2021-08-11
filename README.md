@@ -19,6 +19,7 @@ A node implementation to use the Internetmarke web service of Deutsche Post.
 - [Portokasse Service](#portokasse-service)
   - [Wallet Overview](#wallet-overview)
   - [Top Up Account](#top-up-account)
+  - [Get Journal](#get-journal)
 - [ProdWS (Product Service)](#prodws-product-service)
   - [Retrieve Product List](#retrieve-product-list)
   - [Retrieve Oudated Products](#retrieve-outdated-products)
@@ -344,6 +345,27 @@ const amount = { value: 10, currency: 'EUR' }; // or: const amount = 1000;
 const bic = 'HOLVDEB1XXX';
 const payment = await internetmarke.topUp(amount, PaymentMethod.GiroPay, bic);
 // payment: { code: 'OK', redirect: 'https://giropay.de/...' }
+```
+
+## Get Journal
+
+The portokasse service supports a history of orders and top ups that can be requested with a range or start and end date or a number of days from now.
+
+**Journal in date range**
+
+```typescript
+const range: JournalRange = {
+  startDate: new Date('2021-08-01'),
+  endDate: new Date('2021-08-11')
+};
+const journal = await internetmarke.getJournal(range);
+```
+
+**Journal of the latest days**
+
+```typescript
+const days = 14;
+const journal = await internetmarke.getJournal(days);
 ```
 
 ## ProdWS (Product Service)

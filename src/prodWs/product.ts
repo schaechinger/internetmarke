@@ -1,12 +1,9 @@
+import { Amount } from '../utils/amount';
+
 export interface ProductDataRange {
   min?: number;
   max?: number;
   unit?: string;
-}
-
-export interface Amount {
-  value: number;
-  currency: string;
 }
 
 export interface Product {

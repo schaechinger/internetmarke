@@ -47,6 +47,7 @@ describe('Internetmarke', () => {
     expect(internetmarke.topUp(0, PaymentMethod.GiroPay)).to.eventually.be.rejectedWith(
       InternetmarkeError
     );
+    expect(internetmarke.getJournal(1)).to.eventually.be.rejectedWith(InternetmarkeError);
   });
 
   it('should throw errors when accessing ProdWS services before init', () => {

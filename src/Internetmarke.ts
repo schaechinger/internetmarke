@@ -19,8 +19,10 @@ import { UserInfo } from './User';
 import container from './di/inversify-config';
 import { TYPES } from './di/types';
 import { InternetmarkeError } from './Error';
-import { Amount, Product } from './prodWs/product';
+import { Product } from './prodWs/product';
+import { Amount } from './utils/amount';
 import { ProductService, ProductServiceOptions, ProdWS } from './prodWs/Service';
+import { Journal, JournalOptions } from './portokasse/journal';
 import {
   PaymentMethod,
   PaymentResponse,
@@ -255,6 +257,10 @@ export class Internetmarke implements OneClickForApp, Portokasse, ProdWS {
     bic?: string
   ): Promise<PaymentResponse> {
     return this.portokasseService.topUp(amount, paymentMethod, bic);
+  }
+
+  public getJournal(daysOrDateRange: JournalOptions): Promise<Journal> {
+    return this.portokasseService.getJournal(daysOrDateRange);
   }
 
   protected init(): void {

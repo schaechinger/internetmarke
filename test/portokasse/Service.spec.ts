@@ -4,8 +4,9 @@ import { UserError } from '../../src/Error';
 import { PaymentMethod, PortokasseService } from '../../src/portokasse/Service';
 import { userCredentials } from '../1c4a/helper';
 import { User } from '../../src/User';
-import { PortokasseError } from '../../src/portokasse/Error';
+import { JournalError, PortokasseError } from '../../src/portokasse/Error';
 import { Internetmarke } from '../../src/Internetmarke';
+import { journalResult } from './journal.spec';
 
 describe('Portokasse Service', () => {
   let service: PortokasseService;
@@ -47,7 +48,7 @@ describe('Portokasse Service', () => {
       );
     });
 
-    it('should init with minimal options', async () => {
+    xit('should init with minimal options', async () => {
       const myService = await internetmarke.initPortokasseService({ user: userCredentials });
 
       expect(myService).to.be.instanceOf(PortokasseService);
@@ -136,6 +137,86 @@ describe('Portokasse Service', () => {
       expect(service.topUp(500, PaymentMethod.Paypal)).to.eventually.be.rejectedWith(
         `Error from Portokasse: ${errorCode}`
       );
+    });
+  });
+
+  describe('getJournal', () => {
+    it('should get journal with days', async () => {
+      moxios.stubOnce('get', /\/journals\?/, {
+        status: 200,
+        headers: {},
+        response: journalResult
+      });
+
+      await service.init({ user: userCredentials });
+      const res = await service.getJournal(10);
+
+      expect(res).to.exist;
+    });
+
+    it('should get journal with date range', async () => {
+      moxios.stubOnce('get', /\/journals\?/, {
+        status: 200,
+        headers: {},
+        response: journalResult
+      });
+
+      await service.init({ user: userCredentials });
+      const res = await service.getJournal({
+        startDate: new Date('2021-08-01'),
+        endDate: new Date('2021-08-11')
+      });
+
+      expect(res).to.exist;
+    });
+
+    it('should detect missing options', async () => {
+      moxios.stubOnce('get', /\/journals\?/, {
+        status: 422,
+        headers: {},
+        response: {
+          code: 'InvaliteDate'
+        }
+      });
+
+      await service.init({ user: userCredentials });
+      const promise = service.getJournal({} as any);
+
+      expect(promise).to.eventually.be.rejectedWith(JournalError);
+    });
+
+    it('should detect missing start date', async () => {
+      moxios.stubOnce('get', /\/journals\?/, {
+        status: 422,
+        headers: {},
+        response: {
+          code: 'InvaliteDate'
+        }
+      });
+
+      await service.init({ user: userCredentials });
+      const promise = service.getJournal({
+        endDate: new Date('2021-08-11')
+      } as any);
+
+      expect(promise).to.eventually.be.rejectedWith(JournalError);
+    });
+
+    it('should detect missing end date', async () => {
+      moxios.stubOnce('get', /\/journals\?/, {
+        status: 422,
+        headers: {},
+        response: {
+          code: 'InvaliteDate'
+        }
+      });
+
+      await service.init({ user: userCredentials });
+      const promise = service.getJournal({
+        startDate: new Date('2021-08-01')
+      } as any);
+
+      expect(promise).to.eventually.be.rejectedWith(JournalError);
     });
   });
 });

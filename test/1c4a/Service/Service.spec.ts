@@ -69,6 +69,12 @@ describe('1C4A Service', () => {
         internetmarke.initOneClickForAppService({ partner: partnerCredentials } as any)
       ).to.eventually.be.rejectedWith(UserError);
     });
+
+    xit('should init with minimal options', async () => {
+      const myService = await internetmarke.initOneClickForAppService(options);
+
+      expect(myService).to.exist;
+    });
   });
 
   describe('retrievePageFormats', () => {

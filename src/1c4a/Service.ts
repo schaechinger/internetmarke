@@ -21,6 +21,7 @@ import { Partner, PartnerCredentials } from './Partner';
 import { User, UserCredentials, UserInfo } from '../User';
 import { VoucherFormat, VoucherLayout } from './voucher';
 import { ProductError } from '../prodWs/Error';
+import { amountToCents, parseAmount } from '../utils/amount';
 
 export interface OneCLickForAppServiceOptions {
   /** The partner credentials to pass to the service. */
@@ -380,14 +381,7 @@ export class OneClickForAppService extends SoapService implements OneClickForApp
     }
 
     if (product.price) {
-      if ('number' === typeof product.price) {
-        position.price = {
-          value: +product.price / 100,
-          currency: 'EUR'
-        };
-      } else {
-        position.price = product.price;
-      }
+      position.price = parseAmount(product.price);
     } else {
       throw new ProductError('Missing price information for product');
     }
@@ -435,7 +429,7 @@ export class OneClickForAppService extends SoapService implements OneClickForApp
     const positions: any = this.shoppingCart
       .map(position => {
         if (position) {
-          total += position.price!.value;
+          total += amountToCents(position.price);
         }
 
         return position;
@@ -444,10 +438,7 @@ export class OneClickForAppService extends SoapService implements OneClickForApp
 
     return {
       positions,
-      total: {
-        value: Math.round(total * 100) / 100,
-        currency: 'EUR'
-      }
+      total: parseAmount(total)
     };
   }
 
