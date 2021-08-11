@@ -36,7 +36,7 @@ export interface PageFormat {
   description?: string;
   pageType: PageFormatPageType;
   pageLayout: {
-    size: number;
+    size: PageFormatDimension;
     orientation: PageFormatOrientation;
     labelSpacing: PageFormatDimension;
     labelCount: PageFormatPosition;

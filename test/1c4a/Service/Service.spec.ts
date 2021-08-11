@@ -1,8 +1,17 @@
 import { expect } from 'chai';
 import { SimpleAddress } from '../../../src/1c4a/address';
-import { AddressError, PartnerError, VoucherLayoutError } from '../../../src/1c4a/Error';
+import {
+  AddressError,
+  CheckoutError,
+  PartnerError,
+  VoucherLayoutError
+} from '../../../src/1c4a/Error';
 import { GalleryItem, ImageItem, MotiveLink } from '../../../src/1c4a/gallery';
-import { PageFormat } from '../../../src/1c4a/pageFormat';
+import {
+  PageFormat,
+  PageFormatOrientation,
+  PageFormatPageType
+} from '../../../src/1c4a/pageFormat';
 import { OneClickForAppService } from '../../../src/1c4a/Service';
 import { VoucherLayout } from '../../../src/1c4a/voucher';
 import { UserError } from '../../../src/Error';
@@ -225,12 +234,27 @@ describe('1C4A Service', () => {
       expect(cart.total.value).to.equal(1.7);
     });
 
+    it('should throw an error if the voucher layout is missing', () => {
+      expect(() => {
+        service.addItemToShoppingCart({ id: 1 } as Product);
+      }).to.throw(VoucherLayoutError);
+    });
+
     it('should throw an error if the product price is missing', () => {
       expect(() => {
         service.addItemToShoppingCart({ id: 1 } as Product, {
           voucherLayout: VoucherLayout.AddressZone
         });
       }).to.throw(ProductError);
+    });
+
+    it('should throw an error if an image is passed in AddressZone layout', () => {
+      expect(() => {
+        service.addItemToShoppingCart({ id: 1 } as Product, {
+          imageItem: { imageID: 1 } as any,
+          voucherLayout: VoucherLayout.AddressZone
+        });
+      }).to.throw(VoucherLayoutError);
     });
 
     it('should throw an error if only sender address is given', () => {
@@ -305,6 +329,82 @@ describe('1C4A Service', () => {
       const item = service.removeItemFromShoppingCart(0);
 
       expect(item).to.not.exist;
+    });
+  });
+
+  describe('Checkout', () => {
+    const pageFormatData: PageFormat = {
+      id: 1,
+      isAddressPossible: true,
+      isImagePossible: false,
+      name: 'DIN A4 Normalpapier',
+      pageType: PageFormatPageType.RegularPage,
+      pageLayout: {
+        size: { x: 210, y: 297 },
+        orientation: PageFormatOrientation.Portrait,
+        labelSpacing: { x: 0, y: 0 },
+        labelCount: { labelX: 2, labelY: 5 },
+        margin: { top: 31, bottom: 31, left: 15, right: 15 }
+      }
+    };
+
+    it('should throw an error if the shopping cart is empty', async () => {
+      await service.init(options);
+
+      const promise = service.checkoutShoppingCart();
+
+      expect(promise).to.eventually.be.rejectedWith(CheckoutError);
+    });
+
+    it('should checkout cart as PNG', async () => {
+      await service.init(options);
+      service.addItemToShoppingCart({ id: 1, price: 80 } as Product, {
+        voucherLayout: VoucherLayout.FrankingZone
+      });
+
+      const promise = service.checkoutShoppingCart();
+
+      expect(promise).to.eventually.be.fulfilled;
+    });
+
+    it('should require position data for PDF without page format information', async () => {
+      await service.init(options);
+      service.addItemToShoppingCart({ id: 1, price: 80 } as Product, {
+        voucherLayout: VoucherLayout.FrankingZone
+      });
+
+      const promise = service.checkoutShoppingCart({
+        pageFormat: { id: 1 } as PageFormat
+      });
+
+      expect(promise).to.eventually.be.rejectedWith(CheckoutError);
+    });
+
+    it('should generate position data for PDF with page format information', async () => {
+      await service.init(options);
+      service.addItemToShoppingCart({ id: 1, price: 80 } as Product, {
+        voucherLayout: VoucherLayout.FrankingZone
+      });
+
+      const promise = service.checkoutShoppingCart({
+        pageFormat: pageFormatData
+      });
+
+      expect(promise).to.eventually.be.fulfilled;
+    });
+
+    it('should use position data form item for PDF', async () => {
+      await service.init(options);
+      service.addItemToShoppingCart({ id: 1, price: 80 } as Product, {
+        voucherLayout: VoucherLayout.FrankingZone,
+        position: { labelX: 1, labelY: 1 }
+      });
+
+      const promise = service.checkoutShoppingCart({
+        pageFormat: { id: 1 } as PageFormat
+      });
+
+      expect(promise).to.eventually.be.fulfilled;
     });
   });
 });

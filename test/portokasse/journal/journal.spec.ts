@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { parseJournalEntry } from '../../src/portokasse/journal';
+import { parseJournalEntry } from '../../../src/portokasse/journal';
 
 export const journalResult = {
   startDate: '01.08.2021',
@@ -18,7 +18,6 @@ export const journalResult = {
     }
   ]
 };
-
 
 describe('Journal', () => {
   it('should detect invalid journal entries', () => {

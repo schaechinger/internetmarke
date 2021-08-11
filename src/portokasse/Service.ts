@@ -199,8 +199,6 @@ export class PortokasseService extends RestService implements Portokasse {
 
       return res.data;
     } catch (e) {
-      console.log(path, data);
-
       const error = new PortokasseError(
         `Error from Portokasse: ${e.response?.data.code || 'Unknown'}`
       );

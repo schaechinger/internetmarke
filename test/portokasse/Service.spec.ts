@@ -6,7 +6,7 @@ import { userCredentials } from '../1c4a/helper';
 import { User } from '../../src/User';
 import { JournalError, PortokasseError } from '../../src/portokasse/Error';
 import { Internetmarke } from '../../src/Internetmarke';
-import { journalResult } from './journal.spec';
+import { journalResult } from './journal/journal.spec';
 
 describe('Portokasse Service', () => {
   let service: PortokasseService;
@@ -57,7 +57,7 @@ describe('Portokasse Service', () => {
 
   describe('getUserInfo', () => {
     it('should fail to get user info before init', async () => {
-      moxios.stubOnce('get', /\/wallet-overviews\/me$/, {
+      moxios.stubOnce('get', /\/wallet-overviews/, {
         status: 401,
         headers: {},
         response: {
@@ -65,13 +65,11 @@ describe('Portokasse Service', () => {
         }
       });
 
-      await service.init({ user: userCredentials });
-
       expect(service.getUserInfo()).to.eventually.be.rejectedWith(PortokasseError);
     });
 
     it('should retrieve user balance', async () => {
-      moxios.stubOnce('get', /\/wallet-overviews\/me$/, {
+      moxios.stubOnce('get', /\/wallet-overviews/, {
         status: 200,
         headers: {},
         response: {

@@ -11,7 +11,6 @@ import {
   OneClickForAppError,
   PageFormatError,
   PartnerError,
-  ShoppingCartItemError,
   VoucherLayoutError
 } from './Error';
 import { GalleryItem, ImageItem, MotiveLink } from './gallery';
@@ -342,10 +341,6 @@ export class OneClickForAppService extends SoapService implements OneClickForApp
    * @returns The index of the item within the shopping cart.
    */
   public addItemToShoppingCart(product: Product, options: ShoppingCartItemOptions = {}): number {
-    if (!product) {
-      throw new ShoppingCartItemError('Missing product, cannot only add products to shopping cart');
-    }
-
     const voucherLayout = options.voucherLayout || this.defaults.voucherLayout;
     if (!voucherLayout) {
       throw new VoucherLayoutError(
