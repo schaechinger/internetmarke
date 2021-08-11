@@ -32,12 +32,6 @@ describe('ProdWS Service', () => {
         ClientError
       );
     });
-
-    it('should init with minimal options', async () => {
-      const myService = await internetmarke.initProductService({ client: clientCredentials });
-
-      expect(myService).to.be.instanceOf(ProductService);
-    });
   });
 
   describe('getProductList', () => {
