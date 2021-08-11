@@ -4,10 +4,11 @@ import { clientStub } from './Client.stub';
 import { getLoggerStub } from '../../stubs/logger.stub';
 import { clientCredentials } from '../helper';
 import { validProducts } from '../product/product.data';
-import { getProdWsStub, prodWsStub } from './Soap.stub';
+import { getInvalidProdWsStub, getProdWsStub, prodWsStub } from './Soap.stub';
 import { DataStore } from '../../../src/services/DataStore';
 import { Product } from '../../../src/prodWs/product';
 import { ClientError } from '../../../src/prodWs/Error';
+import { Internetmarke } from '../../../src/Internetmarke';
 
 describe('ProdWS Service', () => {
   let service: ProductService;
@@ -19,12 +20,23 @@ describe('ProdWS Service', () => {
   });
 
   describe('init', () => {
+    // test init through public internetmarke api
+    let internetmarke: Internetmarke;
+
+    beforeEach(() => {
+      internetmarke = new Internetmarke();
+    });
+
     it('should prevent init without client credentials', async () => {
-      await expect(service.init({} as any)).to.eventually.be.rejectedWith(ClientError);
+      expect(internetmarke.initProductService({} as any)).to.eventually.be.rejectedWith(
+        ClientError
+      );
     });
 
     it('should init with minimal options', async () => {
-      await expect(service.init({ client: clientCredentials })).to.eventually.be.fulfilled;
+      const myService = await internetmarke.initProductService({ client: clientCredentials });
+
+      expect(myService).to.be.instanceOf(ProductService);
     });
   });
 
@@ -36,6 +48,16 @@ describe('ProdWS Service', () => {
 
       expect(products).to.exist;
       expect(products).to.have.length(validProducts.length);
+    });
+
+    it('should detect invalid product list response', async () => {
+      service = new ProductService(clientStub, store, getLoggerStub, getInvalidProdWsStub);
+
+      await service.init({ client: clientCredentials, ttl: 0 });
+      const products = await service.getProductList();
+
+      expect(products).to.exist;
+      expect(products).to.have.length(0);
     });
 
     it('should load outdated product list without cache', async () => {

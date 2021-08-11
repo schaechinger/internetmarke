@@ -59,9 +59,11 @@ export class User {
    * Update the user data as retrieved from the service.
    *
    * @param data The user data from the service.
+   * @param initialData Determines whether to reset the token in case non is
+   *  provided.
    */
-  public load(data: UserData): void {
-    if (data.userToken || data.email) {
+  public load(data: UserData, initialData = false): void {
+    if (data.userToken || data.email || initialData) {
       this[TOKEN] = data.userToken || data.email || null;
     }
 

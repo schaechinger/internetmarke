@@ -22,7 +22,7 @@ export interface ShoppingCart {
 
 export interface ShoppingCartSummary {
   positions: ShoppingCartItem[];
-  price: Amount;
+  total: Amount;
 }
 
 export interface Order {

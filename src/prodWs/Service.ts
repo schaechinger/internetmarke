@@ -70,7 +70,9 @@ export class ProductService extends SoapService implements ProdWS {
   /**
    * Retrieves the list of available products from the service.
    */
-  public getProductList(date?: Date): Promise<Product[]> {
+  public async getProductList(date?: Date): Promise<Product[]> {
+    await this.checkServiceInit('Cannot get product list before initializing product service');
+
     // only use cache for the latest product data
     if (!date) {
       return this.productStore.getList();
@@ -86,7 +88,9 @@ export class ProductService extends SoapService implements ProdWS {
    *
    * @param id The id of the product that should be retrieved.
    */
-  public getProduct(id: number): Promise<Product | null> {
+  public async getProduct(id: number): Promise<Product | null> {
+    await this.checkServiceInit('Cannot get product before initializing product service');
+
     return this.productStore.getItem(id);
   }
 

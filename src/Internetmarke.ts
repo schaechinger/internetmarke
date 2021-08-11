@@ -89,11 +89,6 @@ export class Internetmarke implements OneClickForApp, Portokasse, ProdWS {
    * Retrieves the page formats available for pdf voucher format.
    */
   public retrievePageFormats(): Promise<PageFormat[]> {
-    this.checkServiceInit(
-      this.oneClick4AppService,
-      'Cannot retrieve page formats before initializing OneClickForApp service'
-    );
-
     return this.oneClick4AppService.retrievePageFormats();
   }
 
@@ -101,11 +96,6 @@ export class Internetmarke implements OneClickForApp, Portokasse, ProdWS {
    * Retrieves the page formats with the given id if existing.
    */
   public retrievePageFormat(id: number): Promise<PageFormat | null> {
-    this.checkServiceInit(
-      this.oneClick4AppService,
-      'Cannot retrieve page format before initializing OneClickForApp service'
-    );
-
     return this.oneClick4AppService.retrievePageFormat(id);
   }
 
@@ -113,11 +103,6 @@ export class Internetmarke implements OneClickForApp, Portokasse, ProdWS {
    * Creates a globally unique order id to pass during checkout.
    */
   public createShopOrderId(): Promise<number | null> {
-    this.checkServiceInit(
-      this.oneClick4AppService,
-      'Cannot create shop order id before initializing OneClickForApp service'
-    );
-
     return this.oneClick4AppService.createShopOrderId();
   }
 
@@ -126,11 +111,6 @@ export class Internetmarke implements OneClickForApp, Portokasse, ProdWS {
    * gallery provided by Deutsche Post.
    */
   public retrievePublicGallery(): Promise<GalleryItem[]> {
-    this.checkServiceInit(
-      this.oneClick4AppService,
-      'Cannot retrieve public gallery before initializing OneClickForApp service'
-    );
-
     return this.oneClick4AppService.retrievePublicGallery();
   }
 
@@ -138,11 +118,6 @@ export class Internetmarke implements OneClickForApp, Portokasse, ProdWS {
    * Retrieves all images from the private gallery of the authenticated user.
    */
   public retrievePrivateGallery(): Promise<MotiveLink[]> {
-    this.checkServiceInit(
-      this.oneClick4AppService,
-      'Cannot retrieve private gallery before initializing OneClickForApp service'
-    );
-
     return this.oneClick4AppService.retrievePrivateGallery();
   }
 
@@ -158,11 +133,6 @@ export class Internetmarke implements OneClickForApp, Portokasse, ProdWS {
     product: Product,
     options: PreviewVoucherOptions = {}
   ): Promise<string | null> {
-    this.checkServiceInit(
-      this.oneClick4AppService,
-      'Cannot preview voucher before initializing OneClickForApp service'
-    );
-
     return this.oneClick4AppService.retrievePreviewVoucher(product, options);
   }
 
@@ -176,11 +146,6 @@ export class Internetmarke implements OneClickForApp, Portokasse, ProdWS {
    * @returns The index of the item within the shopping cart.
    */
   public addItemToShoppingCart(product: Product, options: ShoppingCartItemOptions = {}): number {
-    this.checkServiceInit(
-      this.oneClick4AppService,
-      'Cannot add item to shopping cart before initializing OneClickForApp service'
-    );
-
     return this.oneClick4AppService.addItemToShoppingCart(product, options);
   }
 
@@ -190,11 +155,6 @@ export class Internetmarke implements OneClickForApp, Portokasse, ProdWS {
    * @param index The index of the desired shopping cart item.
    */
   public getItemFromShoppingCart(index: number): ShoppingCartItem | null {
-    this.checkServiceInit(
-      this.oneClick4AppService,
-      'Cannot get item from shopping cart before initializing OneClickForApp service'
-    );
-
     return this.oneClick4AppService.getItemFromShoppingCart(index);
   }
 
@@ -206,11 +166,6 @@ export class Internetmarke implements OneClickForApp, Portokasse, ProdWS {
    * @returns The removed item if found.
    */
   public removeItemFromShoppingCart(index: number): ShoppingCartItem | null {
-    this.checkServiceInit(
-      this.oneClick4AppService,
-      'Cannot remove item from shopping cart before initializing OneClickForApp service'
-    );
-
     return this.oneClick4AppService.removeItemFromShoppingCart(index);
   }
 
@@ -218,11 +173,6 @@ export class Internetmarke implements OneClickForApp, Portokasse, ProdWS {
    * Generates a brief summary of the items in the shopping cart.
    */
   public getShoppingCartSummary(): ShoppingCartSummary {
-    this.checkServiceInit(
-      this.oneClick4AppService,
-      'Cannot get shopping cart summary before initializing OneClickForApp service'
-    );
-
     return this.oneClick4AppService.getShoppingCartSummary();
   }
 
@@ -235,11 +185,6 @@ export class Internetmarke implements OneClickForApp, Portokasse, ProdWS {
    * @param options The checkout options to customize the vouchers.
    */
   public checkoutShoppingCart(options: CheckoutShoppingCartOptions = {}): Promise<Order | null> {
-    this.checkServiceInit(
-      this.oneClick4AppService,
-      'Cannot checkout shopping cart before initializing OneClickForApp service'
-    );
-
     return this.oneClick4AppService.checkoutShoppingCart(options);
   }
 
@@ -250,11 +195,6 @@ export class Internetmarke implements OneClickForApp, Portokasse, ProdWS {
    *  vouchers.
    */
   public retrieveOrder(shopOrderId: number): Promise<Order | null> {
-    this.checkServiceInit(
-      this.oneClick4AppService,
-      'Cannot retrieve order before initializing OneClickForApp service'
-    );
-
     return this.oneClick4AppService.retrieveOrder(shopOrderId);
   }
 
@@ -278,11 +218,6 @@ export class Internetmarke implements OneClickForApp, Portokasse, ProdWS {
    * Retrieves the list of available products from the service.
    */
   public getProductList(date?: Date): Promise<Product[]> {
-    this.checkServiceInit(
-      this.productService,
-      'Cannot get product list before initializing product service'
-    );
-
     return this.productService.getProductList(date);
   }
 
@@ -292,11 +227,6 @@ export class Internetmarke implements OneClickForApp, Portokasse, ProdWS {
    * @param id The id of the product that should be retrieved.
    */
   public getProduct(id: number): Promise<Product | null> {
-    this.checkServiceInit(
-      this.productService,
-      'Cannot get product before initializing product service'
-    );
-
     return this.productService.getProduct(id);
   }
 
@@ -324,11 +254,6 @@ export class Internetmarke implements OneClickForApp, Portokasse, ProdWS {
     paymentMethod: PaymentMethod,
     bic?: string
   ): Promise<PaymentResponse> {
-    this.checkServiceInit(
-      this.portokasseService,
-      'Cannot get balance before initializing portokasse service'
-    );
-
     return this.portokasseService.topUp(amount, paymentMethod, bic);
   }
 

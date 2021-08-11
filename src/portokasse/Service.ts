@@ -3,7 +3,7 @@ import axiosCookieJarSupport from 'axios-cookiejar-support';
 import { inject, injectable } from 'inversify';
 import { CookieJar } from 'tough-cookie';
 import { TYPES } from '../di/types';
-import { UserError } from '../Error';
+import { InternetmarkeError, UserError } from '../Error';
 import { PortokasseError } from './Error';
 import { Amount } from '../prodWs/product';
 import { RestService } from '../services/Rest';
@@ -60,6 +60,8 @@ export class PortokasseService extends RestService implements Portokasse {
   }
 
   public async getUserInfo(): Promise<UserInfo> {
+    await this.checkServiceInit('Cannot get balance before initializing Portokasse service');
+
     const res = await this.request('GET', '/api/v1/wallet-overviews/me');
 
     if (res?.balance) {
@@ -76,6 +78,10 @@ export class PortokasseService extends RestService implements Portokasse {
     paymentMethod: PaymentMethod,
     bic?: string
   ): Promise<PaymentResponse> {
+    await this.checkServiceInit(
+      'Cannot top up user account before initializing Portokasse service'
+    );
+
     const data: any = {
       amount: 'number' === typeof amount ? amount : (amount as Amount).value * 100,
       paymentMethod
@@ -92,9 +98,19 @@ export class PortokasseService extends RestService implements Portokasse {
     await this.request('GET', '/login');
     const info = await this.request('POST', '/login', this.user.getCredentials());
 
-    this.user.load(info);
+    this.user.load(info, true);
 
     return this.user.isAuthenticated();
+  }
+
+  private async checkServiceInit(message: string): Promise<void> {
+    if (this.user.isAuthenticated()) {
+      await this.login();
+    }
+
+    if (!this.isInitialized()) {
+      throw new InternetmarkeError(message);
+    }
   }
 
   private async request(method: Method, path: string = '', data?: any): Promise<any> {

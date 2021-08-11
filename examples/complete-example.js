@@ -1,6 +1,7 @@
 const CountryCode = require('../lib/1c4a/countryCode');
 const { VoucherLayout } = require('../lib/1c4a/voucher');
 const { Internetmarke } = require('../lib/Internetmarke');
+const { PaymentMethod } = require('../lib/portokasse/Service');
 
 // To start this example directly make sure to build the project first:
 // npm i && npm run build
@@ -29,8 +30,9 @@ const { Internetmarke } = require('../lib/Internetmarke');
   const product = await internetmarke.getProduct(1);
   console.log('getProduct', product);
 
+
   //
-  // 1C4A
+  // Portokasse
   //
 
   // TODO: insert your credentials
@@ -38,6 +40,22 @@ const { Internetmarke } = require('../lib/Internetmarke');
     username: 'user-account@example.com',
     password: '********'
   };
+
+  await internetmarke.initPortokasseService({ user: userCredentials });
+
+  // basic user info (walletBalance) prior to 1C4A init
+  console.log('user info', await internetmarke.getUserInfo());
+  // this will fail as the minimum amount id EUR 10 / 1000 cents
+  // this will prevent you account from being charged in this test
+  try {
+    const amount = { value: 5, currency: 'EUR' }; //or: const amount = 500
+    await internetmarke.topUp(amount, PaymentMethod.Paypal)
+  } catch { }
+
+  //
+  // 1C4A
+  //
+
   // TODO: insert your credentials
   const partnerCredentials = {
     id: 'PARTNER_ID',
@@ -53,6 +71,8 @@ const { Internetmarke } = require('../lib/Internetmarke');
   });
 
   // user info (walletBalance, orderIds purchased during this app run, etc.)
+  // this call makes use of the live wallet balance lookup as the Portokasse
+  // service is initialized
   console.log('user info', await internetmarke.getUserInfo());
 
   // page formats / retrievePageFormats

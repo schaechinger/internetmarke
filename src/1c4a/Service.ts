@@ -1,6 +1,6 @@
 import { inject, injectable } from 'inversify';
 import { TYPES } from '../di/types';
-import { SoapError, UserError } from '../Error';
+import { InternetmarkeError, SoapError, UserError } from '../Error';
 import { Product } from '../prodWs/product';
 import { DataStore } from '../services/DataStore';
 import { SoapService } from '../services/Soap';
@@ -20,6 +20,7 @@ import { PageFormat, PageFormatPosition } from './pageFormat';
 import { Partner, PartnerCredentials } from './Partner';
 import { User, UserCredentials, UserInfo } from '../User';
 import { VoucherFormat, VoucherLayout } from './voucher';
+import { ProductError } from '../prodWs/Error';
 
 export interface OneCLickForAppServiceOptions {
   /** The partner credentials to pass to the service. */
@@ -178,20 +179,7 @@ export class OneClickForAppService extends SoapService implements OneClickForApp
 
     await this.checkSoapClient();
 
-    const success = await this.soapClient
-      .authenticateUserAsync(this.user.getCredentials())
-      .then(([response]: any) => {
-        if (response) {
-          this.log('logged in with user token %s', response.userToken);
-          this.user.load(response);
-        }
-
-        return !!response;
-      })
-      .catch((e: any) => {
-        this.log('authenticateUser', e.root.Envelope.Body.Fault);
-        throw new SoapError(e.root.Envelope.Body.Fault.faultstring);
-      });
+    const success = await this.login();
 
     if (success) {
       // init stores
@@ -217,6 +205,10 @@ export class OneClickForAppService extends SoapService implements OneClickForApp
    * Retrieves the page formats available for pdf voucher format.
    */
   public async retrievePageFormats(): Promise<PageFormat[]> {
+    await this.checkServiceInit(
+      'Cannot retrieve page formats before initializing OneClickForApp service'
+    );
+
     return this.pageFormatStore.getList();
   }
 
@@ -224,6 +216,10 @@ export class OneClickForAppService extends SoapService implements OneClickForApp
    * Retrieve the page formats with the given id if existing.
    */
   public async retrievePageFormat(id: number): Promise<PageFormat | null> {
+    await this.checkServiceInit(
+      'Cannot retrieve page format before initializing OneClickForApp service'
+    );
+
     return this.pageFormatStore.getItem(id);
   }
 
@@ -231,6 +227,10 @@ export class OneClickForAppService extends SoapService implements OneClickForApp
    * Creates a globally unique order id to pass during checkout.
    */
   public async createShopOrderId(): Promise<number | null> {
+    await this.checkServiceInit(
+      'Cannot create shop order id before initializing OneClickForApp service'
+    );
+
     return this.soapClient
       .createShopOrderIdAsync({
         userToken: this.user.getToken()
@@ -248,8 +248,8 @@ export class OneClickForAppService extends SoapService implements OneClickForApp
         return null;
       })
       .catch((e: any) => {
-        this.log('createShopOrderId', e.root.Envelope.Body.Fault);
-        throw new SoapError(e.root.Envelope.Body.Fault.faultstring);
+        this.log('createShopOrderId', e.root?.Envelope.Body.Fault || e);
+        throw new SoapError(e.root?.Envelope.Body.Fault.faultstring || e.message);
       });
   }
 
@@ -258,6 +258,10 @@ export class OneClickForAppService extends SoapService implements OneClickForApp
    * gallery provided by Deutsche Post.
    */
   public async retrievePublicGallery(): Promise<GalleryItem[]> {
+    await this.checkServiceInit(
+      'Cannot retrieve public gallery before initializing OneClickForApp service'
+    );
+
     return this.publicGalleryStore.getList();
   }
 
@@ -265,6 +269,10 @@ export class OneClickForAppService extends SoapService implements OneClickForApp
    * Retrieves all images from the private gallery of the authenticated user.
    */
   public async retrievePrivateGallery(): Promise<MotiveLink[]> {
+    await this.checkServiceInit(
+      'Cannot retrieve private gallery before initializing OneClickForApp service'
+    );
+
     return this.privateGalleryStore!.getList();
   }
 
@@ -280,6 +288,10 @@ export class OneClickForAppService extends SoapService implements OneClickForApp
     product: Product,
     options: PreviewVoucherOptions = {}
   ): Promise<string | null> {
+    await this.checkServiceInit(
+      'Cannot preview voucher before initializing OneClickForApp service'
+    );
+
     const voucherLayout = options.voucherLayout || this.defaults.voucherLayout;
     if (!voucherLayout) {
       throw new VoucherLayoutError(
@@ -376,6 +388,8 @@ export class OneClickForAppService extends SoapService implements OneClickForApp
       } else {
         position.price = product.price;
       }
+    } else {
+      throw new ProductError('Missing price information for product');
     }
     position.voucherLayout = voucherLayout;
     if (options.position) {
@@ -416,7 +430,7 @@ export class OneClickForAppService extends SoapService implements OneClickForApp
   /**
    * Generates a brief summary of the items in the shopping cart.
    */
-  public getShoppingCartSummary(): any {
+  public getShoppingCartSummary(): ShoppingCartSummary {
     let total = 0;
     const positions: any = this.shoppingCart
       .map(position => {
@@ -431,7 +445,7 @@ export class OneClickForAppService extends SoapService implements OneClickForApp
     return {
       positions,
       total: {
-        value: total,
+        value: Math.round(total * 100) / 100,
         currency: 'EUR'
       }
     };
@@ -448,6 +462,10 @@ export class OneClickForAppService extends SoapService implements OneClickForApp
   public async checkoutShoppingCart(
     options: CheckoutShoppingCartOptions = {}
   ): Promise<Order | null> {
+    await this.checkServiceInit(
+      'Cannot checkout shopping cart before initializing OneClickForApp service'
+    );
+
     if (!this.shoppingCart.length) {
       throw new CheckoutError('Cannot checkout empty shopping cart');
     }
@@ -487,7 +505,7 @@ export class OneClickForAppService extends SoapService implements OneClickForApp
       .filter(position => !!position)
       .map((position, i) => {
         if (position) {
-          total += position.price!.value * 100;
+          total += Math.round(position.price!.value * 100);
           delete position.price;
 
           if (isPdfVoucher) {
@@ -603,6 +621,8 @@ export class OneClickForAppService extends SoapService implements OneClickForApp
    * @param shopOrderId The order information that hold the data about the vouchers.
    */
   public async retrieveOrder(shopOrderId: number): Promise<Order | null> {
+    await this.checkServiceInit('Cannot retrieve order before initializing OneClickForApp service');
+
     return this.soapClient
       .retrieveOrderAsync({
         userToken: this.user.getToken(),
@@ -610,21 +630,53 @@ export class OneClickForAppService extends SoapService implements OneClickForApp
       })
       .then(([response]: any) => {
         this.log(
-          'retrieved order %s with %d vouchers',
+          'retrieved order %s with %d voucher%s',
           response.shoppingCart.shopOrderId,
-          response.shoppingCart.voucherList.voucher.length
+          response.shoppingCart.voucherList.voucher.length,
+          1 === response.shoppingCart.voucherList.voucher.length ? '' : 's'
         );
 
         return response || null;
       })
       .catch((e: any) => {
-        this.log('retrieve order error', e.root.Envelope.Body.Fault);
-        throw new SoapError(e.root.Envelope.Body.Fault.faultstring);
+        this.log('retrieve order error', e.root?.Envelope.Body.Fault || e);
+        throw new SoapError(e.root?.Envelope.Body.Fault.faultstring || e.message);
       });
   }
 
   protected initSoapClient(): void {
     this.soapClient.addSoapHeader(this.partner.getSoapHeaders());
+  }
+
+  protected async checkServiceInit(msg: string): Promise<void> {
+    if (this.isInitialized()) {
+      // try to refresh token
+      // await this.login();
+    }
+
+    if (!this.user.isAuthenticated()) {
+      throw new InternetmarkeError(msg);
+    }
+  }
+
+  private login(): Promise<boolean> {
+    return this.soapClient
+      .authenticateUserAsync(this.user.getCredentials())
+      .then(([response]: any) => {
+        if (response) {
+          this.log('logged in to 1C4A service');
+          this.user.load(response, true);
+        }
+
+        return !!response;
+      })
+      .catch((e: any) => {
+        this.log('authenticateUser', e.root?.Envelope.Body.Fault || e);
+        const error = new SoapError(e.root?.Envelope.Body.Fault.faultstring || e.message);
+        if (e.root) {
+          (error as any).root = e.root;
+        }
+      });
   }
 
   private placeToFirstEmpty(positionMap: number[], index: number): void {
@@ -658,7 +710,7 @@ export class OneClickForAppService extends SoapService implements OneClickForApp
         }
       })
       .catch((e: any) => {
-        this.log('retrievePageFormats', e.root.Envelope.Body.Fault);
+        this.log('retrievePageFormats', e.root?.Envelope.Body.Fault || e);
         // throw new SoapError(e.root.Envelope.Body.Fault.faultstring);
       });
 

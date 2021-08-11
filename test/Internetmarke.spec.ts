@@ -1,4 +1,5 @@
 import { expect } from 'chai';
+import { VoucherLayout } from '../src/1c4a/voucher';
 import { InternetmarkeError } from '../src/Error';
 import { PaymentMethod } from '../src/portokasse/Service';
 import { Product } from '../src/prodWs/product';
@@ -16,28 +17,41 @@ describe('Internetmarke', () => {
 
   it('should throw errors when accessing 1C4A services before init', () => {
     expect(internetmarke.getUserInfo()).to.eventually.be.rejectedWith(InternetmarkeError);
-    expect(() => internetmarke.retrievePageFormats()).to.throw(InternetmarkeError);
-    expect(() => internetmarke.retrievePageFormat(1)).to.throw(InternetmarkeError);
-    expect(() => internetmarke.createShopOrderId()).to.throw(InternetmarkeError);
-    expect(() => internetmarke.retrievePublicGallery()).to.throw(InternetmarkeError);
-    expect(() => internetmarke.retrievePrivateGallery()).to.throw(InternetmarkeError);
-    expect(() => internetmarke.retrievePreviewVoucher({} as Product)).to.throw(InternetmarkeError);
-    expect(() => internetmarke.addItemToShoppingCart({} as Product)).to.throw(InternetmarkeError);
-    expect(() => internetmarke.getItemFromShoppingCart(0)).to.throw(InternetmarkeError);
-    expect(() => internetmarke.removeItemFromShoppingCart(0)).to.throw(InternetmarkeError);
-    expect(() => internetmarke.getShoppingCartSummary()).to.throw(InternetmarkeError);
-    expect(() => internetmarke.checkoutShoppingCart()).to.throw(InternetmarkeError);
-    expect(() => internetmarke.retrieveOrder(0)).to.throw(InternetmarkeError);
+    expect(internetmarke.retrievePageFormats()).to.eventually.be.rejectedWith(InternetmarkeError);
+    expect(internetmarke.retrievePageFormat(1)).to.eventually.be.rejectedWith(InternetmarkeError);
+    expect(internetmarke.createShopOrderId()).to.eventually.be.rejectedWith(InternetmarkeError);
+    expect(internetmarke.retrievePublicGallery()).to.eventually.be.rejectedWith(InternetmarkeError);
+    expect(internetmarke.retrievePrivateGallery()).to.eventually.be.rejectedWith(
+      InternetmarkeError
+    );
+    expect(internetmarke.retrievePreviewVoucher({} as Product)).to.eventually.be.rejectedWith(
+      InternetmarkeError
+    );
+    expect(internetmarke.checkoutShoppingCart()).to.eventually.be.rejectedWith(InternetmarkeError);
+    expect(internetmarke.retrieveOrder(0)).to.eventually.be.rejectedWith(InternetmarkeError);
+  });
+
+  it('should make local 1C4A shopping cart methods available before init', () => {
+    expect(() =>
+      internetmarke.addItemToShoppingCart({ id: 1, price: 80 } as Product, {
+        voucherLayout: VoucherLayout.FrankingZone
+      })
+    ).to.not.throw(InternetmarkeError);
+    expect(() => internetmarke.getItemFromShoppingCart(0)).to.not.throw(InternetmarkeError);
+    expect(() => internetmarke.removeItemFromShoppingCart(0)).to.not.throw(InternetmarkeError);
+    expect(() => internetmarke.getShoppingCartSummary()).to.not.throw(InternetmarkeError);
   });
 
   it('should throw errors when accessing Portokasse services before init', () => {
     expect(internetmarke.getUserInfo()).to.eventually.be.rejectedWith(InternetmarkeError);
-    expect(() => internetmarke.topUp(0, PaymentMethod.GiroPay)).to.throw(InternetmarkeError);
+    expect(internetmarke.topUp(0, PaymentMethod.GiroPay)).to.eventually.be.rejectedWith(
+      InternetmarkeError
+    );
   });
 
   it('should throw errors when accessing ProdWS services before init', () => {
-    expect(() => internetmarke.getProductList()).to.throw(InternetmarkeError);
-    expect(() => internetmarke.getProduct(0)).to.throw(InternetmarkeError);
+    expect(internetmarke.getProductList()).to.eventually.be.rejectedWith(InternetmarkeError);
+    expect(internetmarke.getProduct(0)).to.eventually.be.rejectedWith(InternetmarkeError);
   });
 
   describe('getUserInfo', () => {

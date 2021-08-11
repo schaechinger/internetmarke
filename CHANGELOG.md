@@ -5,13 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.5.0] - Unreleased
+## [0.5.1] - 2021-08-11
+
+### Changed
+
+- Overall error handling from services and stability update
+- Services now take care of initialization state by theirself
+- Local shopping cart options can be used prior to 1C4A service init
+
+## Fixed
+
+- Rounding error in total amount of shopping cart summary
+- `getShoppingCartSummary()` now has return type `ShoppingCartSummary`
+
+## [0.5.0] - 2021-08-10
 
 ### Added
 
 - Portokasse service support to top up your account
 - Dependency injection with inversify
 - Addresses now support state codes that get added in front of the zip code
+
+### Changed
+
+- `getUserInfo()` returns a promise as it makes use of the Portokasse service
+  to retrieve live wallet balance data
 
 ### Fixed
 

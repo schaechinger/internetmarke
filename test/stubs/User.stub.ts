@@ -20,7 +20,8 @@ export const userStub: any = {
   isAuthenticated: stub().returns(true),
   getToken: stub().returns('<TOKEN>'),
   getInfo: stub().returns(userInfoResult),
-  setCredentials: stub()
+  setCredentials: stub(),
+  addOrderId: stub()
 };
 
 export const unauthorizedUserInfoResult: UserInfo = {
@@ -36,7 +37,8 @@ export const unauthorizedUserStub: any = {
   isAuthenticated: stub().returns(true),
   getToken: stub().returns(null),
   getInfo: stub().returns(unauthorizedUserInfoResult),
-  setCredentials: stub()
+  setCredentials: stub(),
+  addOrderId: stub()
 };
 
 export const portokasseUserInfoResult: UserInfo = {

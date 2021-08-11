@@ -2,6 +2,7 @@ import { Debugger } from 'debug';
 import { inject, injectable } from 'inversify';
 import { Client as SoapClient } from 'soap';
 import { TYPES } from '../di/types';
+import { InternetmarkeError } from '../Error';
 import { PostService } from './service';
 
 /**
@@ -34,6 +35,12 @@ export abstract class SoapService implements PostService {
       this.soapClient = await this.getSoapClient(this.wsdl);
 
       this.initSoapClient();
+    }
+  }
+
+  protected async checkServiceInit(message: string): Promise<void> {
+    if (!this.isInitialized()) {
+      throw new InternetmarkeError(message);
     }
   }
 }

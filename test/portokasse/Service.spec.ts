@@ -5,6 +5,7 @@ import { PaymentMethod, PortokasseService } from '../../src/portokasse/Service';
 import { userCredentials } from '../1c4a/helper';
 import { User } from '../../src/User';
 import { PortokasseError } from '../../src/portokasse/Error';
+import { Internetmarke } from '../../src/Internetmarke';
 
 describe('Portokasse Service', () => {
   let service: PortokasseService;
@@ -33,14 +34,23 @@ describe('Portokasse Service', () => {
   });
 
   describe('init', () => {
+    // test init through public internetmarke api
+    let internetmarke: Internetmarke;
+
+    beforeEach(() => {
+      internetmarke = new Internetmarke();
+    });
+
     it('should prevent init without user credentials', async () => {
-      expect(service.init({} as any)).to.eventually.be.rejectedWith(UserError);
-      expect(service.isInitialized()).to.be.false;
+      expect(internetmarke.initPortokasseService({} as any)).to.eventually.be.rejectedWith(
+        UserError
+      );
     });
 
     it('should init with minimal options', async () => {
-      await service.init({ user: userCredentials });
-      expect(service.isInitialized()).to.be.true;
+      const myService = await internetmarke.initPortokasseService({ user: userCredentials });
+
+      expect(myService).to.be.instanceOf(PortokasseService);
     });
   });
 
@@ -53,6 +63,8 @@ describe('Portokasse Service', () => {
           code: 'UNAUTHORIZED'
         }
       });
+
+      await service.init({ user: userCredentials });
 
       expect(service.getUserInfo()).to.eventually.be.rejectedWith(PortokasseError);
     });
@@ -86,6 +98,7 @@ describe('Portokasse Service', () => {
         }
       });
 
+      await service.init({ user: userCredentials });
       const res = await service.topUp(1000, PaymentMethod.GiroPay, 'XXXXDEXXXX');
 
       expect(res).to.exist;
@@ -101,6 +114,7 @@ describe('Portokasse Service', () => {
         }
       });
 
+      await service.init({ user: userCredentials });
       const res = await service.topUp(1000, PaymentMethod.Paypal);
 
       expect(res).to.exist;
@@ -116,6 +130,8 @@ describe('Portokasse Service', () => {
           arguments: null
         }
       });
+
+      await service.init({ user: userCredentials });
 
       expect(service.topUp(500, PaymentMethod.Paypal)).to.eventually.be.rejectedWith(
         `Error from Portokasse: ${errorCode}`

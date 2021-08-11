@@ -19,4 +19,18 @@ export const prodWsStub = {
   setSecurity: stub()
 };
 
+export const invalidProdWsStub = {
+  getProductListAsync: stub().returns(
+    Promise.resolve([
+      {
+        attributes: {
+          success: 'false'
+        }
+      }
+    ])
+  ),
+  setSecurity: stub()
+};
+
 export const getProdWsStub = () => Promise.resolve(prodWsStub);
+export const getInvalidProdWsStub = () => Promise.resolve(invalidProdWsStub);
