@@ -14,6 +14,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Checkout supports PPL versions of products
 - Using the `.cache` directory instead of the global `/tmp` folder
 
+### Fixed
+
+- Checkout option `shopOrderId` is now a number
+
 ## [0.5.1] - 2021-08-11
 
 ### Changed

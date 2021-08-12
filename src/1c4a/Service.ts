@@ -91,7 +91,7 @@ export enum ShippingList {
 
 export interface CheckoutShoppingCartOptions {
   /** The order id that should be used. Will be generated if not set. */
-  shopOrderId?: string;
+  shopOrderId?: number;
   /**
    * The page format to use for all vouchers. This will turn the vouchers into a combined pdf file.
    */

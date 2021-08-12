@@ -179,6 +179,26 @@ describe('1C4A Service', () => {
       expect(oneC4AStub.retrievePreviewVoucherPDFAsync.calledOnce).to.be.false;
       expect(promise).to.eventually.be.rejectedWith(VoucherLayoutError);
     });
+
+    it('should set image in franking layout', async () => {
+      await service.init(options);
+
+      const promise = service.retrievePreviewVoucher({ id: 1, price: 80 } as Product, {
+        imageItem: { imageID: 1 } as ImageItem,
+        voucherLayout: VoucherLayout.FrankingZone
+      });
+
+      expect(promise).to.eventually.be.fulfilled;
+    });
+
+    it('should throw error if voucher layout is missing', async () => {
+      await service.init(options);
+
+      const promise = service.retrievePreviewVoucher({ id: 1, price: 80 } as Product);
+
+      expect(oneC4AStub.retrievePreviewVoucherPNGAsync.calledOnce).to.be.false;
+      expect(promise).to.eventually.be.rejectedWith(VoucherLayoutError);
+    });
   });
 
   describe('shopping cart', () => {
@@ -236,6 +256,14 @@ describe('1C4A Service', () => {
       }).to.throw(VoucherLayoutError);
     });
 
+    it('should use the global voucher layout if no layout is passed', async () => {
+      await service.init({ ...options, voucherLayout: VoucherLayout.AddressZone });
+
+      expect(() => {
+        service.addItemToShoppingCart({ id: 1, price: 80 } as Product);
+      }).to.not.throw(VoucherLayoutError);
+    });
+
     it('should throw an error if the product price is missing', () => {
       expect(() => {
         service.addItemToShoppingCart({ id: 1 } as Product, {
@@ -251,6 +279,15 @@ describe('1C4A Service', () => {
           voucherLayout: VoucherLayout.AddressZone
         });
       }).to.throw(VoucherLayoutError);
+    });
+
+    it('should set image if passed in franking layout', () => {
+      expect(() => {
+        service.addItemToShoppingCart({ id: 1 } as Product, {
+          imageItem: { imageID: 1 } as any,
+          voucherLayout: VoucherLayout.FrankingZone
+        });
+      }).to.not.throw(VoucherLayoutError);
     });
 
     it('should throw an error if only sender address is given', () => {
@@ -361,6 +398,17 @@ describe('1C4A Service', () => {
       const promise = service.checkoutShoppingCart();
 
       expect(promise).to.eventually.be.fulfilled;
+    });
+
+    it('should checkout cart with given shopOrderId', async () => {
+      await service.init(options);
+      service.addItemToShoppingCart({ id: 1, price: 80 } as Product, {
+        voucherLayout: VoucherLayout.FrankingZone
+      });
+
+      const order = await service.checkoutShoppingCart({ shopOrderId: 1234 });
+
+      expect((order as any).shopOrderId).to.equal(1234);
     });
 
     it('should require position data for PDF without page format information', async () => {
