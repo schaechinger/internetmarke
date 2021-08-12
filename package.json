@@ -32,6 +32,9 @@
   "engines": {
     "node": ">=10.0.0"
   },
+  "bin": {
+    "internetmarke": "./lib/cli"
+  },
   "directories": {
     "lib": "./lib/",
     "test": "./test",
@@ -41,13 +44,14 @@
     "axios": "^0.21.1",
     "axios-cookiejar-support": "^1.0.1",
     "debug": "^4.3.2",
-    "find-cache-dir": "3.3.1",
+    "find-cache-dir": "^3.3.1",
     "inversify": "^5.1.1",
     "md5": "^2.3.0",
     "moment-timezone": "^0.5.33",
     "reflect-metadata": "^0.1.13",
     "soap": "^0.40.0",
-    "tough-cookie": "^4.0.0"
+    "tough-cookie": "^4.0.0",
+    "yargs": "17.1.0"
   },
   "devDependencies": {
     "@commitlint/cli": "^13.1.0",
@@ -55,15 +59,16 @@
     "@types/chai": "^4.2.21",
     "@types/chai-as-promised": "^7.1.4",
     "@types/debug": "^4.1.7",
-    "@types/find-cache-dir": "3.2.1",
+    "@types/find-cache-dir": "^3.2.1",
     "@types/inversify": "^2.0.33",
     "@types/md5": "^2.3.1",
     "@types/mocha": "^9.0.0",
     "@types/moxios": "^0.4.12",
-    "@types/node": "^16.4.3",
-    "@types/rimraf": "3.0.1",
-    "@types/sinon": "10.0.2",
+    "@types/node": "16.6.0",
+    "@types/rimraf": "^3.0.1",
+    "@types/sinon": "^10.0.2",
     "@types/tough-cookie": "^4.0.1",
+    "@types/yargs": "17.0.2",
     "chai": "^4.3.4",
     "chai-as-promised": "^7.1.1",
     "husky": "^7.0.1",
