@@ -1,13 +1,11 @@
 import { Debugger } from 'debug';
+import findCacheDir from 'find-cache-dir';
 import fs from 'fs';
 import { inject, injectable } from 'inversify';
-import { tmpdir } from 'os';
 import { join as joinPath } from 'path';
 // @ts-ignore
-import { version as packageVersion } from '../../package.json';
+import { name as packageName, version as packageVersion } from '../../package.json';
 import { TYPES } from '../di/types';
-
-const BASE_DIR = 'node-internetmarke';
 
 interface CacheFormat<T> {
   date: string;
@@ -54,13 +52,10 @@ export class DataStore<T> implements IDataStore<T> {
       this.ttl = ttl;
     }
 
-    const dir = joinPath(tmpdir(), BASE_DIR);
-    try {
-      fs.accessSync(dir);
-    } catch (err) {
-      fs.mkdirSync(dir);
-    }
-    this.file = joinPath(dir, file);
+    const dir = findCacheDir({ name: packageName, create: true });
+    this.log('cache', dir);
+
+    this.file = joinPath(dir!, file);
     fs.closeSync(fs.openSync(this.file, 'a'));
 
     await this.load();

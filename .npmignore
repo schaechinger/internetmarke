@@ -6,6 +6,7 @@
 /src/
 /test/
 .gitignore
+.mocharc.js
 .prettierrc
 commitlint.config.js
 package-lock.json

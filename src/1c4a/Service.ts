@@ -583,7 +583,9 @@ export class OneClickForAppService extends SoapService implements OneClickForApp
       delete payload.userToken;
       this.log('[dryrun] checkout request payload:', JSON.stringify(payload));
 
-      return payload;
+      if ('test' === process.env.NODE_ENV) {
+        return payload;
+      }
     }
 
     return this.soapClient[checkout](payload)
