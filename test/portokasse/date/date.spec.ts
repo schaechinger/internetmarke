@@ -18,10 +18,10 @@ describe('Date', () => {
   });
 
   it('should handle a given date in a different time zone', () => {
-    const date = new Date('2021-07-25 05:33:00.000+07:00');
+    const date = new Date('2021-07-25 04:33:00.000+07:00');
     const dateString = formatDate(date);
 
     expect(dateString).to.exist;
-    expect(dateString).to.equal('25.07.2021');
+    expect(dateString).to.equal('24.07.2021');
   });
 });
