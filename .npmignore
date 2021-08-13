@@ -10,6 +10,7 @@
 .eslintrc
 .gitignore
 .mocharc.js
+.nycrc
 .prettierrc
 commitlint.config.js
 package-lock.json

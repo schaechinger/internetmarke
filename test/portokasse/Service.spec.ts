@@ -6,6 +6,7 @@ import { userCredentials } from '../1c4a/helper';
 import { User } from '../../src/User';
 import { JournalError, PortokasseError } from '../../src/portokasse/Error';
 import { Internetmarke } from '../../src/Internetmarke';
+import { getLoggerStub } from '../stubs/logger.stub';
 import { journalResult } from './journal/journal.spec';
 
 describe('Portokasse Service', () => {
@@ -27,7 +28,7 @@ describe('Portokasse Service', () => {
       response: { email: 'user@deutschepost.de' }
     });
 
-    service = new PortokasseService(new User());
+    service = new PortokasseService(new User(), getLoggerStub);
   });
 
   afterEach(() => {
@@ -103,7 +104,7 @@ describe('Portokasse Service', () => {
       expect(res).to.exist;
     });
 
-    it('should top up with Paypal', async () => {
+    it('should top up with PayPal', async () => {
       moxios.stubOnce('post', /\/payments$/, {
         status: 200,
         headers: {},
@@ -114,7 +115,7 @@ describe('Portokasse Service', () => {
       });
 
       await service.init({ user: userCredentials });
-      const res = await service.topUp(1000, PaymentMethod.Paypal);
+      const res = await service.topUp(1000, PaymentMethod.PayPal);
 
       expect(res).to.exist;
     });
@@ -132,7 +133,7 @@ describe('Portokasse Service', () => {
 
       await service.init({ user: userCredentials });
 
-      expect(service.topUp(500, PaymentMethod.Paypal)).to.eventually.be.rejectedWith(
+      expect(service.topUp(500, PaymentMethod.PayPal)).to.eventually.be.rejectedWith(
         `Error from Portokasse: ${errorCode}`
       );
     });
@@ -147,7 +148,7 @@ describe('Portokasse Service', () => {
       });
 
       await service.init({ user: userCredentials });
-      const res = await service.getJournal(10);
+      const res = await service.getJournal({ days: 10 });
 
       expect(res).to.exist;
     });
@@ -163,6 +164,23 @@ describe('Portokasse Service', () => {
       const res = await service.getJournal({
         startDate: new Date('2021-08-01'),
         endDate: new Date('2021-08-11')
+      });
+
+      expect(res).to.exist;
+    });
+
+    it('should get journal for different page', async () => {
+      moxios.stubOnce('get', /\/journals\?/, {
+        status: 200,
+        headers: {},
+        response: journalResult
+      });
+
+      await service.init({ user: userCredentials });
+      const res = await service.getJournal({
+        offset: 10,
+        rows: 5,
+        days: 10
       });
 
       expect(res).to.exist;

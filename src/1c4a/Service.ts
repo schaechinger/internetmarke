@@ -585,6 +585,8 @@ export class OneClickForAppService extends SoapService implements OneClickForApp
       if ('test' === process.env.NODE_ENV) {
         return payload;
       }
+
+      return {} as any;
     }
 
     return this.soapClient[checkout](payload)
@@ -611,12 +613,8 @@ export class OneClickForAppService extends SoapService implements OneClickForApp
         return response;
       })
       .catch((e: any) => {
-        this.log(
-          'checkoutShoppingCart',
-          e.root.Envelope.Body.Fault,
-          e.root.Envelope.Body.Fault.detail.ShoppingCartValidationException
-        );
-        throw new SoapError(e.root.Envelope.Body.Fault.faultstring);
+        this.log('checkoutShoppingCart', e.root?.Envelope.Body.Fault || e.message);
+        throw new SoapError(e.root?.Envelope.Body.Fault.faultstring || e.message);
       });
   }
 

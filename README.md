@@ -347,9 +347,21 @@ const payment = await internetmarke.topUp(amount, PaymentMethod.GiroPay, bic);
 // payment: { code: 'OK', redirect: 'https://giropay.de/...' }
 ```
 
+**DirectDebit top up**
+
+```typescript
+const amount = { value: 10, currency: 'EUR' }; // or: const amount = 1000;
+const payment = await internetmarke.topUp(amount, PaymentMethod.DirectDebit);
+// payment: { code: 'OK', redirect: null }
+```
+
 ## Get Journal
 
-The portokasse service supports a history of orders and top ups that can be requested with a range or start and end date or a number of days from now.
+The portokasse service supports a history of orders and top ups that can be
+requested with a range or start and end date or a number of days from now.
+
+Optional option parameters are `offset` and `rows` that refer to a paging
+mechanism and default to the first ten entries.
 
 **Journal in date range**
 
@@ -364,7 +376,7 @@ const journal = await internetmarke.getJournal(range);
 **Journal of the latest days**
 
 ```typescript
-const days = 14;
+const days = { days: 14 };
 const journal = await internetmarke.getJournal(days);
 ```
 

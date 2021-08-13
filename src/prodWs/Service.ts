@@ -4,6 +4,7 @@ import { TYPES } from '../di/types';
 import { DataStore } from '../services/DataStore';
 import { SoapService } from '../services/Soap';
 import { Client, ClientCredentials } from './Client';
+import { formatDate } from './date';
 import { ClientError } from './Error';
 import { parseSalesProduct, Product } from './product';
 
@@ -98,12 +99,8 @@ export class ProductService extends SoapService implements ProdWS {
     };
 
     if (date) {
-      const timestamp = date.toISOString().split('T');
       payload.timestamp = {
-        attributes: {
-          date: timestamp[0],
-          time: `${timestamp[1].substr(0, 12)}+00:00`
-        }
+        attributes: formatDate(date)
       };
     }
 

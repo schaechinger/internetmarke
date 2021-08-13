@@ -5,10 +5,8 @@
     "project": "./tsconfig.eslint.json"
   },
   "rules": {
-    "@typescript-eslint/comma-dangle": "off",
-    "@typescript-eslint/no-unused-vars": [2, { "args": "all", "argsIgnorePattern": "^_" }],
     "arrow-body-style": "off",
-    "arrow-parens": "off",
+    "capitalized-comments": "error",
     "import/prefer-default-export": "off",
     "no-console": "error",
     "prettier/prettier": "error",
@@ -21,5 +19,6 @@
         "@typescript-eslint/no-unused-expressions": "off"
       }
     }
-  ]
+  ],
+  "ignorePatterns": ["node_modules"]
 }

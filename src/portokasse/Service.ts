@@ -5,21 +5,31 @@ import { CookieJar } from 'tough-cookie';
 import { TYPES } from '../di/types';
 import { RestService } from '../services/Rest';
 import { User, UserCredentials, UserInfo } from '../User';
-import { Amount, parseAmount } from '../utils/amount';
+import { Amount, amountToCents, parseAmount } from '../utils/amount';
 import { InternetmarkeError, UserError } from '../Error';
 import { JournalError, PortokasseError } from './Error';
 import { formatDate } from './date';
-import { Journal, JournalEntry, JournalOptions, parseJournalEntry } from './journal';
+import {
+  Journal,
+  JournalDays,
+  JournalEntry,
+  JournalOptions,
+  JournalRange,
+  parseJournalEntry
+} from './journal';
+import { Debugger } from 'debug';
 
 export enum PaymentMethod {
   DirectDebit = 'DIRECTDEBIT',
   GiroPay = 'GIROPAY',
-  Paypal = 'PAYPAL'
+  PayPal = 'PAYPAL'
 }
 
 export interface PaymentResponse {
-  code: string; // 'OK'
-  redirect: string; // paypal url
+  /** The status code which is usually 'OK'. */
+  code: string;
+  /** PayPal/Giropay redirect url, null for DirectDebit. */
+  redirect: string | null;
 }
 
 export interface PortokasseServiceOptions {
@@ -44,8 +54,12 @@ export class PortokasseService extends RestService implements Portokasse {
 
   private csrf?: string;
 
-  constructor(@inject(TYPES.User) private user: User) {
+  private log: Debugger;
+
+  constructor(@inject(TYPES.User) private user: User, @inject(TYPES.LoggerFactory) getLogger: any) {
     super();
+
+    this.log = getLogger('portokasse');
   }
 
   public async init(options: PortokasseServiceOptions): Promise<boolean> {
@@ -64,6 +78,9 @@ export class PortokasseService extends RestService implements Portokasse {
     return this.user.isAuthenticated();
   }
 
+  /**
+   * Retrieves the user information including the wallet balance.
+   */
   public async getUserInfo(): Promise<UserInfo> {
     await this.checkServiceInit('Cannot get balance before initializing Portokasse service');
 
@@ -88,7 +105,7 @@ export class PortokasseService extends RestService implements Portokasse {
     );
 
     const data: any = {
-      amount: 'number' === typeof amount ? amount : (amount as Amount).value * 100,
+      amount: amountToCents(amount),
       paymentMethod
     };
 
@@ -99,19 +116,31 @@ export class PortokasseService extends RestService implements Portokasse {
     return this.request('POST', '/api/v1/payments', data);
   }
 
+  /**
+   * Get the purchase and top up journal of your account.
+   *
+   * @param daysOrDateRange Eigher a days or a date range option with optional
+   *  offset and rows information.
+   */
   public async getJournal(daysOrDateRange: JournalOptions): Promise<Journal> {
     await this.checkServiceInit('Cannot get journal before initializing Portokasse service');
 
-    const params: string[] = ['offset=0', 'rows=10'];
+    const params: string[] = [
+      `offset=${daysOrDateRange.offset || 0}`,
+      `rows=${daysOrDateRange.rows || 10}`
+    ];
 
     let type = 'DAYS';
 
-    if ('number' === typeof daysOrDateRange) {
-      params.push(`selectionDays=${daysOrDateRange}`);
-    } else if (daysOrDateRange.startDate && daysOrDateRange.endDate) {
+    if ((daysOrDateRange as JournalDays).days) {
+      params.push(`selectionDays=${(daysOrDateRange as JournalDays).days}`);
+    } else if (
+      (daysOrDateRange as JournalRange).startDate &&
+      (daysOrDateRange as JournalRange).endDate
+    ) {
       type = 'RANGE';
-      params.push(`selectionStart=${formatDate(daysOrDateRange.startDate)}`);
-      params.push(`selectionEnd=${formatDate(daysOrDateRange.endDate)}`);
+      params.push(`selectionStart=${formatDate((daysOrDateRange as JournalRange).startDate)}`);
+      params.push(`selectionEnd=${formatDate((daysOrDateRange as JournalRange).endDate)}`);
     } else {
       throw new JournalError(
         'Start date and end date need to be passed as a pair or with an amount of days from today'
@@ -187,6 +216,12 @@ export class PortokasseService extends RestService implements Portokasse {
     }
 
     try {
+      let payload: any = data ? { ...data } : '';
+      if (payload && payload.password) {
+        payload.password = '********';
+      }
+      this.log('[%s] %s %o', method, path, payload);
+
       const res = await axios(options);
 
       if (res.headers && res.headers['set-cookie']) {

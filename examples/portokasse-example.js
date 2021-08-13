@@ -21,6 +21,6 @@ const { PaymentMethod } = require('../lib/portokasse/Service');
   // this will prevent you account from being charged in this test
   try {
     const amount = { value: 5, currency: 'EUR' }; //or: const amount = 500
-    await internetmarke.topUp(amount, PaymentMethod.Paypal)
+    await internetmarke.topUp(amount, PaymentMethod.PayPal)
   } catch { }
 })();

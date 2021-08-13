@@ -1,6 +1,6 @@
 {
   "name": "internetmarke",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "description": "A node implementation to use the Internetmarke web service of Deutsche Post.",
   "keywords": [
     "internetmarke",
@@ -55,6 +55,7 @@
   "devDependencies": {
     "@commitlint/cli": "^13.1.0",
     "@commitlint/config-conventional": "^13.1.0",
+    "@istanbuljs/nyc-config-typescript": "^1.0.1",
     "@types/chai": "^4.2.21",
     "@types/chai-as-promised": "^7.1.4",
     "@types/debug": "^4.1.7",
@@ -86,10 +87,10 @@
     "typescript": "^4.3.5"
   },
   "nyc": {
-    "branches": "&gt;80",
-    "lines": "&gt;80",
-    "functions": "&gt;80",
-    "statements": "&gt;80"
+    "branches": 80,
+    "lines": 80,
+    "functions": 80,
+    "statements": 80
   },
   "husky": {
     "hooks": {

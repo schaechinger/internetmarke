@@ -1,11 +1,20 @@
 import { Amount, parseAmount } from '../utils/amount';
 
-export interface JournalRange {
+interface JournalBaseOptions {
+  offset?: number;
+  rows?: number;
+}
+
+export interface JournalDays extends JournalBaseOptions {
+  days: number;
+}
+
+export interface JournalRange extends JournalBaseOptions {
   startDate: Date;
   endDate: Date;
 }
 
-export type JournalOptions = JournalRange | number;
+export type JournalOptions = JournalRange | JournalDays;
 
 export enum JournalEntryType {
   Payment = 'PAYMENT',
