@@ -45,14 +45,14 @@ export const parseSalesProduct = (data: any): Product | null => {
       height: {}
     };
 
-    for (const key in data.dimensionList) {
+    Object.keys(data.dimensionList).forEach(key => {
       const { minValue, maxValue, unit } = data.dimensionList[key].attributes;
       (product.dimensions as any)[key] = {
         min: +minValue,
         max: +maxValue,
         unit
       };
-    }
+    });
   }
 
   // weight

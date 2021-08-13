@@ -1,5 +1,3 @@
 import { stub } from 'sinon';
 
-export const getLoggerStub = (_id: string) => {
-  return stub();
-};
+export const getLoggerStub = (): any => stub();

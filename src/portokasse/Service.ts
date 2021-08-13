@@ -4,9 +4,8 @@ import { inject, injectable } from 'inversify';
 import { CookieJar } from 'tough-cookie';
 import { TYPES } from '../di/types';
 import { RestService } from '../services/Rest';
-import { Amount } from '../utils/amount';
 import { User, UserCredentials, UserInfo } from '../User';
-import { parseAmount } from '../utils/amount';
+import { Amount, parseAmount } from '../utils/amount';
 import { InternetmarkeError, UserError } from '../Error';
 import { JournalError, PortokasseError } from './Error';
 import { formatDate } from './date';
@@ -42,6 +41,7 @@ const BASE_URL = 'https://portokasse.deutschepost.de/portokasse';
 @injectable()
 export class PortokasseService extends RestService implements Portokasse {
   private cookieJar: CookieJar;
+
   private csrf?: string;
 
   constructor(@inject(TYPES.User) private user: User) {
@@ -165,9 +165,9 @@ export class PortokasseService extends RestService implements Portokasse {
     if (data) {
       if (isLogin) {
         const encodedData: string[] = [];
-        for (let prop in data) {
+        Object.keys(data).forEach(prop => {
           encodedData.push(`${prop}=${encodeURIComponent(data[prop])}`);
-        }
+        });
 
         options.data = encodedData.join('&');
       } else {

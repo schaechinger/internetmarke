@@ -1,3 +1,4 @@
+/* eslint-disable max-classes-per-file */
 import { InternetmarkeError } from '../Error';
 
 export class OneClickForAppError extends InternetmarkeError {}

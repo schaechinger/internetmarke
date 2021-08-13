@@ -1,6 +1,6 @@
 import { expect } from 'chai';
+import findCacheDir from 'find-cache-dir';
 import { accessSync, unlinkSync } from 'fs';
-import { tmpdir } from 'os';
 import { join as joinPath } from 'path';
 import { sync as rmdirSync } from 'rimraf';
 import { stub } from 'sinon';
@@ -10,7 +10,7 @@ import { getLoggerStub } from '../stubs/logger.stub';
 describe('DataStore', () => {
   let store: DataStore<any>;
   const tmpFile = 'test.json';
-  const rootPath = joinPath(tmpdir(), 'node-internetmarke');
+  const rootPath = findCacheDir({ name: 'internetmarke' })!;
   const tmpPath = joinPath(rootPath, tmpFile);
 
   let loadData: any;
@@ -30,7 +30,9 @@ describe('DataStore', () => {
   afterEach(() => {
     try {
       unlinkSync(tmpPath);
-    } catch {}
+    } catch {
+      // no temp file available
+    }
   });
 
   it('should create the root temp dir if not existing', async () => {

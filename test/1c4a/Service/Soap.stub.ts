@@ -13,7 +13,7 @@ export const oneC4AStub = {
   retrievePreviewVoucherPNGAsync: stub().returns(Promise.resolve([{ link: 'http://localhost' }])),
   checkoutShoppingCartPDFAsync: stub().returns(Promise.resolve([{}])),
   checkoutShoppingCartPNGAsync: stub().returns(Promise.resolve([{}])),
-  retrieveOrderAsync: stub().returns(Promise.resolve([{}])),
+  retrieveOrderAsync: stub(),
   retrievePageFormatsAsync: stub().returns(
     Promise.resolve([
       {
@@ -49,5 +49,19 @@ export const oneC4AStub = {
   ),
   addSoapHeader: stub()
 };
+
+oneC4AStub.retrieveOrderAsync
+  .withArgs({
+    userToken: '<TOKEN>',
+    shopOrderId: 12345
+  })
+  .returns(
+    Promise.resolve([
+      {
+        link: 'http://localhost'
+      }
+    ])
+  );
+oneC4AStub.retrieveOrderAsync.returns(Promise.resolve([null]));
 
 export const get1C4AStub = () => Promise.resolve(oneC4AStub);

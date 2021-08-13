@@ -11,6 +11,7 @@ export interface ShoppingCartItem {
   additionalInfo?: string;
   position?: PageFormatPosition;
   price?: Amount;
+  ppl?: number;
 }
 
 export interface ShoppingCart {

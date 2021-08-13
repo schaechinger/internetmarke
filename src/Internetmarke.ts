@@ -30,14 +30,15 @@ import {
   PortokasseService,
   PortokasseServiceOptions
 } from './portokasse/Service';
-import { PostService } from './services/service';
 
 /**
  * Main class of the internetmarke package with access to all available methods.
  */
 export class Internetmarke implements OneClickForApp, Portokasse, ProdWS {
   protected oneClick4AppService: OneClickForAppService;
+
   protected portokasseService: PortokasseService;
+
   protected productService: ProductService;
 
   constructor() {
@@ -70,9 +71,8 @@ export class Internetmarke implements OneClickForApp, Portokasse, ProdWS {
       info = await this.portokasseService.getUserInfo();
     }
 
-    if (!info) {
-      this.checkServiceInit(
-        this.oneClick4AppService,
+    if (!info && !this.oneClick4AppService.isInitialized()) {
+      throw new InternetmarkeError(
         'Cannot get user info before initializing OneClickForApp service'
       );
     }
@@ -196,7 +196,7 @@ export class Internetmarke implements OneClickForApp, Portokasse, ProdWS {
    * @param shopOrderId The order information that hold the data about the
    *  vouchers.
    */
-  public retrieveOrder(shopOrderId: number): Promise<Order | null> {
+  public async retrieveOrder(shopOrderId: number): Promise<Order | null> {
     return this.oneClick4AppService.retrieveOrder(shopOrderId);
   }
 
@@ -267,11 +267,5 @@ export class Internetmarke implements OneClickForApp, Portokasse, ProdWS {
     this.oneClick4AppService = container.get<OneClickForAppService>(TYPES.OneClickForAppService);
     this.portokasseService = container.get<PortokasseService>(TYPES.PortokasseService);
     this.productService = container.get<ProductService>(TYPES.ProductService);
-  }
-
-  private checkServiceInit(service: PostService, message: string): void {
-    if (!service.isInitialized()) {
-      throw new InternetmarkeError(message);
-    }
   }
 }

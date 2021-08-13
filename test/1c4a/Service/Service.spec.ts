@@ -68,21 +68,17 @@ describe('1C4A Service', () => {
     });
 
     it('should prevent init without client credentials', async () => {
-      expect(internetmarke.initOneClickForAppService({} as any)).to.eventually.be.rejectedWith(
-        PartnerError
-      );
+      expect(service.init({} as any)).to.eventually.be.rejectedWith(PartnerError);
     });
 
     it('should prevent init without client credentials', async () => {
-      expect(
-        internetmarke.initOneClickForAppService({ partner: partnerCredentials } as any)
-      ).to.eventually.be.rejectedWith(UserError);
+      expect(service.init({ partner: partnerCredentials } as any)).to.eventually.be.rejectedWith(
+        UserError
+      );
     });
 
-    xit('should init with minimal options', async () => {
-      const myService = await internetmarke.initOneClickForAppService(options);
-
-      expect(myService).to.exist;
+    it('should init with minimal options', async () => {
+      expect(service.init(options)).to.eventually.be.fulfilled;
     });
   });
 
@@ -183,6 +179,26 @@ describe('1C4A Service', () => {
       expect(oneC4AStub.retrievePreviewVoucherPDFAsync.calledOnce).to.be.false;
       expect(promise).to.eventually.be.rejectedWith(VoucherLayoutError);
     });
+
+    it('should set image in franking layout', async () => {
+      await service.init(options);
+
+      const promise = service.retrievePreviewVoucher({ id: 1, price: 80 } as Product, {
+        imageItem: { imageID: 1 } as ImageItem,
+        voucherLayout: VoucherLayout.FrankingZone
+      });
+
+      expect(promise).to.eventually.be.fulfilled;
+    });
+
+    it('should throw error if voucher layout is missing', async () => {
+      await service.init(options);
+
+      const promise = service.retrievePreviewVoucher({ id: 1, price: 80 } as Product);
+
+      expect(oneC4AStub.retrievePreviewVoucherPNGAsync.calledOnce).to.be.false;
+      expect(promise).to.eventually.be.rejectedWith(VoucherLayoutError);
+    });
   });
 
   describe('shopping cart', () => {
@@ -240,6 +256,14 @@ describe('1C4A Service', () => {
       }).to.throw(VoucherLayoutError);
     });
 
+    it('should use the global voucher layout if no layout is passed', async () => {
+      await service.init({ ...options, voucherLayout: VoucherLayout.AddressZone });
+
+      expect(() => {
+        service.addItemToShoppingCart({ id: 1, price: 80 } as Product);
+      }).to.not.throw(VoucherLayoutError);
+    });
+
     it('should throw an error if the product price is missing', () => {
       expect(() => {
         service.addItemToShoppingCart({ id: 1 } as Product, {
@@ -255,6 +279,15 @@ describe('1C4A Service', () => {
           voucherLayout: VoucherLayout.AddressZone
         });
       }).to.throw(VoucherLayoutError);
+    });
+
+    it('should set image if passed in franking layout', () => {
+      expect(() => {
+        service.addItemToShoppingCart({ id: 1 } as Product, {
+          imageItem: { imageID: 1 } as any,
+          voucherLayout: VoucherLayout.FrankingZone
+        });
+      }).to.not.throw(VoucherLayoutError);
     });
 
     it('should throw an error if only sender address is given', () => {
@@ -344,7 +377,12 @@ describe('1C4A Service', () => {
         orientation: PageFormatOrientation.Portrait,
         labelSpacing: { x: 0, y: 0 },
         labelCount: { labelX: 2, labelY: 5 },
-        margin: { top: 31, bottom: 31, left: 15, right: 15 }
+        margin: {
+          top: 31,
+          bottom: 31,
+          left: 15,
+          right: 15
+        }
       }
     };
 
@@ -365,6 +403,17 @@ describe('1C4A Service', () => {
       const promise = service.checkoutShoppingCart();
 
       expect(promise).to.eventually.be.fulfilled;
+    });
+
+    it('should checkout cart with given shopOrderId', async () => {
+      await service.init(options);
+      service.addItemToShoppingCart({ id: 1, price: 80 } as Product, {
+        voucherLayout: VoucherLayout.FrankingZone
+      });
+
+      const order = await service.checkoutShoppingCart({ shopOrderId: 1234 });
+
+      expect((order as any).shopOrderId).to.equal(1234);
     });
 
     it('should require position data for PDF without page format information', async () => {
@@ -405,6 +454,50 @@ describe('1C4A Service', () => {
       });
 
       expect(promise).to.eventually.be.fulfilled;
+    });
+
+    it('should use ppl version for checkout', async () => {
+      await service.init(options);
+      service.addItemToShoppingCart({ id: 1, price: 80, ppl: 49 } as Product, {
+        voucherLayout: VoucherLayout.FrankingZone
+      });
+
+      const payload = (await service.checkoutShoppingCart({
+        dryrun: true
+      })) as any;
+
+      expect(payload.ppl).to.equal(49);
+    });
+
+    it('should ignore ppl if not passed to shopping cart', async () => {
+      await service.init(options);
+      service.addItemToShoppingCart({ id: 1, price: 80 } as Product, {
+        voucherLayout: VoucherLayout.FrankingZone
+      });
+
+      const payload = (await service.checkoutShoppingCart({
+        dryrun: true
+      })) as any;
+
+      expect(payload.ppl).to.not.exist;
+    });
+  });
+
+  describe('retrieveOrder', () => {
+    it('should retrieve the order for the given id', async () => {
+      await service.init(options);
+
+      const order = await service.retrieveOrder(12345);
+
+      expect(order).to.exist;
+    });
+
+    it('should detect invalid order id', async () => {
+      await service.init(options);
+
+      const order = await service.retrieveOrder(512);
+
+      expect(order).to.be.null;
     });
   });
 });

@@ -29,14 +29,16 @@ describe('Internetmarke', () => {
     );
     expect(internetmarke.checkoutShoppingCart()).to.eventually.be.rejectedWith(InternetmarkeError);
     expect(internetmarke.retrieveOrder(0)).to.eventually.be.rejectedWith(InternetmarkeError);
+
+    expect(internetmarke.initOneClickForAppService({} as any)).to.eventually.be.rejected;
   });
 
   it('should make local 1C4A shopping cart methods available before init', () => {
-    expect(() =>
+    expect(() => {
       internetmarke.addItemToShoppingCart({ id: 1, price: 80 } as Product, {
         voucherLayout: VoucherLayout.FrankingZone
-      })
-    ).to.not.throw(InternetmarkeError);
+      });
+    }).to.not.throw(InternetmarkeError);
     expect(() => internetmarke.getItemFromShoppingCart(0)).to.not.throw(InternetmarkeError);
     expect(() => internetmarke.removeItemFromShoppingCart(0)).to.not.throw(InternetmarkeError);
     expect(() => internetmarke.getShoppingCartSummary()).to.not.throw(InternetmarkeError);
@@ -48,11 +50,15 @@ describe('Internetmarke', () => {
       InternetmarkeError
     );
     expect(internetmarke.getJournal(1)).to.eventually.be.rejectedWith(InternetmarkeError);
+
+    expect(internetmarke.initPortokasseService({} as any)).to.eventually.be.rejected;
   });
 
   it('should throw errors when accessing ProdWS services before init', () => {
     expect(internetmarke.getProductList()).to.eventually.be.rejectedWith(InternetmarkeError);
     expect(internetmarke.getProduct(0)).to.eventually.be.rejectedWith(InternetmarkeError);
+
+    expect(internetmarke.initProductService({} as any)).to.eventually.be.rejected;
   });
 
   describe('getUserInfo', () => {

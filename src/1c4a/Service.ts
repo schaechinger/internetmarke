@@ -91,7 +91,7 @@ export enum ShippingList {
 
 export interface CheckoutShoppingCartOptions {
   /** The order id that should be used. Will be generated if not set. */
-  shopOrderId?: string;
+  shopOrderId?: number;
   /**
    * The page format to use for all vouchers. This will turn the vouchers into a combined pdf file.
    */
@@ -138,9 +138,11 @@ const WSDL = 'https://internetmarke.deutschepost.de/OneClickForAppV3/OneClickFor
 @injectable()
 export class OneClickForAppService extends SoapService implements OneClickForApp {
   protected wsdl = WSDL;
+
   private defaults: { voucherLayout: VoucherLayout | null } = {
     voucherLayout: null
   };
+
   private shoppingCart: (ShoppingCartItem | null)[];
 
   constructor(
@@ -375,6 +377,10 @@ export class OneClickForAppService extends SoapService implements OneClickForApp
       position.address = { sender, receiver };
     }
 
+    if (product.ppl) {
+      position.ppl = product.ppl;
+    }
+
     if (product.price) {
       position.price = parseAmount(product.price);
     } else {
@@ -456,11 +462,6 @@ export class OneClickForAppService extends SoapService implements OneClickForApp
       throw new CheckoutError('Cannot checkout empty shopping cart');
     }
 
-    // enble dryrun as default in test env
-    if (undefined === options.dryrun && 'test' === process.env.NODE_ENV) {
-      options.dryrun = true;
-    }
-
     const isPdfVoucher = !!options.pageFormat;
     const voucherFormat = isPdfVoucher ? VoucherFormat.PDF : VoucherFormat.PNG;
     const checkout = `checkoutShoppingCart${voucherFormat}Async`;
@@ -487,15 +488,23 @@ export class OneClickForAppService extends SoapService implements OneClickForApp
     }
 
     let total = 0;
+    payload.ppl = 0;
     payload.positions = this.shoppingCart
       .filter(position => !!position)
       .map((position, i) => {
-        if (position) {
-          total += Math.round(position.price!.value * 100);
-          delete position.price;
+        const pos = { ...position };
+
+        if (pos) {
+          total += amountToCents(pos.price!);
+          delete pos.price;
+
+          if (pos.ppl && pos.ppl > payload.ppl) {
+            payload.ppl = pos.ppl;
+            delete pos.ppl;
+          }
 
           if (isPdfVoucher) {
-            if (!position.position) {
+            if (!pos.position) {
               // cannot generatie positions
               if (!positionMap) {
                 throw new CheckoutError(
@@ -505,7 +514,7 @@ export class OneClickForAppService extends SoapService implements OneClickForApp
 
               this.placeToFirstEmpty(positionMap, i);
             } else if (positionMap) {
-              const { labelX, labelY, page } = position.position;
+              const { labelX, labelY, page } = pos.position;
               // check if position is in range
               if (
                 1 > labelX ||
@@ -525,7 +534,7 @@ export class OneClickForAppService extends SoapService implements OneClickForApp
                 pageFormatX * (labelY - 1) +
                 pageFormatX * pageFormatY * ((page || 1)! - 1);
 
-              let formerIndex = positionMap[posIndex];
+              const formerIndex = positionMap[posIndex];
               positionMap[posIndex] = i;
               // move former index to the next empty position
               if (undefined !== formerIndex) {
@@ -535,8 +544,12 @@ export class OneClickForAppService extends SoapService implements OneClickForApp
           }
         }
 
-        return position as ShoppingCartItem;
+        return pos as ShoppingCartItem;
       });
+
+    if (!payload.ppl) {
+      delete payload.ppl;
+    }
 
     // set missing position information for given pageFormat
     if (positionMap?.length) {
@@ -565,11 +578,13 @@ export class OneClickForAppService extends SoapService implements OneClickForApp
     }
 
     // dryrun, don't request checkout
-    if (options.dryrun) {
+    if (options.dryrun || (undefined === options.dryrun && 'test' === process.env.NODE_ENV)) {
       delete payload.userToken;
       this.log('[dryrun] checkout request payload:', JSON.stringify(payload));
 
-      return null;
+      if ('test' === process.env.NODE_ENV) {
+        return payload;
+      }
     }
 
     return this.soapClient[checkout](payload)
@@ -596,7 +611,11 @@ export class OneClickForAppService extends SoapService implements OneClickForApp
         return response;
       })
       .catch((e: any) => {
-        this.log('checkoutShoppingCart', e.root.Envelope.Body.Fault);
+        this.log(
+          'checkoutShoppingCart',
+          e.root.Envelope.Body.Fault,
+          e.root.Envelope.Body.Fault.detail.ShoppingCartValidationException
+        );
         throw new SoapError(e.root.Envelope.Body.Fault.faultstring);
       });
   }
@@ -615,13 +634,6 @@ export class OneClickForAppService extends SoapService implements OneClickForApp
         shopOrderId
       })
       .then(([response]: any) => {
-        this.log(
-          'retrieved order %s with %d voucher%s',
-          response.shoppingCart.shopOrderId,
-          response.shoppingCart.voucherList.voucher.length,
-          1 === response.shoppingCart.voucherList.voucher.length ? '' : 's'
-        );
-
         return response || null;
       })
       .catch((e: any) => {
@@ -668,8 +680,9 @@ export class OneClickForAppService extends SoapService implements OneClickForApp
   private placeToFirstEmpty(positionMap: number[], index: number): void {
     let placed = false;
 
-    for (let i = 0; positionMap.length > i; i++) {
+    for (let i = 0; positionMap.length > i; i += 1) {
       if (undefined === positionMap[i]) {
+        /* eslint-disable no-param-reassign */
         positionMap[i] = index;
         placed = true;
         this.log('  found place @ %d', i);

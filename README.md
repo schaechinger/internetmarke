@@ -29,7 +29,7 @@ A node implementation to use the Internetmarke web service of Deutsche Post.
 To add internetmarke to your project use npm:
 
 ```bash
-npm install internetmarke
+npm i internetmarke
 ```
 
 ## Prerequisites / Required Accounts
