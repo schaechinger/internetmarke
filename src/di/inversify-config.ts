@@ -6,7 +6,6 @@ import { TYPES } from './types';
 import { Partner } from '../1c4a/Partner';
 import { OneClickForAppService } from '../1c4a/Service';
 import { User } from '../User';
-import { Internetmarke } from '../Internetmarke';
 import { Client } from '../prodWs/Client';
 import { ProductService } from '../prodWs/Service';
 import { DataStore } from '../services/DataStore';
@@ -18,21 +17,16 @@ import { PortokasseService } from '../portokasse/Service';
 const container = new Container();
 
 // factories
-container
-  .bind<interfaces.Factory<Debugger>>(TYPES.LoggerFactory)
-  .toFactory<Debugger>((_context: interfaces.Context) => {
-    return (logId?: string): Debugger => {
-      return debug(`internetmarke${logId ? `:${logId}` : ''}`);
-    };
-  });
+container.bind<interfaces.Factory<Debugger>>(TYPES.LoggerFactory).toFactory<Debugger>((): any => {
+  return (logId?: string): Debugger => debug(`internetmarke${logId ? `:${logId}` : ''}`);
+});
+
 container
   .bind<interfaces.Factory<SoapClient>>(TYPES.SoapClientFactory)
-  .toFactory<Promise<SoapClient>>((_context: interfaces.Context) => {
-    return (wsdl: string): Promise<SoapClient> => {
-      return createClientAsync(wsdl, {
-        disableCache: true
-      });
-    };
+  .toFactory<Promise<SoapClient>>((): any => (wsdl: string): Promise<SoapClient> => {
+    return createClientAsync(wsdl, {
+      disableCache: true
+    });
   });
 
 // Portokasse
@@ -50,7 +44,5 @@ container.bind<OneClickForAppService>(TYPES.OneClickForAppService).to(OneClickFo
 container.bind<Client>(TYPES.Client).to(Client);
 container.bind<DataStore<Product>>(TYPES.ProductStore).to(DataStore).inSingletonScope();
 container.bind<ProductService>(TYPES.ProductService).to(ProductService);
-
-container.bind<Internetmarke>(TYPES.Internetmarke).to(Internetmarke);
 
 export default container;

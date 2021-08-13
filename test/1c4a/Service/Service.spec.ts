@@ -377,7 +377,12 @@ describe('1C4A Service', () => {
         orientation: PageFormatOrientation.Portrait,
         labelSpacing: { x: 0, y: 0 },
         labelCount: { labelX: 2, labelY: 5 },
-        margin: { top: 31, bottom: 31, left: 15, right: 15 }
+        margin: {
+          top: 31,
+          bottom: 31,
+          left: 15,
+          right: 15
+        }
       }
     };
 

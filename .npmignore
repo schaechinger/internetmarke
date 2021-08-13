@@ -5,9 +5,13 @@
 /examples/
 /src/
 /test/
+.editorconfig
+.eslintignore
+.eslintrc
 .gitignore
 .mocharc.js
 .prettierrc
 commitlint.config.js
 package-lock.json
+tsconfig.eslint.json
 tsconfig.json

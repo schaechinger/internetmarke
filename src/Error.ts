@@ -1,3 +1,4 @@
+/* eslint-disable max-classes-per-file */
 export class InternetmarkeError extends Error {
   constructor(message: string) {
     super(message);

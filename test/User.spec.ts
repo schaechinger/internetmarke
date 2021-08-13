@@ -67,7 +67,7 @@ describe('User', () => {
     user.load(data);
 
     const parts = Object.keys(infoUpdates);
-    for (let i = 0; parts.length > i; i++) {
+    for (let i = 0; parts.length > i; i += 1) {
       const prop = parts[i];
       const update = {
         [prop]: infoUpdates[prop]

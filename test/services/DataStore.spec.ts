@@ -30,7 +30,9 @@ describe('DataStore', () => {
   afterEach(() => {
     try {
       unlinkSync(tmpPath);
-    } catch {}
+    } catch {
+      // no temp file available
+    }
   });
 
   it('should create the root temp dir if not existing', async () => {

@@ -27,11 +27,17 @@ export interface IDataStore<T> {
 @injectable()
 export class DataStore<T> implements IDataStore<T> {
   private file: string;
+
   private name: string;
+
   private ttl = 7 * 24 * 3600;
+
   private data: { [id: number]: T };
+
   private lastUpdate: Date | null = null;
+
   private log: Debugger;
+
   private loadData: () => Promise<{ [id: number]: T }>;
 
   constructor(@inject(TYPES.LoggerFactory) getLogger: Function) {
@@ -123,7 +129,7 @@ export class DataStore<T> implements IDataStore<T> {
    */
   protected isValid(): boolean {
     if (!this.lastUpdate || !this.ttl || this.ttl * 1000 < Date.now() - this.lastUpdate.getTime()) {
-      this.log(`store %s is outdated`, this.name);
+      this.log('store %s is outdated', this.name);
 
       return false;
     }

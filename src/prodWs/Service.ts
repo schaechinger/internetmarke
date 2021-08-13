@@ -78,9 +78,7 @@ export class ProductService extends SoapService implements ProdWS {
       return this.productStore.getList();
     }
 
-    return this.updateProducts(date).then(products => {
-      return Object.values(products);
-    });
+    return this.updateProducts(date).then(products => Object.values(products));
   }
 
   /**
