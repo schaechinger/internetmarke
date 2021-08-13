@@ -1,14 +1,15 @@
 import axios, { Method, AxiosRequestConfig } from 'axios';
 import axiosCookieJarSupport from 'axios-cookiejar-support';
+import { Debugger } from 'debug';
 import { inject, injectable } from 'inversify';
 import { CookieJar } from 'tough-cookie';
 import { TYPES } from '../di/types';
+import { InternetmarkeError, UserError } from '../Error';
 import { RestService } from '../services/Rest';
 import { User, UserCredentials, UserInfo } from '../User';
 import { Amount, amountToCents, parseAmount } from '../utils/amount';
-import { InternetmarkeError, UserError } from '../Error';
-import { JournalError, PortokasseError } from './Error';
 import { formatDate } from './date';
+import { JournalError, PortokasseError } from './Error';
 import {
   Journal,
   JournalDays,
@@ -17,7 +18,6 @@ import {
   JournalRange,
   parseJournalEntry
 } from './journal';
-import { Debugger } from 'debug';
 
 export enum PaymentMethod {
   DirectDebit = 'DIRECTDEBIT',
@@ -216,7 +216,7 @@ export class PortokasseService extends RestService implements Portokasse {
     }
 
     try {
-      let payload: any = data ? { ...data } : '';
+      const payload: any = data ? { ...data } : '';
       if (payload && payload.password) {
         payload.password = '********';
       }
