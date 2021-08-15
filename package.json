@@ -1,6 +1,6 @@
 {
   "name": "internetmarke",
-  "version": "0.5.1",
+  "version": "0.6.0",
   "description": "A node implementation to use the Internetmarke web service of Deutsche Post.",
   "keywords": [
     "internetmarke",
@@ -22,8 +22,12 @@
     "url": "https://github.com/schaechinger/internetmarke/issues"
   },
   "scripts": {
-    "clean": "rm -rf lib .nyc_output coverage",
+    "clean": "rm -rf lib .nyc_output coverage *.tgz",
     "build": "npm run clean && tsc -p ./tsconfig.json",
+    "lint": "eslint . --ext .ts",
+    "lint:fix": "npm run lint -- --fix",
+    "prettier": "prettier --config .prettierrc 'src/**/*.ts' --write",
+    "check:license": "license-checker --production --summary",
     "test": "mocha -r ts-node/register 'test/**/*.spec.ts'",
     "test:dot": "npm run test -- -R dot",
     "test:codecov": "nyc --reporter=cobertura npm run test",
@@ -51,11 +55,13 @@
     "reflect-metadata": "^0.1.13",
     "soap": "^0.40.0",
     "tough-cookie": "^4.0.0",
-    "yargs": "17.1.0"
+    "yargs": "^17.1.0",
+    "yauzl": "^2.10.0"
   },
   "devDependencies": {
     "@commitlint/cli": "^13.1.0",
     "@commitlint/config-conventional": "^13.1.0",
+    "@istanbuljs/nyc-config-typescript": "^1.0.1",
     "@types/chai": "^4.2.21",
     "@types/chai-as-promised": "^7.1.4",
     "@types/debug": "^4.1.7",
@@ -68,10 +74,18 @@
     "@types/rimraf": "^3.0.1",
     "@types/sinon": "^10.0.2",
     "@types/tough-cookie": "^4.0.1",
-    "@types/yargs": "17.0.2",
+    "@types/yargs": "^17.0.2",
+    "@types/yauzl": "^2.9.2",
+    "@typescript-eslint/eslint-plugin": "^4.29.1",
     "chai": "^4.3.4",
     "chai-as-promised": "^7.1.1",
+    "eslint": "^7.32.0",
+    "eslint-config-airbnb-typescript": "^12.3.1",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-import": "^2.24.0",
+    "eslint-plugin-prettier": "^3.4.0",
     "husky": "^7.0.1",
+    "license-checker": "^25.0.1",
     "mocha": "^9.0.3",
     "moxios": "^0.4.0",
     "nyc": "^15.1.0",
@@ -82,10 +96,10 @@
     "typescript": "^4.3.5"
   },
   "nyc": {
-    "branches": "&gt;80",
-    "lines": "&gt;80",
-    "functions": "&gt;80",
-    "statements": "&gt;80"
+    "branches": 80,
+    "lines": 80,
+    "functions": 80,
+    "statements": 80
   },
   "husky": {
     "hooks": {

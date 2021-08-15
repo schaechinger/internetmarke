@@ -1,0 +1,24 @@
+{
+  "plugins": ["prettier"],
+  "extends": ["airbnb-typescript/base", "prettier"],
+  "parserOptions": {
+    "project": "./tsconfig.eslint.json"
+  },
+  "rules": {
+    "arrow-body-style": "off",
+    "capitalized-comments": "error",
+    "import/prefer-default-export": "off",
+    "no-console": "error",
+    "prettier/prettier": "error",
+    "yoda": ["error", "always"]
+  },
+  "overrides": [
+    {
+      "files": ["*.spec.ts"],
+      "rules": {
+        "@typescript-eslint/no-unused-expressions": "off"
+      }
+    }
+  ],
+  "ignorePatterns": ["node_modules"]
+}

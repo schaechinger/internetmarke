@@ -1,26 +1,35 @@
 import axios, { Method, AxiosRequestConfig } from 'axios';
 import axiosCookieJarSupport from 'axios-cookiejar-support';
+import { Debugger } from 'debug';
 import { inject, injectable } from 'inversify';
 import { CookieJar } from 'tough-cookie';
 import { TYPES } from '../di/types';
-import { RestService } from '../services/Rest';
-import { Amount } from '../utils/amount';
-import { User, UserCredentials, UserInfo } from '../User';
-import { parseAmount } from '../utils/amount';
 import { InternetmarkeError, UserError } from '../Error';
-import { JournalError, PortokasseError } from './Error';
+import { RestService } from '../services/Rest';
+import { User, UserCredentials, UserInfo } from '../User';
+import { Amount, amountToCents, parseAmount } from '../utils/amount';
 import { formatDate } from './date';
-import { Journal, JournalEntry, JournalOptions, parseJournalEntry } from './journal';
+import { JournalError, PortokasseError } from './Error';
+import {
+  Journal,
+  JournalDays,
+  JournalEntry,
+  JournalOptions,
+  JournalRange,
+  parseJournalEntry
+} from './journal';
 
 export enum PaymentMethod {
   DirectDebit = 'DIRECTDEBIT',
   GiroPay = 'GIROPAY',
-  Paypal = 'PAYPAL'
+  PayPal = 'PAYPAL'
 }
 
 export interface PaymentResponse {
-  code: string; // 'OK'
-  redirect: string; // paypal url
+  /** The status code which is usually 'OK'. */
+  code: string;
+  /** PayPal/Giropay redirect url, null for DirectDebit. */
+  redirect: string | null;
 }
 
 export interface PortokasseServiceOptions {
@@ -42,10 +51,15 @@ const BASE_URL = 'https://portokasse.deutschepost.de/portokasse';
 @injectable()
 export class PortokasseService extends RestService implements Portokasse {
   private cookieJar: CookieJar;
+
   private csrf?: string;
 
-  constructor(@inject(TYPES.User) private user: User) {
+  private log: Debugger;
+
+  constructor(@inject(TYPES.User) private user: User, @inject(TYPES.LoggerFactory) getLogger: any) {
     super();
+
+    this.log = getLogger('portokasse');
   }
 
   public async init(options: PortokasseServiceOptions): Promise<boolean> {
@@ -64,6 +78,9 @@ export class PortokasseService extends RestService implements Portokasse {
     return this.user.isAuthenticated();
   }
 
+  /**
+   * Retrieves the user information including the wallet balance.
+   */
   public async getUserInfo(): Promise<UserInfo> {
     await this.checkServiceInit('Cannot get balance before initializing Portokasse service');
 
@@ -78,6 +95,19 @@ export class PortokasseService extends RestService implements Portokasse {
     return this.user.getInfo();
   }
 
+  /**
+   * Tops up the Portokasse account with the given amount of money and the
+   * defined payment provider or type.
+   *
+   * @param amount The amout you want to charge as amount object or as number in
+   *  in Euro cents. Note: The minimum amount id EUR 10.
+   * @param paymentMethod The type of provider you want to choose. PayPal and
+   *  GiroPay both return a callback url to proceed the transaction, DirectDebit
+   *  requires a one time registration at the Portokasse website prior it can
+   *  be used.
+   * @param bic Optional BIC of the bank account you want to be charged. This
+   *  value is only used for GiroPay transactions.
+   */
   public async topUp(
     amount: Amount | number,
     paymentMethod: PaymentMethod,
@@ -88,7 +118,7 @@ export class PortokasseService extends RestService implements Portokasse {
     );
 
     const data: any = {
-      amount: 'number' === typeof amount ? amount : (amount as Amount).value * 100,
+      amount: amountToCents(amount),
       paymentMethod
     };
 
@@ -99,19 +129,31 @@ export class PortokasseService extends RestService implements Portokasse {
     return this.request('POST', '/api/v1/payments', data);
   }
 
+  /**
+   * Get the purchase and top up journal of your account.
+   *
+   * @param daysOrDateRange Eigher a days or a date range option with optional
+   *  offset and rows information.
+   */
   public async getJournal(daysOrDateRange: JournalOptions): Promise<Journal> {
     await this.checkServiceInit('Cannot get journal before initializing Portokasse service');
 
-    const params: string[] = ['offset=0', 'rows=10'];
+    const params: string[] = [
+      `offset=${daysOrDateRange.offset || 0}`,
+      `rows=${daysOrDateRange.rows || 10}`
+    ];
 
     let type = 'DAYS';
 
-    if ('number' === typeof daysOrDateRange) {
-      params.push(`selectionDays=${daysOrDateRange}`);
-    } else if (daysOrDateRange.startDate && daysOrDateRange.endDate) {
+    if ((daysOrDateRange as JournalDays).days) {
+      params.push(`selectionDays=${(daysOrDateRange as JournalDays).days}`);
+    } else if (
+      (daysOrDateRange as JournalRange).startDate &&
+      (daysOrDateRange as JournalRange).endDate
+    ) {
       type = 'RANGE';
-      params.push(`selectionStart=${formatDate(daysOrDateRange.startDate)}`);
-      params.push(`selectionEnd=${formatDate(daysOrDateRange.endDate)}`);
+      params.push(`selectionStart=${formatDate((daysOrDateRange as JournalRange).startDate)}`);
+      params.push(`selectionEnd=${formatDate((daysOrDateRange as JournalRange).endDate)}`);
     } else {
       throw new JournalError(
         'Start date and end date need to be passed as a pair or with an amount of days from today'
@@ -165,9 +207,9 @@ export class PortokasseService extends RestService implements Portokasse {
     if (data) {
       if (isLogin) {
         const encodedData: string[] = [];
-        for (let prop in data) {
+        Object.keys(data).forEach(prop => {
           encodedData.push(`${prop}=${encodeURIComponent(data[prop])}`);
-        }
+        });
 
         options.data = encodedData.join('&');
       } else {
@@ -187,6 +229,12 @@ export class PortokasseService extends RestService implements Portokasse {
     }
 
     try {
+      const payload: any = data ? { ...data } : '';
+      if (payload && payload.password) {
+        payload.password = '********';
+      }
+      this.log('[%s] %s %o', method, path, payload);
+
       const res = await axios(options);
 
       if (res.headers && res.headers['set-cookie']) {

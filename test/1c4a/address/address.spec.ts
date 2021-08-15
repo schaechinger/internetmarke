@@ -99,7 +99,7 @@ describe('Address', () => {
     };
 
     const parts = Object.keys(address);
-    for (let i = 0; parts.length > i; i++) {
+    for (let i = 0; parts.length > i; i += 1) {
       const invalidAddress: any = { ...name };
 
       parts.forEach((part, index) => {
@@ -127,10 +127,10 @@ describe('Address', () => {
         country: CountryCode.USA
       };
 
-      const address = parseAddress(foreignAddress);
+      const result = parseAddress(foreignAddress);
 
-      expect(address).to.exist;
-      expect(address.address.country).to.equal(CountryCode.USA);
+      expect(result).to.exist;
+      expect(result.address.country).to.equal(CountryCode.USA);
     });
 
     it('should accept valid lower case country codes', () => {
@@ -143,10 +143,10 @@ describe('Address', () => {
         country: 'usa' as CountryCode
       };
 
-      const address = parseAddress(foreignAddress);
+      const result = parseAddress(foreignAddress);
 
-      expect(address).to.exist;
-      expect(address.address.country).to.equal(CountryCode.USA);
+      expect(result).to.exist;
+      expect(result.address.country).to.equal(CountryCode.USA);
     });
 
     it('should throw an error for invalid country codes', () => {

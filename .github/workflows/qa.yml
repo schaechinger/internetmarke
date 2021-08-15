@@ -11,7 +11,21 @@ on:
       - master
 
 jobs:
+  lint:
+    name: Linting
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 'lts/*'
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run check:license
+
   test:
+    needs: lint
     env:
       NODE_ENV: test
     strategy:
@@ -35,7 +49,7 @@ jobs:
 
   coverage:
     name: Code coverage update
-    needs: test
+    needs: [lint, test]
     runs-on: ubuntu-latest
 
     steps:

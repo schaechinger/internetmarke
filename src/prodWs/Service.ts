@@ -4,6 +4,7 @@ import { TYPES } from '../di/types';
 import { DataStore } from '../services/DataStore';
 import { SoapService } from '../services/Soap';
 import { Client, ClientCredentials } from './Client';
+import { formatDate } from './date';
 import { ClientError } from './Error';
 import { parseSalesProduct, Product } from './product';
 
@@ -69,6 +70,8 @@ export class ProductService extends SoapService implements ProdWS {
 
   /**
    * Retrieves the list of available products from the service.
+   *
+   * @param date An optional date that loads the product list at the given date.
    */
   public async getProductList(date?: Date): Promise<Product[]> {
     await this.checkServiceInit('Cannot get product list before initializing product service');
@@ -78,9 +81,7 @@ export class ProductService extends SoapService implements ProdWS {
       return this.productStore.getList();
     }
 
-    return this.updateProducts(date).then(products => {
-      return Object.values(products);
-    });
+    return this.updateProducts(date).then(products => Object.values(products));
   }
 
   /**
@@ -100,12 +101,8 @@ export class ProductService extends SoapService implements ProdWS {
     };
 
     if (date) {
-      const timestamp = date.toISOString().split('T');
       payload.timestamp = {
-        attributes: {
-          date: timestamp[0],
-          time: `${timestamp[1].substr(0, 12)}+00:00`
-        }
+        attributes: formatDate(date)
       };
     }
 

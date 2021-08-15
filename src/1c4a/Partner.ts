@@ -30,7 +30,7 @@ export class Partner {
    * @param credentials The credentials that authenticate the partner.
    */
   public setCredentials(credentials: PartnerCredentials): void {
-    this[CREDENTIALS] = credentials;
+    this[CREDENTIALS] = { ...credentials };
 
     if (!this[CREDENTIALS].keyPhase) {
       this[CREDENTIALS].keyPhase = 1;

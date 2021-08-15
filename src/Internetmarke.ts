@@ -1,28 +1,20 @@
-/**
- * internetmarke
- * Copyright (c) 2018-2021 Manuel Schächinger
- * MIT Licensed
- */
-
-import { GalleryItem, MotiveLink } from './1c4a/gallery';
-import { Order, ShoppingCartItem, ShoppingCartSummary } from './1c4a/order';
-import { PageFormat } from './1c4a/pageFormat';
 import {
   CheckoutShoppingCartOptions,
   OneClickForApp,
   OneClickForAppService,
-  OneCLickForAppServiceOptions,
+  OneClickForAppServiceOptions,
   PreviewVoucherOptions,
   ShoppingCartItemOptions
 } from './1c4a/Service';
+import CountryCode from './1c4a/countryCode';
+import { DownloadOptions, DownloadLinks, downloadOrder } from './1c4a/download';
+import { GalleryItem, MotiveLink } from './1c4a/gallery';
+import { Order, ShoppingCartItem, ShoppingCartSummary } from './1c4a/order';
+import { PageFormat } from './1c4a/pageFormat';
+import { InternetmarkeError } from './Error';
 import { UserInfo } from './User';
 import container from './di/inversify-config';
 import { TYPES } from './di/types';
-import { InternetmarkeError } from './Error';
-import { Product } from './prodWs/product';
-import { Amount } from './utils/amount';
-import { ProductService, ProductServiceOptions, ProdWS } from './prodWs/Service';
-import { Journal, JournalOptions } from './portokasse/journal';
 import {
   PaymentMethod,
   PaymentResponse,
@@ -30,14 +22,56 @@ import {
   PortokasseService,
   PortokasseServiceOptions
 } from './portokasse/Service';
-import { PostService } from './services/service';
+import { Journal, JournalOptions } from './portokasse/journal';
+import { ProductService, ProductServiceOptions, ProdWS } from './prodWs/Service';
+import { Product } from './prodWs/product';
+import { Amount } from './utils/amount';
+
+// export types and interfaces
+export { UserCredentials, UserInfo } from './User';
+// 1C4A
+export { PartnerCredentials } from './1c4a/Partner';
+export {
+  CheckoutShoppingCartOptions,
+  OneClickForAppServiceOptions,
+  PreviewVoucherOptions,
+  ShoppingCartItemOptions
+} from './1c4a/Service';
+export { SimpleAddress } from './1c4a/address';
+export { CountryCode };
+export { DownloadLinks, DownloadOptions } from './1c4a/download';
+export { GalleryItem, ImageItem, MotiveLink } from './1c4a/gallery';
+export { Order, ShoppingCart, ShoppingCartItem, ShoppingCartSummary } from './1c4a/order';
+export {
+  PageFormat,
+  PageFormatPosition,
+  PageFormatOrientation,
+  PageFormatPageType
+} from './1c4a/pageFormat';
+export { Voucher, VoucherFormat, VoucherLayout } from './1c4a/voucher';
+// Portokasse
+export { PaymentMethod, PaymentResponse, PortokasseServiceOptions } from './portokasse/Service';
+export {
+  Journal,
+  JournalDays,
+  JournalEntry,
+  JournalEntryState,
+  JournalEntryType,
+  JournalOptions,
+  JournalRange
+} from './portokasse/journal';
+// ProdWS
+export { ClientCredentials } from './prodWs/Client';
+export { ProductServiceOptions } from './prodWs/Service';
 
 /**
  * Main class of the internetmarke package with access to all available methods.
  */
 export class Internetmarke implements OneClickForApp, Portokasse, ProdWS {
   protected oneClick4AppService: OneClickForAppService;
+
   protected portokasseService: PortokasseService;
+
   protected productService: ProductService;
 
   constructor() {
@@ -53,7 +87,7 @@ export class Internetmarke implements OneClickForApp, Portokasse, ProdWS {
    * the user.
    */
   public async initOneClickForAppService(
-    options: OneCLickForAppServiceOptions
+    options: OneClickForAppServiceOptions
   ): Promise<OneClickForAppService> {
     await this.oneClick4AppService.init(options);
 
@@ -70,9 +104,8 @@ export class Internetmarke implements OneClickForApp, Portokasse, ProdWS {
       info = await this.portokasseService.getUserInfo();
     }
 
-    if (!info) {
-      this.checkServiceInit(
-        this.oneClick4AppService,
+    if (!info && !this.oneClick4AppService.isInitialized()) {
+      throw new InternetmarkeError(
         'Cannot get user info before initializing OneClickForApp service'
       );
     }
@@ -200,6 +233,18 @@ export class Internetmarke implements OneClickForApp, Portokasse, ProdWS {
     return this.oneClick4AppService.retrieveOrder(shopOrderId);
   }
 
+  /**
+   * Downloads the file corresponding to the given order. This will also extract
+   * archives if the order contains PNG vouchers.
+   *
+   * @param order The order information as retrieved from the 1C4A service.
+   * @param options Download options to customize the download.
+   */
+  /* eslint-disable class-methods-use-this */
+  public async downloadOrder(order: Order, options: DownloadOptions = {}): Promise<DownloadLinks> {
+    return downloadOrder(order, options);
+  }
+
   //
   // ProdWS
   //
@@ -218,6 +263,8 @@ export class Internetmarke implements OneClickForApp, Portokasse, ProdWS {
 
   /**
    * Retrieves the list of available products from the service.
+   *
+   * @param date An optional date that loads the product list at the given date.
    */
   public getProductList(date?: Date): Promise<Product[]> {
     return this.productService.getProductList(date);
@@ -251,6 +298,19 @@ export class Internetmarke implements OneClickForApp, Portokasse, ProdWS {
     return this.portokasseService;
   }
 
+  /**
+   * Tops up the Portokasse account with the given amount of money and the
+   * defined payment provider or type.
+   *
+   * @param amount The amout you want to charge as amount object or as number in
+   *  in Euro cents. Note: The minimum amount id EUR 10.
+   * @param paymentMethod The type of provider you want to choose. PayPal and
+   *  GiroPay both return a callback url to proceed the transaction, DirectDebit
+   *  requires a one time registration at the Portokasse website prior it can
+   *  be used.
+   * @param bic Optional BIC of the bank account you want to be charged. This
+   *  value is only used for GiroPay transactions.
+   */
   public topUp(
     amount: Amount | number,
     paymentMethod: PaymentMethod,
@@ -259,6 +319,12 @@ export class Internetmarke implements OneClickForApp, Portokasse, ProdWS {
     return this.portokasseService.topUp(amount, paymentMethod, bic);
   }
 
+  /**
+   * Get the purchase and top up journal of your account.
+   *
+   * @param daysOrDateRange Eigher a days or a date range option with optional
+   *  offset and rows information.
+   */
   public getJournal(daysOrDateRange: JournalOptions): Promise<Journal> {
     return this.portokasseService.getJournal(daysOrDateRange);
   }
@@ -268,10 +334,6 @@ export class Internetmarke implements OneClickForApp, Portokasse, ProdWS {
     this.portokasseService = container.get<PortokasseService>(TYPES.PortokasseService);
     this.productService = container.get<ProductService>(TYPES.ProductService);
   }
-
-  private checkServiceInit(service: PostService, message: string): void {
-    if (!service.isInitialized()) {
-      throw new InternetmarkeError(message);
-    }
-  }
 }
+
+export default Internetmarke;

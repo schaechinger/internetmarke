@@ -29,6 +29,6 @@ export interface ShoppingCartSummary {
 export interface Order {
   link: string;
   manifestLink?: string;
-  walletBallance: number;
+  walletBallance?: number;
   shoppingCart: ShoppingCart;
 }

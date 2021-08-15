@@ -17,15 +17,7 @@
     "declaration": true,
     "outDir": "./lib",
     "rootDir": "./src",
-    "typeRoots": [
-      "typings",
-      "./node_modules/@types",
-    ]
+    "typeRoots": ["typings", "./node_modules/@types"]
   },
-  "exclude": [
-    "./examples/",
-    "./node_modules/",
-    "./lib/",
-    "./test/",
-  ]
+  "exclude": ["./examples/", "./node_modules/", "./lib/", "./test/"]
 }

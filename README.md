@@ -15,6 +15,7 @@ A node implementation to use the Internetmarke web service of Deutsche Post.
   - [Managing the Shopping Cart](#managing-the-shopping-cart)
   - [Checkout Shopping Cart and Place Order](#checkout-shopping-cart-and-place-order)
   - [Retrieve Older Orders](#retrieve-older-orders)
+  - [Download Orders](#download-orders)
   - [Addresses](#addresses)
 - [Portokasse Service](#portokasse-service)
   - [Wallet Overview](#wallet-overview)
@@ -264,6 +265,37 @@ same as from the `checkoutShoppingCart()` method.
 const order = await internetmarke.retrieveOrder(orderId);
 ```
 
+### Download Orders
+
+You can download purchased vouchers with the response of `checkoutShoppingCart()`
+or `retrieveOrder()` to make the files available on your machine.
+
+PNG orders come bundled in a zip archive whereas PDF orders combine all
+purchased vouchers in a single document. The filename is the same as the voucher
+id for all PNG orders and PDF orders with just a single voucher. If a PDF order
+contains more than one voucher the filename equals to the order id with a `im-`
+prefix.
+
+By default archives extract the containing vouchers and get removed afterwards.
+
+The files are downloaded in the temp folder of your computer and create a
+directory `node-internetmarke` however the download folder can be changed.
+
+The response use an object that lists all voucher ids of the given order as keys
+with the download path to the corresponding file. For PDF orders the path is
+always the same.
+
+```typescript
+const options: DownloadOptions = {
+  path, // optional, the path where the vouchers should be downloaded to
+  deleteArchive, // optional, whether to delete the archive after extraction, defaults to true.
+  extractArchive // optional, extract vouchers in an archive, defaults to true. If false, the archive does not get deleted in any case
+};
+
+// const order = await intermetmarke.retrieveOrder(1234);
+const links = await internetmarke.downloadOrder(order, options);
+```
+
 ### Addresses
 
 Addresses can be passed in `SimpleAddress` format which is flat and does not
@@ -347,9 +379,21 @@ const payment = await internetmarke.topUp(amount, PaymentMethod.GiroPay, bic);
 // payment: { code: 'OK', redirect: 'https://giropay.de/...' }
 ```
 
+**DirectDebit top up**
+
+```typescript
+const amount = { value: 10, currency: 'EUR' }; // or: const amount = 1000;
+const payment = await internetmarke.topUp(amount, PaymentMethod.DirectDebit);
+// payment: { code: 'OK', redirect: null }
+```
+
 ## Get Journal
 
-The portokasse service supports a history of orders and top ups that can be requested with a range or start and end date or a number of days from now.
+The portokasse service supports a history of orders and top ups that can be
+requested with a range or start and end date or a number of days from now.
+
+Optional option parameters are `offset` and `rows` that refer to a paging
+mechanism and default to the first ten entries.
 
 **Journal in date range**
 
@@ -364,7 +408,7 @@ const journal = await internetmarke.getJournal(range);
 **Journal of the latest days**
 
 ```typescript
-const days = 14;
+const days = { days: 14 };
 const journal = await internetmarke.getJournal(days);
 ```
 

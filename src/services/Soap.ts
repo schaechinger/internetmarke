@@ -12,8 +12,10 @@ import { PostService } from './service';
 export abstract class SoapService implements PostService {
   /** The wsdl url to define the service endpoints. */
   protected abstract wsdl: string;
+
   /** The soap client used to request the service. */
   protected soapClient: SoapClient;
+
   protected log: Debugger;
 
   constructor(

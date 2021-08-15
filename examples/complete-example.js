@@ -1,7 +1,4 @@
-const CountryCode = require('../lib/1c4a/countryCode');
-const { VoucherLayout } = require('../lib/1c4a/voucher');
-const { Internetmarke } = require('../lib/Internetmarke');
-const { PaymentMethod } = require('../lib/portokasse/Service');
+const { CountryCode, Internetmarke, PaymentMethod, VoucherLayout } = require('..');
 
 // To start this example directly make sure to build the project first:
 // npm i && npm run build
@@ -49,7 +46,7 @@ const { PaymentMethod } = require('../lib/portokasse/Service');
   // this will prevent you account from being charged in this test
   try {
     const amount = { value: 5, currency: 'EUR' }; //or: const amount = 500
-    await internetmarke.topUp(amount, PaymentMethod.Paypal)
+    await internetmarke.topUp(amount, PaymentMethod.PayPal)
   } catch { }
 
   //

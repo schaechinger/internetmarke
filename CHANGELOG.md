@@ -5,14 +5,35 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.6.0] - 2021-08-15
 
 ### Added
 
-- Ability to download purchased vouchers
+- Orders can now be downloaded to your computer
+- PNG orders also extract the archive after download
+- All useful interfaces are now available from the main package
+
+### Changed
+
+- Credentials are now copied before use in the credential stores
+
+### Fixed
+
+- Fixed typo in `OneClickForAppServiceOptions`
+- Order response property `walletBallance` is now optional as it does not occur
+  in the response of `retrieveOrder()`
+
+## [0.5.2] - 2021-08-13
+
+### Added
+
 - Portokasse journal lists top up and order history
 - Checkout supports PPL versions of products
 - Using the `.cache` directory instead of the global `/tmp` folder
+
+### Changed
+
+- Added eslint and prettier to the project and updated code style
 
 ### Fixed
 

@@ -61,6 +61,27 @@ export interface AddressBinding {
   receiver: NamedAddress;
 }
 
+export const parseName = (data: SimpleName): PersonName | null => {
+  let name: PersonName | null = null;
+
+  if (data.firstname && data.lastname) {
+    name = {
+      salutation: (data.salutation || '').substr(0, 10),
+      title: (data.title || '').substr(0, 10),
+      firstname: data.firstname.substr(0, 35),
+      lastname: data.lastname.substr(0, 35)
+    };
+    if (!name.salutation) {
+      delete name.salutation;
+    }
+    if (!name.title) {
+      delete name.title;
+    }
+  }
+
+  return name;
+};
+
 export const parseAddress = (data: SimpleAddress): NamedAddress => {
   // address
   let zip = data.zip || '';
@@ -110,8 +131,9 @@ export const parseAddress = (data: SimpleAddress): NamedAddress => {
 
     return companyAddress;
   }
+
   // person address
-  else if (name) {
+  if (name) {
     return {
       name: {
         personName: name
@@ -124,25 +146,4 @@ export const parseAddress = (data: SimpleAddress): NamedAddress => {
   throw new AddressError(
     'Missing address name, at least company or firstname and lastname must be provided.'
   );
-};
-
-export const parseName = (data: SimpleName): PersonName | null => {
-  let name: PersonName | null = null;
-
-  if (data.firstname && data.lastname) {
-    name = {
-      salutation: (data.salutation || '').substr(0, 10),
-      title: (data.title || '').substr(0, 10),
-      firstname: data.firstname.substr(0, 35),
-      lastname: data.lastname.substr(0, 35)
-    };
-    if (!name.salutation) {
-      delete name.salutation;
-    }
-    if (!name.title) {
-      delete name.title;
-    }
-  }
-
-  return name;
 };

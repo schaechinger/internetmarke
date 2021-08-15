@@ -8,7 +8,7 @@ import { getInvalidProdWsStub, getProdWsStub, prodWsStub } from './Soap.stub';
 import { DataStore } from '../../../src/services/DataStore';
 import { Product } from '../../../src/prodWs/product';
 import { ClientError } from '../../../src/prodWs/Error';
-import { Internetmarke } from '../../../src/Internetmarke';
+import { InternetmarkeMock } from '../../stubs/Internetmarke.mock';
 
 describe('ProdWS Service', () => {
   let service: ProductService;
@@ -21,10 +21,11 @@ describe('ProdWS Service', () => {
 
   describe('init', () => {
     // test init through public internetmarke api
-    let internetmarke: Internetmarke;
+    let internetmarke: InternetmarkeMock;
 
     beforeEach(() => {
-      internetmarke = new Internetmarke();
+      internetmarke = new InternetmarkeMock();
+      internetmarke.setProdWsStub(prodWsStub);
     });
 
     it('should prevent init without client credentials', async () => {
@@ -63,16 +64,13 @@ describe('ProdWS Service', () => {
     it('should load outdated product list without cache', async () => {
       await service.init({ client: clientCredentials, ttl: 3600 });
 
-      const date = ['2018-02-01', '10:00:00.000+00:00'];
-      const products = await service.getProductList(new Date(date.join(' ')));
+      const products = await service.getProductList(new Date('2018-02-01'));
 
       expect(products).to.exist;
       const call = prodWsStub.getProductListAsync.getCall(0);
       const args = call.firstArg;
 
       expect(args).to.have.property('timestamp');
-      expect(args.timestamp.attributes.date).to.equal(date[0]);
-      expect(args.timestamp.attributes.time).to.equal(date[1]);
     });
   });
 

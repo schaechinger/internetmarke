@@ -1,4 +1,5 @@
-import { InternetmarkeError } from "../Error";
+/* eslint-disable max-classes-per-file */
+import { InternetmarkeError } from '../Error';
 
 export class ProductError extends InternetmarkeError {}
 

@@ -30,7 +30,9 @@ describe('DataStore', () => {
   afterEach(() => {
     try {
       unlinkSync(tmpPath);
-    } catch {}
+    } catch {
+      // no temp file available
+    }
   });
 
   it('should create the root temp dir if not existing', async () => {
@@ -55,7 +57,7 @@ describe('DataStore', () => {
 
     await store.init(tmpFile, loadData);
 
-    expect(() => accessSync(tmpPath)).to.not.throw;
+    expect(() => accessSync(tmpPath)).to.not.throw();
     expect(loadData.calledOnce).to.be.true;
   });
 

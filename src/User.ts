@@ -30,8 +30,8 @@ export interface UserInfo {
   showTermsAndCondition?: boolean;
 }
 
-const CREDENTIALS = Symbol('credentials'),
-  TOKEN = Symbol('token');
+const CREDENTIALS = Symbol('credentials');
+const TOKEN = Symbol('token');
 
 /**
  * The Portokasse user that is billed for ordered vouchers.
@@ -39,10 +39,15 @@ const CREDENTIALS = Symbol('credentials'),
 @injectable()
 export class User {
   private [CREDENTIALS]: UserCredentials;
+
   private [TOKEN]: string | null;
+
   private walletBalance: Amount;
+
   private infoMessage?: string;
+
   private orderIds: number[] = [];
+
   private showTermsAndCondition = false;
 
   /**
@@ -51,7 +56,7 @@ export class User {
    * @param credentials The credentials that authenticate the user.
    */
   public setCredentials(credentials: UserCredentials): void {
-    this[CREDENTIALS] = credentials;
+    this[CREDENTIALS] = { ...credentials };
     this[TOKEN] = null;
   }
 
