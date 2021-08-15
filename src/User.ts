@@ -56,7 +56,7 @@ export class User {
    * @param credentials The credentials that authenticate the user.
    */
   public setCredentials(credentials: UserCredentials): void {
-    this[CREDENTIALS] = credentials;
+    this[CREDENTIALS] = { ...credentials };
     this[TOKEN] = null;
   }
 

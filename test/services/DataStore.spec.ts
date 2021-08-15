@@ -57,7 +57,7 @@ describe('DataStore', () => {
 
     await store.init(tmpFile, loadData);
 
-    expect(() => accessSync(tmpPath)).to.not.throw;
+    expect(() => accessSync(tmpPath)).to.not.throw();
     expect(loadData.calledOnce).to.be.true;
   });
 

@@ -67,11 +67,11 @@ describe('1C4A Service', () => {
       internetmarke.set1C4AStub(oneClickForAppServiceStub);
     });
 
-    it('should prevent init without client credentials', async () => {
+    it('should prevent init without partner credentials', async () => {
       expect(service.init({} as any)).to.eventually.be.rejectedWith(PartnerError);
     });
 
-    it('should prevent init without client credentials', async () => {
+    it('should prevent init without user credentials', async () => {
       expect(service.init({ partner: partnerCredentials } as any)).to.eventually.be.rejectedWith(
         UserError
       );
@@ -227,7 +227,8 @@ describe('1C4A Service', () => {
 
     it('should add an item to the shopping cart', () => {
       service.addItemToShoppingCart({ id: 1, price: 80 } as Product, {
-        voucherLayout: VoucherLayout.FrankingZone
+        voucherLayout: VoucherLayout.FrankingZone,
+        position: { labelX: 1, labelY: 2 }
       });
       const cart = service.getShoppingCartSummary();
 

@@ -70,6 +70,8 @@ export class ProductService extends SoapService implements ProdWS {
 
   /**
    * Retrieves the list of available products from the service.
+   *
+   * @param date An optional date that loads the product list at the given date.
    */
   public async getProductList(date?: Date): Promise<Product[]> {
     await this.checkServiceInit('Cannot get product list before initializing product service');

@@ -22,7 +22,7 @@ import { VoucherFormat, VoucherLayout } from './voucher';
 import { ProductError } from '../prodWs/Error';
 import { amountToCents, parseAmount } from '../utils/amount';
 
-export interface OneCLickForAppServiceOptions {
+export interface OneClickForAppServiceOptions {
   /** The partner credentials to pass to the service. */
   partner: PartnerCredentials;
   /**
@@ -164,7 +164,7 @@ export class OneClickForAppService extends SoapService implements OneClickForApp
    * Initializes the connection to the OneClickPerApp service and authenticates
    * the user.
    */
-  public async init(options: OneCLickForAppServiceOptions): Promise<void> {
+  public async init(options: OneClickForAppServiceOptions): Promise<void> {
     if (!options.partner) {
       throw new PartnerError('Missing partner credentials for OneClickForApp service init.');
     }

@@ -18,7 +18,7 @@ export class Client {
    * @param credentials The credentials that authenticate the client.
    */
   setCredentials(credentials: ClientCredentials): void {
-    this[CREDENTIALS] = credentials;
+    this[CREDENTIALS] = { ...credentials };
   }
 
   public getUsername(): string {

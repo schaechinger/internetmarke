@@ -1,6 +1,6 @@
 {
   "name": "internetmarke",
-  "version": "0.5.2",
+  "version": "0.6.0",
   "description": "A node implementation to use the Internetmarke web service of Deutsche Post.",
   "keywords": [
     "internetmarke",
@@ -22,7 +22,7 @@
     "url": "https://github.com/schaechinger/internetmarke/issues"
   },
   "scripts": {
-    "clean": "rm -rf lib .nyc_output coverage",
+    "clean": "rm -rf lib .nyc_output coverage *.tgz",
     "build": "npm run clean && tsc -p ./tsconfig.json",
     "lint": "eslint . --ext .ts",
     "lint:fix": "npm run lint -- --fix",
@@ -51,7 +51,8 @@
     "moment-timezone": "^0.5.33",
     "reflect-metadata": "^0.1.13",
     "soap": "^0.40.0",
-    "tough-cookie": "^4.0.0"
+    "tough-cookie": "^4.0.0",
+    "yauzl": "^2.10.0"
   },
   "devDependencies": {
     "@commitlint/cli": "^13.1.0",
@@ -69,6 +70,7 @@
     "@types/rimraf": "^3.0.1",
     "@types/sinon": "^10.0.2",
     "@types/tough-cookie": "^4.0.1",
+    "@types/yauzl": "^2.9.2",
     "@typescript-eslint/eslint-plugin": "^4.29.1",
     "chai": "^4.3.4",
     "chai-as-promised": "^7.1.1",

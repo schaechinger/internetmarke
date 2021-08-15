@@ -1,4 +1,4 @@
-const { Internetmarke } = require('../lib/Internetmarke');
+const { Internetmarke } = require('..');
 
 // To start this example directly make sure to build the project first:
 // npm i && npm run build

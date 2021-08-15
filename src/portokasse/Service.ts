@@ -95,6 +95,19 @@ export class PortokasseService extends RestService implements Portokasse {
     return this.user.getInfo();
   }
 
+  /**
+   * Tops up the Portokasse account with the given amount of money and the
+   * defined payment provider or type.
+   *
+   * @param amount The amout you want to charge as amount object or as number in
+   *  in Euro cents. Note: The minimum amount id EUR 10.
+   * @param paymentMethod The type of provider you want to choose. PayPal and
+   *  GiroPay both return a callback url to proceed the transaction, DirectDebit
+   *  requires a one time registration at the Portokasse website prior it can
+   *  be used.
+   * @param bic Optional BIC of the bank account you want to be charged. This
+   *  value is only used for GiroPay transactions.
+   */
   public async topUp(
     amount: Amount | number,
     paymentMethod: PaymentMethod,
