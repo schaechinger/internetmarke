@@ -265,15 +265,15 @@ same as from the `checkoutShoppingCart()` method.
 const order = await internetmarke.retrieveOrder(orderId);
 ```
 
-### Download Addresses
+### Download Orders
 
-You can download the vouchers with the response of `checkoutShoppingCart()` or
-`retrieveOrder()` to make the files available on your machine.
+You can download purchased vouchers with the response of `checkoutShoppingCart()`
+or `retrieveOrder()` to make the files available on your machine.
 
 PNG orders come bundled in a zip archive whereas PDF orders combine all
 purchased vouchers in a single document. The filename is the same as the voucher
 id for all PNG orders and PDF orders with just a single voucher. If a PDF order
-contains more than one voucher the filename contains the order id with a `im-`
+contains more than one voucher the filename equals to the order id with a `im-`
 prefix.
 
 By default archives extract the containing vouchers and get removed afterwards.
@@ -281,8 +281,8 @@ By default archives extract the containing vouchers and get removed afterwards.
 The files are downloaded in the temp folder of your computer and create a
 directory `node-internetmarke` however the download folder can be changed.
 
-The response us an object that lists all voucher ids of the given order as keys
-with the download path of the corresponding file. For PDF orders the path is
+The response use an object that lists all voucher ids of the given order as keys
+with the download path to the corresponding file. For PDF orders the path is
 always the same.
 
 ```typescript
