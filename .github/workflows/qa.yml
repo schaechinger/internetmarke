@@ -11,8 +11,8 @@ on:
       - master
 
 jobs:
-  lint:
-    name: Linting
+  build:
+    name: Lint & build
     runs-on: ubuntu-latest
 
     steps:
@@ -25,7 +25,7 @@ jobs:
       - run: npm run check:license
 
   test:
-    needs: lint
+    needs: build
     env:
       NODE_ENV: test
     strategy:
@@ -42,14 +42,11 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       - run: npm ci
-      - run: npm run build --if-present
-
-      - name: Run unit tests
-        run: npm run test
+      - run: npm run test
 
   coverage:
     name: Code coverage update
-    needs: [lint, test]
+    needs: [build, test]
     runs-on: ubuntu-latest
 
     steps:
@@ -58,7 +55,6 @@ jobs:
         with:
           node-version: 'lts/*'
       - run: npm ci
-      - run: npm run build --if-present
       - run: npm run test:codecov
       - uses: codecov/codecov-action@v2
         with:

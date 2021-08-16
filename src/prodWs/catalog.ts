@@ -20,9 +20,7 @@ const getPropertyValue = (prop: any): any => {
   } else if (undefined !== prop.dateValue) {
     value = (prop.dateValue && new Date(prop.dateValue.attributes.fixDate)) || null;
   } else {
-    console.log(prop);
-
-    throw new Error('Unknown prop type');
+    // throw new Error(`Unknown prop type: ${Object.keys(prop)[0]}`);
   }
 
   return value;
