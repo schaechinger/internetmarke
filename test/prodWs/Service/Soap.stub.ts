@@ -16,11 +16,34 @@ export const prodWsStub = {
       }
     ])
   ),
+  getCatalogListAsync: stub().returns(
+    Promise.resolve([
+      {
+        attributes: {
+          success: 'true'
+        },
+        Response: {
+          catalogValueList: {
+            catalogValue: []
+          }
+        }
+      }
+    ])
+  ),
   setSecurity: stub()
 };
 
 export const invalidProdWsStub = {
   getProductListAsync: stub().returns(
+    Promise.resolve([
+      {
+        attributes: {
+          success: 'false'
+        }
+      }
+    ])
+  ),
+  getCatalogListAsync: stub().returns(
     Promise.resolve([
       {
         attributes: {

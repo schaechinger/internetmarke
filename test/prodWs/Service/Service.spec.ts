@@ -9,14 +9,22 @@ import { DataStore } from '../../../src/services/DataStore';
 import { Product } from '../../../src/prodWs/product';
 import { ClientError } from '../../../src/prodWs/Error';
 import { InternetmarkeMock } from '../../stubs/Internetmarke.mock';
+import { Catalog } from '../../../src/prodWs/catalog';
 
 describe('ProdWS Service', () => {
   let service: ProductService;
-  const store = new DataStore<Product>(getLoggerStub);
+  const catalogStore = new DataStore<Catalog>(getLoggerStub);
+  const productStore = new DataStore<Product>(getLoggerStub);
 
   beforeEach(async () => {
     prodWsStub.getProductListAsync.resetHistory();
-    service = new ProductService(clientStub, store, getLoggerStub, getProdWsStub);
+    service = new ProductService(
+      clientStub,
+      catalogStore,
+      productStore,
+      getLoggerStub,
+      getProdWsStub
+    );
   });
 
   describe('init', () => {
@@ -52,7 +60,13 @@ describe('ProdWS Service', () => {
     });
 
     it('should detect invalid product list response', async () => {
-      service = new ProductService(clientStub, store, getLoggerStub, getInvalidProdWsStub);
+      service = new ProductService(
+        clientStub,
+        catalogStore,
+        productStore,
+        getLoggerStub,
+        getInvalidProdWsStub
+      );
 
       await service.init({ client: clientCredentials, ttl: 0 });
       const products = await service.getProductList();

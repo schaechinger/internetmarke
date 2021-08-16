@@ -55,6 +55,8 @@ describe('Internetmarke', () => {
   });
 
   it('should throw errors when accessing ProdWS services before init', () => {
+    expect(internetmarke.getCatalogList()).to.eventually.be.rejectedWith(InternetmarkeError);
+    expect(internetmarke.getCatalog('name')).to.eventually.be.rejectedWith(InternetmarkeError);
     expect(internetmarke.getProductList()).to.eventually.be.rejectedWith(InternetmarkeError);
     expect(internetmarke.getProduct(0)).to.eventually.be.rejectedWith(InternetmarkeError);
 

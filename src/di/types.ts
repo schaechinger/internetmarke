@@ -9,9 +9,10 @@ export const TYPES = {
   PortokasseService: Symbol('PortokasseService'),
   ProductService: Symbol('ProductService'),
   // stores
-  PageFormatStore: Symbol('DataStore<PageFormat>'),
-  MotiveLinkStore: Symbol('DataStore<MotiveLink>'),
+  CatalogStore: Symbol('DataStore<Catalog>'),
   GalleryItemStore: Symbol('DataStore<GalleryItem>'),
+  MotiveLinkStore: Symbol('DataStore<MotiveLink>'),
+  PageFormatStore: Symbol('DataStore<PageFormat>'),
   ProductStore: Symbol('DataStore<Product>'),
   // factories
   LoggerFactory: Symbol('Factory<Logger>'),

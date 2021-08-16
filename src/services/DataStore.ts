@@ -14,9 +14,9 @@ interface CacheFormat<T> {
 }
 
 export interface IDataStore<T> {
-  init(file: string, loadData: () => Promise<{ [id: number]: T }>, ttl?: number): Promise<void>;
+  init(file: string, loadData: () => Promise<{ [id: string]: T }>, ttl?: number): Promise<void>;
   getList(): Promise<T[]>;
-  getItem(id: number): Promise<T | null>;
+  getItem(id: string | number): Promise<T | null>;
   update(content: { [id: number]: T }, date?: Date): Promise<boolean>;
   remove(): Promise<boolean>;
 }
@@ -38,10 +38,10 @@ export class DataStore<T> implements IDataStore<T> {
 
   private log: Debugger;
 
-  private loadData: () => Promise<{ [id: number]: T }>;
+  private loadData: () => Promise<{ [id: string]: T }>;
 
   constructor(@inject(TYPES.LoggerFactory) getLogger: Function) {
-    this.log = getLogger('dataStore');
+    this.log = getLogger('datastore');
   }
 
   /**
@@ -49,7 +49,7 @@ export class DataStore<T> implements IDataStore<T> {
    */
   public async init(
     file: string,
-    loadData: () => Promise<{ [id: number]: T }>,
+    loadData: () => Promise<{ [id: string]: T }>,
     ttl?: number
   ): Promise<void> {
     this.name = file.substr(0, file.lastIndexOf('.'));
@@ -82,7 +82,7 @@ export class DataStore<T> implements IDataStore<T> {
    *
    * @param id The id of the item.
    */
-  public async getItem(id: number): Promise<T | null> {
+  public async getItem(id: string | number): Promise<T | null> {
     await this.checkData();
 
     return this.data[id] || null;
@@ -93,7 +93,7 @@ export class DataStore<T> implements IDataStore<T> {
    *
    * @param content - The content that should be stored in the file.
    */
-  public update(content: { [id: number]: T }, date = new Date()): Promise<boolean> {
+  public update(content: { [id: string]: T }, date = new Date()): Promise<boolean> {
     this.data = content;
     this.lastUpdate = date;
 

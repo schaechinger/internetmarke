@@ -58,7 +58,13 @@ oneC4AStub.retrieveOrderAsync
   .returns(
     Promise.resolve([
       {
-        link: 'http://localhost'
+        link: 'http://localhost',
+        shoppingCart: {
+          shopOrderId: 12345,
+          voucherList: {
+            voucher: []
+          }
+        }
       }
     ])
   );

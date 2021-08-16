@@ -53,7 +53,7 @@ const extractArchive = async (
 
               const promise = new Promise<void>(rsv => {
                 const voucherId =
-                  order.shoppingCart.voucherList.voucher[index]?.voucherId ||
+                  order.shoppingCart.vouchers[index]?.voucherId ||
                   `im-${order.shoppingCart.shopOrderId}-${index}`;
                 const voucherPath = joinPath(
                   basePath,
@@ -97,7 +97,7 @@ export const downloadOrder = async (
 ): Promise<DownloadLinks> => {
   let links: DownloadLinks = {};
 
-  const vouchers = order.shoppingCart.voucherList.voucher;
+  const { vouchers } = order.shoppingCart;
   const res = await axios.get(order.link, { responseType: 'arraybuffer' });
   let filename: string = res.headers['content-disposition'].substr(
     res.headers['content-disposition'].lastIndexOf('=') + 1

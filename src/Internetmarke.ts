@@ -26,6 +26,7 @@ import { Journal, JournalOptions } from './portokasse/journal';
 import { ProductService, ProductServiceOptions, ProdWS } from './prodWs/Service';
 import { Product } from './prodWs/product';
 import { Amount } from './utils/amount';
+import { Catalog } from './prodWs/catalog';
 
 // export types and interfaces
 export { UserCredentials, UserInfo } from './User';
@@ -41,7 +42,7 @@ export { SimpleAddress } from './1c4a/address';
 export { CountryCode };
 export { DownloadLinks, DownloadOptions } from './1c4a/download';
 export { GalleryItem, ImageItem, MotiveLink } from './1c4a/gallery';
-export { Order, ShoppingCart, ShoppingCartItem, ShoppingCartSummary } from './1c4a/order';
+export { Order, ShoppingCartItem, ShoppingCartSummary } from './1c4a/order';
 export {
   PageFormat,
   PageFormatPosition,
@@ -259,6 +260,22 @@ export class Internetmarke implements OneClickForApp, Portokasse, ProdWS {
     await this.productService.init(options);
 
     return this.productService;
+  }
+
+  /**
+   * Retrieves the list of available catalogs from the service.
+   */
+  public getCatalogList(): Promise<Catalog[]> {
+    return this.productService.getCatalogList();
+  }
+
+  /**
+   * Retrieves the catalog with the given name if existing.
+   *
+   * @param name The name of the catalog that should be retrieved.
+   */
+  public getCatalog(name: string): Promise<Catalog | null> {
+    return this.productService.getCatalog(name);
   }
 
   /**

@@ -27,9 +27,7 @@ describe('download', () => {
       link: url,
       shoppingCart: {
         shopOrderId: 1234,
-        voucherList: {
-          voucher: []
-        }
+        vouchers: []
       }
     };
   });
@@ -56,7 +54,7 @@ describe('download', () => {
         response: readFileSync(joinPath(__dirname, 'data', filename))
       });
 
-      order.shoppingCart.voucherList.voucher = vouchers;
+      order.shoppingCart.vouchers = vouchers;
       const links = await downloadOrder(order);
 
       expect(links).to.exist;
@@ -84,7 +82,7 @@ describe('download', () => {
         response: readFileSync(joinPath(__dirname, 'data', filename))
       });
 
-      order.shoppingCart.voucherList.voucher = vouchers;
+      order.shoppingCart.vouchers = vouchers;
       const links = await downloadOrder(order, { deleteArchive: false });
 
       expect(links).to.exist;
@@ -105,7 +103,7 @@ describe('download', () => {
         response: readFileSync(joinPath(__dirname, 'data', filename))
       });
 
-      order.shoppingCart.voucherList.voucher = vouchers;
+      order.shoppingCart.vouchers = vouchers;
       const links = await downloadOrder(order, { deleteArchive: false });
 
       expect(links).to.exist;
@@ -128,7 +126,7 @@ describe('download', () => {
         response: readFileSync(joinPath(__dirname, 'data', filename))
       });
 
-      order.shoppingCart.voucherList.voucher = [vouchers[0]];
+      order.shoppingCart.vouchers = [vouchers[0]];
       const links = await downloadOrder(order);
 
       expect(links).to.exist;
@@ -155,7 +153,7 @@ describe('download', () => {
         response: readFileSync(joinPath(__dirname, 'data', filename))
       });
 
-      order.shoppingCart.voucherList.voucher = vouchers;
+      order.shoppingCart.vouchers = vouchers;
       const links = await downloadOrder(order);
 
       expect(links).to.exist;

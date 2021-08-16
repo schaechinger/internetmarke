@@ -366,7 +366,7 @@ describe('1C4A Service', () => {
     });
   });
 
-  describe('Checkout', () => {
+  describe('checkout', () => {
     const pageFormatData: PageFormat = {
       id: 1,
       isAddressPossible: true,

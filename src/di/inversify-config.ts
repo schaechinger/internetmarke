@@ -13,6 +13,7 @@ import { PageFormat } from '../1c4a/pageFormat';
 import { GalleryItem, MotiveLink } from '../1c4a/gallery';
 import { Product } from '../prodWs/product';
 import { PortokasseService } from '../portokasse/Service';
+import { Catalog } from '../prodWs/catalog';
 
 const container = new Container();
 
@@ -42,6 +43,7 @@ container.bind<OneClickForAppService>(TYPES.OneClickForAppService).to(OneClickFo
 
 // ProdWS
 container.bind<Client>(TYPES.Client).to(Client);
+container.bind<DataStore<Catalog>>(TYPES.CatalogStore).to(DataStore).inSingletonScope();
 container.bind<DataStore<Product>>(TYPES.ProductStore).to(DataStore).inSingletonScope();
 container.bind<ProductService>(TYPES.ProductService).to(ProductService);
 

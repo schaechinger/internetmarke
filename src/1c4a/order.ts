@@ -14,13 +14,6 @@ export interface ShoppingCartItem {
   ppl?: number;
 }
 
-export interface ShoppingCart {
-  shopOrderId?: number;
-  voucherList: {
-    voucher: Voucher[];
-  };
-}
-
 export interface ShoppingCartSummary {
   positions: ShoppingCartItem[];
   total: Amount;
@@ -30,5 +23,28 @@ export interface Order {
   link: string;
   manifestLink?: string;
   walletBallance?: number;
-  shoppingCart: ShoppingCart;
+  shoppingCart: {
+    shopOrderId: number;
+    vouchers: Voucher[];
+  };
 }
+
+export const parseOrder = (data: any): Order | null => {
+  if (!data?.shoppingCart) {
+    return null;
+  }
+
+  const order: Order = {
+    link: data.link,
+    shoppingCart: {
+      shopOrderId: +data.shoppingCart.shopOrderId,
+      vouchers: data.shoppingCart.voucherList.voucher
+    }
+  };
+
+  if (data.manifestLink) {
+    order.manifestLink = data.manifestLink;
+  }
+
+  return order;
+};

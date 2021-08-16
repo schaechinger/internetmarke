@@ -14,7 +14,7 @@ import {
   VoucherLayoutError
 } from './Error';
 import { GalleryItem, ImageItem, MotiveLink } from './gallery';
-import { Order, ShoppingCartItem, ShoppingCartSummary } from './order';
+import { Order, parseOrder, ShoppingCartItem, ShoppingCartSummary } from './order';
 import { PageFormat, PageFormatPosition } from './pageFormat';
 import { Partner, PartnerCredentials } from './Partner';
 import { User, UserCredentials, UserInfo } from '../User';
@@ -590,27 +590,25 @@ export class OneClickForAppService extends SoapService implements OneClickForApp
     }
 
     return this.soapClient[checkout](payload)
-      .then(([response]: [Order]) => {
-        if (response) {
-          if (response.shoppingCart.shopOrderId) {
-            response.shoppingCart.shopOrderId = +response.shoppingCart.shopOrderId;
-          }
+      .then(([response]) => {
+        const order = parseOrder(response);
 
+        if (order) {
           this.user.load({
-            walletBalance: response.walletBallance || (response as any).walletBalance
+            walletBalance: response.walletBallance || response.walletBalance
           });
           this.user.addOrderId(response.shoppingCart.shopOrderId!);
 
           this.shoppingCart = [];
+
+          this.log(
+            'checkout successful, shopOrderId: %s with %d vouchers',
+            order.shoppingCart.shopOrderId,
+            order.shoppingCart.vouchers.length
+          );
         }
 
-        this.log(
-          'checkout successful, shopOrderId: %s with %d vouchers',
-          response.shoppingCart.shopOrderId,
-          response.shoppingCart.voucherList.voucher.length
-        );
-
-        return response;
+        return order;
       })
       .catch((e: any) => {
         this.log('checkoutShoppingCart', e.root?.Envelope.Body.Fault || e.message);
@@ -632,7 +630,7 @@ export class OneClickForAppService extends SoapService implements OneClickForApp
         shopOrderId
       })
       .then(([response]: any) => {
-        return response || null;
+        return parseOrder(response);
       })
       .catch((e: any) => {
         this.log('retrieve order error', e.root?.Envelope.Body.Fault || e);
