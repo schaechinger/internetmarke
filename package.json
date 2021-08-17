@@ -71,7 +71,7 @@
     "@types/sinon": "^10.0.2",
     "@types/tough-cookie": "^4.0.1",
     "@types/yauzl": "^2.9.2",
-    "@typescript-eslint/eslint-plugin": "^4.29.1",
+    "@typescript-eslint/eslint-plugin": "^4.29.2",
     "chai": "^4.3.4",
     "chai-as-promised": "^7.1.1",
     "eslint": "^7.32.0",
@@ -95,10 +95,5 @@
     "lines": 80,
     "functions": 80,
     "statements": 80
-  },
-  "husky": {
-    "hooks": {
-      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
-    }
   }
 }
