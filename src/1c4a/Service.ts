@@ -597,12 +597,12 @@ export class OneClickForAppService extends SoapService implements OneClickForApp
           this.user.load({
             walletBalance: response.walletBallance || response.walletBalance
           });
-          this.user.addOrderId(response.shoppingCart.shopOrderId!);
+          this.user.addOrderId(order.shoppingCart.shopOrderId!);
 
           this.shoppingCart = [];
 
           this.log(
-            'checkout successful, shopOrderId: %s with %d vouchers',
+            'checkout successful, shopOrderId: %s with %d voucher(s)',
             order.shoppingCart.shopOrderId,
             order.shoppingCart.vouchers.length
           );

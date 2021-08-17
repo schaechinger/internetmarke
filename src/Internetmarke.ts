@@ -64,6 +64,8 @@ export {
 // ProdWS
 export { ClientCredentials } from './prodWs/Client';
 export { ProductServiceOptions } from './prodWs/Service';
+export { Catalog, CatalogItem } from './prodWs/catalog';
+export { Product } from './prodWs/product';
 
 /**
  * Main class of the internetmarke package with access to all available methods.

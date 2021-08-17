@@ -22,8 +22,9 @@ A node implementation to use the Internetmarke web service of Deutsche Post.
   - [Top Up Account](#top-up-account)
   - [Get Journal](#get-journal)
 - [ProdWS (Product Service)](#prodws-product-service)
-  - [Retrieve Product List](#retrieve-product-list)
-  - [Retrieve Oudated Products](#retrieve-outdated-products)
+  - [Product List](#product-list)
+  - [Oudated Products](#outdated-products)
+  - [Catalog list](#catalog-list)
 
 ## Installation
 
@@ -436,7 +437,7 @@ await internetmarke.initProductService(options);
 If your id (`Mandant-ID`) differs from the upper case version of the username
 you can add it to the client credentials.
 
-### Retrieve Product List
+### Product List
 
 Once the product service is initialized you can retrieve the whole product list
 or a single product from the webservice. You can also query one single product
@@ -447,7 +448,7 @@ const products = await internetmarke.getProductList();
 const product = await internetmarke.getProduct(1);
 ```
 
-### Retrieve Outdated Products
+### Outdated Products
 
 If you however want to retrieve an older product list you can optionally pass a
 date that defines the historical date of product list on this date.
@@ -459,6 +460,18 @@ through it afterwards and find the right product.
 
 ```typescript
 const oldProducts = await internetmarke.getProductList(new Date('2018-02-01'));
+```
+
+### Catalog List
+
+The ProdWS has a lot of metadata useful for checkout and general information
+around the Internetmarke environment.
+
+Note that catalogs come with strings as their id instead of numeric values.
+
+```typescript
+const catalogs = await internetmarke.getCatalogList();
+const catalog = await internetmarke.getCatalog('Entgeltzone');
 ```
 
 [npm-url]: https://npmjs.org/package/internetmarke
