@@ -27,6 +27,14 @@ const { CountryCode, Internetmarke, PaymentMethod, VoucherLayout } = require('..
   const product = await internetmarke.getProduct(1);
   console.log('getProduct', product);
 
+  // list available catalogs
+  const catalogs = await internetmarke.getCatalogList();
+  console.log('catalogs length:', catalogs.length, catalogs[0]);
+
+  // get catalog by name
+  const catalog = await internetmarke.getCatalog('Entgeltzone');
+  console.log('catalog', catalog);
+
 
   //
   // Portokasse
@@ -139,7 +147,7 @@ const { CountryCode, Internetmarke, PaymentMethod, VoucherLayout } = require('..
   console.log('shopping cart summary', cart);
 
   // checkout in PDF mode (with given pageFormat template)
-  // dryrun simulates the checkout and does not 
+  // dryrun simulates the checkout and does not charge your account
   const order = await internetmarke.checkoutShoppingCart({ pageFormat: pageFormats[0], dryrun: true });
   console.log('order', order);
 })();

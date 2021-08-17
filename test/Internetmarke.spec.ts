@@ -1,6 +1,7 @@
 import { expect } from 'chai';
 import { VoucherLayout } from '../src/1c4a/voucher';
 import { InternetmarkeError } from '../src/Error';
+import { Order } from '../src/Internetmarke';
 import { PaymentMethod } from '../src/portokasse/Service';
 import { Product } from '../src/prodWs/product';
 import { InternetmarkeMock } from './stubs/Internetmarke.mock';
@@ -15,25 +16,31 @@ describe('Internetmarke', () => {
     internetmarke = new InternetmarkeMock();
   });
 
-  it('should throw errors when accessing 1C4A services before init', () => {
-    expect(internetmarke.getUserInfo()).to.eventually.be.rejectedWith(InternetmarkeError);
-    expect(internetmarke.retrievePageFormats()).to.eventually.be.rejectedWith(InternetmarkeError);
-    expect(internetmarke.retrievePageFormat(1)).to.eventually.be.rejectedWith(InternetmarkeError);
-    expect(internetmarke.createShopOrderId()).to.eventually.be.rejectedWith(InternetmarkeError);
-    expect(internetmarke.retrievePublicGallery()).to.eventually.be.rejectedWith(InternetmarkeError);
-    expect(internetmarke.retrievePrivateGallery()).to.eventually.be.rejectedWith(
-      InternetmarkeError
-    );
-    expect(internetmarke.retrievePreviewVoucher({} as Product)).to.eventually.be.rejectedWith(
-      InternetmarkeError
-    );
-    expect(internetmarke.checkoutShoppingCart()).to.eventually.be.rejectedWith(InternetmarkeError);
-    expect(internetmarke.retrieveOrder(0)).to.eventually.be.rejectedWith(InternetmarkeError);
+  it('should throw errors when accessing 1C4A services before init', async () => {
+    await Promise.all([
+      expect(internetmarke.getUserInfo()).to.eventually.be.rejectedWith(InternetmarkeError),
+      expect(internetmarke.retrievePageFormats()).to.eventually.be.rejectedWith(InternetmarkeError),
+      expect(internetmarke.retrievePageFormat(1)).to.eventually.be.rejectedWith(InternetmarkeError),
+      expect(internetmarke.createShopOrderId()).to.eventually.be.rejectedWith(InternetmarkeError),
+      expect(internetmarke.retrievePublicGallery()).to.eventually.be.rejectedWith(
+        InternetmarkeError
+      ),
+      expect(internetmarke.retrievePrivateGallery()).to.eventually.be.rejectedWith(
+        InternetmarkeError
+      ),
+      expect(internetmarke.retrievePreviewVoucher({} as Product)).to.eventually.be.rejectedWith(
+        InternetmarkeError
+      ),
+      expect(internetmarke.checkoutShoppingCart()).to.eventually.be.rejectedWith(
+        InternetmarkeError
+      ),
+      expect(internetmarke.retrieveOrder(0)).to.eventually.be.rejectedWith(InternetmarkeError),
 
-    expect(internetmarke.initOneClickForAppService({} as any)).to.eventually.be.rejected;
+      expect(internetmarke.initOneClickForAppService({} as any)).to.eventually.be.rejected
+    ]);
   });
 
-  it('should make local 1C4A shopping cart methods available before init', () => {
+  it('should make local 1C4A shopping cart and download methods available before init', () => {
     expect(() => {
       internetmarke.addItemToShoppingCart({ id: 1, price: 80 } as Product, {
         voucherLayout: VoucherLayout.FrankingZone
@@ -42,25 +49,33 @@ describe('Internetmarke', () => {
     expect(() => internetmarke.getItemFromShoppingCart(0)).to.not.throw(InternetmarkeError);
     expect(() => internetmarke.removeItemFromShoppingCart(0)).to.not.throw(InternetmarkeError);
     expect(() => internetmarke.getShoppingCartSummary()).to.not.throw(InternetmarkeError);
+
+    expect(() => internetmarke.downloadOrder({} as Order)).to.not.throw(InternetmarkeError);
   });
 
-  it('should throw errors when accessing Portokasse services before init', () => {
-    expect(internetmarke.getUserInfo()).to.eventually.be.rejectedWith(InternetmarkeError);
-    expect(internetmarke.topUp(0, PaymentMethod.GiroPay)).to.eventually.be.rejectedWith(
-      InternetmarkeError
-    );
-    expect(internetmarke.getJournal({ days: 1 })).to.eventually.be.rejectedWith(InternetmarkeError);
+  it('should throw errors when accessing Portokasse services before init', async () => {
+    await Promise.all([
+      expect(internetmarke.getUserInfo()).to.eventually.be.rejectedWith(InternetmarkeError),
+      expect(internetmarke.topUp(0, PaymentMethod.GiroPay)).to.eventually.be.rejectedWith(
+        InternetmarkeError
+      ),
+      expect(internetmarke.getJournal({ days: 1 })).to.eventually.be.rejectedWith(
+        InternetmarkeError
+      ),
 
-    expect(internetmarke.initPortokasseService({} as any)).to.eventually.be.rejected;
+      expect(internetmarke.initPortokasseService({} as any)).to.eventually.be.rejected
+    ]);
   });
 
-  it('should throw errors when accessing ProdWS services before init', () => {
-    expect(internetmarke.getCatalogList()).to.eventually.be.rejectedWith(InternetmarkeError);
-    expect(internetmarke.getCatalog('name')).to.eventually.be.rejectedWith(InternetmarkeError);
-    expect(internetmarke.getProductList()).to.eventually.be.rejectedWith(InternetmarkeError);
-    expect(internetmarke.getProduct(0)).to.eventually.be.rejectedWith(InternetmarkeError);
+  it('should throw errors when accessing ProdWS services before init', async () => {
+    await Promise.all([
+      expect(internetmarke.getCatalogList()).to.eventually.be.rejectedWith(InternetmarkeError),
+      expect(internetmarke.getCatalog('name')).to.eventually.be.rejectedWith(InternetmarkeError),
+      expect(internetmarke.getProductList()).to.eventually.be.rejectedWith(InternetmarkeError),
+      expect(internetmarke.getProduct(0)).to.eventually.be.rejectedWith(InternetmarkeError),
 
-    expect(internetmarke.initProductService({} as any)).to.eventually.be.rejected;
+      expect(internetmarke.initProductService({} as any)).to.eventually.be.rejected
+    ]);
   });
 
   describe('getUserInfo', () => {

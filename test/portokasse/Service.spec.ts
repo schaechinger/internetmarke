@@ -1,10 +1,10 @@
 import { expect } from 'chai';
 import moxios from 'moxios';
-import { UserError } from '../../src/Error';
+import { InternetmarkeError, UserError } from '../../src/Error';
 import { PaymentMethod, PortokasseService } from '../../src/portokasse/Service';
 import { userCredentials } from '../1c4a/helper';
 import { User } from '../../src/User';
-import { JournalError, PortokasseError } from '../../src/portokasse/Error';
+import { JournalError } from '../../src/portokasse/Error';
 import { Internetmarke } from '../../src/Internetmarke';
 import { getLoggerStub } from '../stubs/logger.stub';
 import { journalResult } from './journal/journal.spec';
@@ -44,7 +44,7 @@ describe('Portokasse Service', () => {
     });
 
     it('should prevent init without user credentials', async () => {
-      expect(internetmarke.initPortokasseService({} as any)).to.eventually.be.rejectedWith(
+      await expect(internetmarke.initPortokasseService({} as any)).to.eventually.be.rejectedWith(
         UserError
       );
     });
@@ -66,7 +66,7 @@ describe('Portokasse Service', () => {
         }
       });
 
-      expect(service.getUserInfo()).to.eventually.be.rejectedWith(PortokasseError);
+      await expect(service.getUserInfo()).to.eventually.be.rejectedWith(InternetmarkeError);
     });
 
     it('should retrieve user balance', async () => {
@@ -133,7 +133,7 @@ describe('Portokasse Service', () => {
 
       await service.init({ user: userCredentials });
 
-      expect(service.topUp(500, PaymentMethod.PayPal)).to.eventually.be.rejectedWith(
+      await expect(service.topUp(500, PaymentMethod.PayPal)).to.eventually.be.rejectedWith(
         `Error from Portokasse: ${errorCode}`
       );
     });
@@ -198,7 +198,7 @@ describe('Portokasse Service', () => {
       await service.init({ user: userCredentials });
       const promise = service.getJournal({} as any);
 
-      expect(promise).to.eventually.be.rejectedWith(JournalError);
+      await expect(promise).to.eventually.be.rejectedWith(JournalError);
     });
 
     it('should detect missing start date', async () => {
@@ -215,7 +215,7 @@ describe('Portokasse Service', () => {
         endDate: new Date('2021-08-11')
       } as any);
 
-      expect(promise).to.eventually.be.rejectedWith(JournalError);
+      await expect(promise).to.eventually.be.rejectedWith(JournalError);
     });
 
     it('should detect missing end date', async () => {
@@ -232,7 +232,7 @@ describe('Portokasse Service', () => {
         startDate: new Date('2021-08-01')
       } as any);
 
-      expect(promise).to.eventually.be.rejectedWith(JournalError);
+      await expect(promise).to.eventually.be.rejectedWith(JournalError);
     });
   });
 });

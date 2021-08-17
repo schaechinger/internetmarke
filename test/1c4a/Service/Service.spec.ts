@@ -3,6 +3,7 @@ import { SimpleAddress } from '../../../src/1c4a/address';
 import {
   AddressError,
   CheckoutError,
+  PageFormatError,
   PartnerError,
   VoucherLayoutError
 } from '../../../src/1c4a/Error';
@@ -10,7 +11,8 @@ import { GalleryItem, ImageItem, MotiveLink } from '../../../src/1c4a/gallery';
 import {
   PageFormat,
   PageFormatOrientation,
-  PageFormatPageType
+  PageFormatPageType,
+  PageFormatPosition
 } from '../../../src/1c4a/pageFormat';
 import { OneClickForAppService } from '../../../src/1c4a/Service';
 import { VoucherLayout } from '../../../src/1c4a/voucher';
@@ -68,17 +70,27 @@ describe('1C4A Service', () => {
     });
 
     it('should prevent init without partner credentials', async () => {
-      expect(service.init({} as any)).to.eventually.be.rejectedWith(PartnerError);
+      await expect(service.init({} as any)).to.eventually.be.rejectedWith(PartnerError);
     });
 
     it('should prevent init without user credentials', async () => {
-      expect(service.init({ partner: partnerCredentials } as any)).to.eventually.be.rejectedWith(
-        UserError
-      );
+      await expect(
+        service.init({ partner: partnerCredentials } as any)
+      ).to.eventually.be.rejectedWith(UserError);
     });
 
     it('should init with minimal options', async () => {
-      expect(service.init(options)).to.eventually.be.fulfilled;
+      await expect(service.init(options)).to.eventually.be.fulfilled;
+    });
+  });
+
+  describe('getUserInfo', () => {
+    it('should get user info', async () => {
+      await service.init(options);
+
+      const info = await service.getUserInfo();
+
+      expect(info).to.exist;
     });
   });
 
@@ -177,7 +189,7 @@ describe('1C4A Service', () => {
       });
 
       expect(oneC4AStub.retrievePreviewVoucherPDFAsync.calledOnce).to.be.false;
-      expect(promise).to.eventually.be.rejectedWith(VoucherLayoutError);
+      await expect(promise).to.eventually.be.rejectedWith(VoucherLayoutError);
     });
 
     it('should set image in franking layout', async () => {
@@ -188,7 +200,7 @@ describe('1C4A Service', () => {
         voucherLayout: VoucherLayout.FrankingZone
       });
 
-      expect(promise).to.eventually.be.fulfilled;
+      await expect(promise).to.eventually.be.fulfilled;
     });
 
     it('should throw error if voucher layout is missing', async () => {
@@ -197,7 +209,7 @@ describe('1C4A Service', () => {
       const promise = service.retrievePreviewVoucher({ id: 1, price: 80 } as Product);
 
       expect(oneC4AStub.retrievePreviewVoucherPNGAsync.calledOnce).to.be.false;
-      expect(promise).to.eventually.be.rejectedWith(VoucherLayoutError);
+      await expect(promise).to.eventually.be.rejectedWith(VoucherLayoutError);
     });
   });
 
@@ -392,7 +404,7 @@ describe('1C4A Service', () => {
 
       const promise = service.checkoutShoppingCart();
 
-      expect(promise).to.eventually.be.rejectedWith(CheckoutError);
+      await expect(promise).to.eventually.be.rejectedWith(CheckoutError);
     });
 
     it('should checkout cart as PNG', async () => {
@@ -403,7 +415,7 @@ describe('1C4A Service', () => {
 
       const promise = service.checkoutShoppingCart();
 
-      expect(promise).to.eventually.be.fulfilled;
+      await expect(promise).to.eventually.be.fulfilled;
     });
 
     it('should checkout cart with given shopOrderId', async () => {
@@ -427,7 +439,7 @@ describe('1C4A Service', () => {
         pageFormat: { id: 1 } as PageFormat
       });
 
-      expect(promise).to.eventually.be.rejectedWith(CheckoutError);
+      await expect(promise).to.eventually.be.rejectedWith(CheckoutError);
     });
 
     it('should generate position data for PDF with page format information', async () => {
@@ -440,7 +452,7 @@ describe('1C4A Service', () => {
         pageFormat: pageFormatData
       });
 
-      expect(promise).to.eventually.be.fulfilled;
+      await expect(promise).to.eventually.be.fulfilled;
     });
 
     it('should use position data form item for PDF', async () => {
@@ -454,7 +466,62 @@ describe('1C4A Service', () => {
         pageFormat: { id: 1 } as PageFormat
       });
 
-      expect(promise).to.eventually.be.fulfilled;
+      await expect(promise).to.eventually.be.fulfilled;
+    });
+
+    it('should fill unused positions if not given for all vouchers', async () => {
+      await service.init(options);
+      service.addItemToShoppingCart({ id: 1, price: 80 } as Product, {
+        voucherLayout: VoucherLayout.FrankingZone,
+        position: { labelX: 1, labelY: 3 }
+      });
+      service.addItemToShoppingCart({ id: 1, price: 80 } as Product, {
+        voucherLayout: VoucherLayout.FrankingZone
+      });
+
+      const promise = service.checkoutShoppingCart({
+        pageFormat: pageFormatData
+      });
+
+      await expect(promise).to.eventually.be.fulfilled;
+    });
+
+    it('should fail if PDF position is not defined without page format data', async () => {
+      await service.init(options);
+      service.addItemToShoppingCart({ id: 1, price: 80 } as Product, {
+        voucherLayout: VoucherLayout.FrankingZone
+      });
+
+      const promise = service.checkoutShoppingCart({
+        pageFormat: { id: 1 } as PageFormat
+      });
+
+      await expect(promise).to.eventually.be.rejectedWith(CheckoutError);
+    });
+
+    it('should detect invalid page formats', async () => {
+      const positions: PageFormatPosition[] = [
+        { labelX: 0, labelY: 1 },
+        { labelX: 1, labelY: 0 },
+        { labelX: 1, labelY: 1, page: 0 },
+        { labelX: 3, labelY: 3 },
+        { labelX: 1, labelY: 6 }
+      ];
+      for (let i = 0; positions.length > i; i += 1) {
+        const position = positions[i];
+
+        service.addItemToShoppingCart({ id: 1, price: 80 } as Product, {
+          voucherLayout: VoucherLayout.FrankingZone,
+          position
+        });
+
+        const promise = service.checkoutShoppingCart({
+          pageFormat: pageFormatData as PageFormat
+        });
+
+        /* eslint-disable no-await-in-loop */
+        await expect(promise).to.eventually.be.rejectedWith(PageFormatError);
+      }
     });
 
     it('should use ppl version for checkout', async () => {

@@ -101,7 +101,7 @@ const { CountryCode, Internetmarke, VoucherLayout } = require('..');
   console.log('shopping cart summary', cart);
 
   // checkout in PDF mode (with given pageFormat template)
-  // dryrun simulates the checkout and does not 
+  // dryrun simulates the checkout and does not charge your account
   const order = await internetmarke.checkoutShoppingCart({ pageFormat: pageFormats[0], dryrun: true });
   console.log('order', order);
 })();

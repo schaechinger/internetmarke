@@ -47,7 +47,11 @@ export const parseCatalog = (data: any): Catalog | null => {
     catalog.description = data.attributes.description;
   }
 
-  data.catalogValueList.catalogValue.forEach((value: any) => {
+  const catalogValueList = Array.isArray(data.catalogValueList.catalogValue)
+    ? data.catalogValueList.catalogValue
+    : [data.catalogValueList.catalogValue];
+
+  catalogValueList.forEach((value: any) => {
     const catalogValue: CatalogItem = {
       name: value.name,
       value: value.value

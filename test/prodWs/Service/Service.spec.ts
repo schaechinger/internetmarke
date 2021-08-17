@@ -33,11 +33,10 @@ describe('ProdWS Service', () => {
 
     beforeEach(() => {
       internetmarke = new InternetmarkeMock();
-      internetmarke.setProdWsStub(prodWsStub);
     });
 
     it('should prevent init without client credentials', async () => {
-      expect(internetmarke.initProductService({} as any)).to.eventually.be.rejectedWith(
+      await expect(internetmarke.initProductService({} as any)).to.eventually.be.rejectedWith(
         ClientError
       );
     });

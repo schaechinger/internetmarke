@@ -2,6 +2,7 @@ import { stub } from 'sinon';
 import { validProducts } from '../product/product.data';
 
 export const prodWsStub = {
+  init: stub(),
   getProductListAsync: stub().returns(
     Promise.resolve([
       {

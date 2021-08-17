@@ -14,7 +14,7 @@ describe('catalog', () => {
     };
   });
   it('should detect invalid catalog data', () => {
-    const invalidCatalogd = [
+    const invalidCatalogs = [
       null,
       {},
       {
@@ -24,7 +24,7 @@ describe('catalog', () => {
       }
     ];
 
-    invalidCatalogd.forEach(invalid => {
+    invalidCatalogs.forEach(invalid => {
       expect(parseCatalog(invalid)).to.be.null;
     });
   });
@@ -35,6 +35,29 @@ describe('catalog', () => {
       value: 'value'
     };
     data.catalogValueList.catalogValue = [value];
+
+    const catalog = parseCatalog(data);
+
+    expect(catalog).to.exist;
+    if (catalog) {
+      expect(catalog.id).to.equal(data.attributes.name);
+      expect(catalog.shortName).to.not.exist;
+      expect(catalog.description).to.not.exist;
+      expect(catalog.items).to.have.length(1);
+
+      const item = catalog.items[0];
+      expect(item.name).to.equal(value.name);
+      expect(item.value).to.equal(value.value);
+      expect(item.properties).to.not.exist;
+    }
+  });
+
+  it('should parse a catalog with only one item', () => {
+    const value = {
+      name: 'name',
+      value: 'value'
+    };
+    data.catalogValueList.catalogValue = value;
 
     const catalog = parseCatalog(data);
 

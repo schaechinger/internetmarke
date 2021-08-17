@@ -22,4 +22,12 @@ const { Internetmarke } = require('..');
   // get product by id
   const product = await internetmarke.getProduct(1);
   console.log('getProduct', product);
+
+  // list available catalogs
+  const catalogs = await internetmarke.getCatalogList();
+  console.log('catalogs length:', catalogs.length, catalogs[0]);
+
+  // get catalog by name
+  const catalog = await internetmarke.getCatalog('Entgeltzone');
+  console.log('catalog', catalog);
 })();
