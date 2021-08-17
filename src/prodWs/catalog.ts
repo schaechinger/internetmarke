@@ -15,11 +15,15 @@ const getPropertyValue = (prop: any): any => {
   let value: any;
   if (undefined !== prop.alphanumericValue) {
     value = prop.alphanumericValue.attributes.fixValue;
+  } else if (undefined !== prop.numericValue) {
+    value = +prop.numericValue.attributes.fixValue;
   } else if (undefined !== prop.booleanValue) {
     value = 'true' === prop.booleanValue;
   } else if (undefined !== prop.dateValue) {
     value = (prop.dateValue && new Date(prop.dateValue.attributes.fixDate)) || null;
   } else {
+    const key = Object.keys(prop)[0];
+    value = prop[key].attributes?.fixValue || prop[key];
     // throw new Error(`Unknown prop type: ${Object.keys(prop)[0]}`);
   }
 
@@ -48,7 +52,7 @@ export const parseCatalog = (data: any): Catalog | null => {
       name: value.name,
       value: value.value
     };
-    if (-1 !== catalogValue.value.indexOf(',')) {
+    if ((catalogValue.value as string).match(/^'.*'$/)) {
       catalogValue.value = value.value
         .split(',')
         .map((val: string) => val.substr(1, val.length - 2));
