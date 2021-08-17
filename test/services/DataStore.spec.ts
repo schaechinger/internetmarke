@@ -3,7 +3,7 @@ import findCacheDir from 'find-cache-dir';
 import { accessSync, unlinkSync } from 'fs';
 import { join as joinPath } from 'path';
 import { sync as rmdirSync } from 'rimraf';
-import { stub } from 'sinon';
+import { stub, useFakeTimers } from 'sinon';
 import { DataStore } from '../../src/services/DataStore';
 import { getLoggerStub } from '../stubs/logger.stub';
 
@@ -62,16 +62,16 @@ describe('DataStore', () => {
   });
 
   it('should reload the data after they are expired', async () => {
-    await store.init(tmpFile, loadData, 0.01);
+    const clock = useFakeTimers();
 
-    await new Promise<void>(resolve => {
-      setTimeout(async () => {
-        await store.getList();
+    await store.init(tmpFile, loadData, 1);
 
-        expect(loadData.calledTwice).to.be.true;
-        resolve();
-      }, 11);
-    });
+    clock.tick(2000);
+
+    await store.getList();
+    expect(loadData.calledTwice).to.be.true;
+
+    clock.restore();
   });
 
   it('should reload the data with disabled cache', async () => {
