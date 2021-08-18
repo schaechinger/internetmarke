@@ -5,6 +5,7 @@ This document contains next steps and other todos for v1.0.0
 ## 1C4A
 
 - [ ] [feat] Private gallery walk through
+- [ ] [feat] Defaults for options
 - [ ] [fix] Images should check the support in the page format
 - [ ] [test] Service tests
 - [ ] [test] Checkout tests
