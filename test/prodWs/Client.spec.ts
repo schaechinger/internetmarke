@@ -1,4 +1,5 @@
 import { expect } from 'chai';
+
 import { Client } from '../../src/prodWs/Client';
 import { clientCredentials } from './helper';
 

@@ -1,4 +1,5 @@
 import { expect } from 'chai';
+
 import { formatDate } from '../../../src/1c4a/date';
 
 describe('Date', () => {

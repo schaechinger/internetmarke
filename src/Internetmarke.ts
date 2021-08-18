@@ -1,3 +1,8 @@
+import CountryCode from './1c4a/countryCode';
+import { DownloadLinks, DownloadOptions, downloadOrder } from './1c4a/download';
+import { GalleryItem, MotiveLink } from './1c4a/gallery';
+import { Order, ShoppingCartItem, ShoppingCartSummary } from './1c4a/order';
+import { PageFormat } from './1c4a/pageFormat';
 import {
   CheckoutShoppingCartOptions,
   OneClickForApp,
@@ -6,15 +11,10 @@ import {
   PreviewVoucherOptions,
   ShoppingCartItemOptions
 } from './1c4a/Service';
-import CountryCode from './1c4a/countryCode';
-import { DownloadOptions, DownloadLinks, downloadOrder } from './1c4a/download';
-import { GalleryItem, MotiveLink } from './1c4a/gallery';
-import { Order, ShoppingCartItem, ShoppingCartSummary } from './1c4a/order';
-import { PageFormat } from './1c4a/pageFormat';
-import { InternetmarkeError } from './Error';
-import { UserInfo } from './User';
 import container from './di/inversify-config';
 import { TYPES } from './di/types';
+import { InternetmarkeError } from './Error';
+import { Journal, JournalOptions } from './portokasse/journal';
 import {
   PaymentMethod,
   PaymentResponse,
@@ -22,15 +22,16 @@ import {
   PortokasseService,
   PortokasseServiceOptions
 } from './portokasse/Service';
-import { Journal, JournalOptions } from './portokasse/journal';
-import { ProductService, ProductServiceOptions, ProdWS } from './prodWs/Service';
-import { Product } from './prodWs/product';
-import { Amount } from './utils/amount';
 import { Catalog } from './prodWs/catalog';
+import { Product } from './prodWs/product';
+import { ProductService, ProductServiceOptions, ProdWS } from './prodWs/Service';
+import { UserInfo } from './User';
+import { Amount } from './utils/amount';
 
 // export types and interfaces
 export { UserCredentials, UserInfo } from './User';
 // 1C4A
+export { SimpleAddress } from './1c4a/address';
 export { PartnerCredentials } from './1c4a/Partner';
 export {
   CheckoutShoppingCartOptions,
@@ -38,20 +39,18 @@ export {
   PreviewVoucherOptions,
   ShoppingCartItemOptions
 } from './1c4a/Service';
-export { SimpleAddress } from './1c4a/address';
 export { CountryCode };
 export { DownloadLinks, DownloadOptions } from './1c4a/download';
 export { GalleryItem, ImageItem, MotiveLink } from './1c4a/gallery';
 export { Order, ShoppingCartItem, ShoppingCartSummary } from './1c4a/order';
 export {
   PageFormat,
-  PageFormatPosition,
   PageFormatOrientation,
-  PageFormatPageType
+  PageFormatPageType,
+  PageFormatPosition
 } from './1c4a/pageFormat';
 export { Voucher, VoucherFormat, VoucherLayout } from './1c4a/voucher';
 // Portokasse
-export { PaymentMethod, PaymentResponse, PortokasseServiceOptions } from './portokasse/Service';
 export {
   Journal,
   JournalDays,
@@ -61,11 +60,12 @@ export {
   JournalOptions,
   JournalRange
 } from './portokasse/journal';
+export { PaymentMethod, PaymentResponse, PortokasseServiceOptions } from './portokasse/Service';
 // ProdWS
-export { ClientCredentials } from './prodWs/Client';
-export { ProductServiceOptions } from './prodWs/Service';
 export { Catalog, CatalogItem } from './prodWs/catalog';
+export { ClientCredentials } from './prodWs/Client';
 export { Product } from './prodWs/product';
+export { ProductServiceOptions } from './prodWs/Service';
 
 /**
  * Main class of the internetmarke package with access to all available methods.

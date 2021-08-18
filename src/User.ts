@@ -1,4 +1,5 @@
 import { injectable } from 'inversify';
+
 import { Amount, parseAmount } from './utils/amount';
 
 export interface UserCredentials {

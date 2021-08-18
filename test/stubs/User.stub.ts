@@ -1,4 +1,5 @@
 import { stub } from 'sinon';
+
 import { UserInfo } from '../../src/User';
 
 export const userInfoResult: UserInfo = {

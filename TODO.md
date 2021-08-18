@@ -4,12 +4,13 @@ This document contains next steps and other todos for v1.0.0
 
 ## 1C4A
 
-- [ ] [feat] Private gallery walk through
 - [ ] [feat] Defaults for options
 - [ ] [fix] Images should check the support in the page format
+- [ ] [feat] Improve error handling from soap requests
 - [ ] [test] Service tests
 - [ ] [test] Checkout tests
-- [ ] [feat] Improve error handling from soap requests
+- [ ] [feat] <del>Private gallery walk through</del>
+      **Update:** Not in use according to Deutsche Post
 
 ## Portokasse
 
@@ -19,4 +20,5 @@ This document contains next steps and other todos for v1.0.0
 ## ProdWS
 
 - [x] [feat] Catalog list support
+- [ ] [feat] Find product by use case
 - [ ] [feat] Additional products from the product list

@@ -1,8 +1,9 @@
-import axios, { Method, AxiosRequestConfig } from 'axios';
+import axios, { AxiosRequestConfig, Method } from 'axios';
 import axiosCookieJarSupport from 'axios-cookiejar-support';
 import { Debugger } from 'debug';
 import { inject, injectable } from 'inversify';
 import { CookieJar } from 'tough-cookie';
+
 import { TYPES } from '../di/types';
 import { InternetmarkeError, UserError } from '../Error';
 import { RestService } from '../services/Rest';

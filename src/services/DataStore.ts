@@ -3,6 +3,7 @@ import findCacheDir from 'find-cache-dir';
 import fs from 'fs';
 import { inject, injectable } from 'inversify';
 import { join as joinPath } from 'path';
+
 // @ts-ignore
 import { name as packageName, version as packageVersion } from '../../package.json';
 import { TYPES } from '../di/types';

@@ -1,4 +1,5 @@
 import { injectable } from 'inversify';
+
 import { PostService } from './service';
 
 @injectable()

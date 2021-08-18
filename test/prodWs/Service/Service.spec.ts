@@ -1,15 +1,16 @@
 import { expect } from 'chai';
+
+import { Catalog } from '../../../src/prodWs/catalog';
+import { ClientError } from '../../../src/prodWs/Error';
+import { Product } from '../../../src/prodWs/product';
 import { ProductService } from '../../../src/prodWs/Service';
-import { clientStub } from './Client.stub';
+import { DataStore } from '../../../src/services/DataStore';
+import { InternetmarkeMock } from '../../stubs/Internetmarke.mock';
 import { getLoggerStub } from '../../stubs/logger.stub';
 import { clientCredentials } from '../helper';
 import { validProducts } from '../product/product.data';
+import { clientStub } from './Client.stub';
 import { getInvalidProdWsStub, getProdWsStub, prodWsStub } from './Soap.stub';
-import { DataStore } from '../../../src/services/DataStore';
-import { Product } from '../../../src/prodWs/product';
-import { ClientError } from '../../../src/prodWs/Error';
-import { InternetmarkeMock } from '../../stubs/Internetmarke.mock';
-import { Catalog } from '../../../src/prodWs/catalog';
 
 describe('ProdWS Service', () => {
   let service: ProductService;

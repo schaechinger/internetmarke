@@ -1,4 +1,5 @@
 import { expect } from 'chai';
+
 import { parseCatalog } from '../../../src/prodWs/catalog';
 
 describe('catalog', () => {

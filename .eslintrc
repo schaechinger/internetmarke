@@ -1,5 +1,5 @@
 {
-  "plugins": ["prettier"],
+  "plugins": ["simple-import-sort", "prettier"],
   "extends": ["airbnb-typescript/base", "prettier"],
   "parserOptions": {
     "project": "./tsconfig.eslint.json"
@@ -10,6 +10,8 @@
     "import/prefer-default-export": "off",
     "no-console": "error",
     "prettier/prettier": "error",
+    "simple-import-sort/imports": "error",
+    "simple-import-sort/exports": "error",
     "yoda": ["error", "always"]
   },
   "overrides": [

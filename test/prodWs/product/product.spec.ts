@@ -1,4 +1,5 @@
 import { expect } from 'chai';
+
 import { parseSalesProduct } from '../../../src/prodWs/product';
 import { invalidProducts, validProducts } from './product.data';
 

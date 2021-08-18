@@ -1,4 +1,5 @@
 import { stub } from 'sinon';
+
 import { portokasseUserInfoResult } from './User.stub';
 
 export const portokasseServiceStub: any = {

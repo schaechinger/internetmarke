@@ -1,4 +1,5 @@
 import { expect } from 'chai';
+
 import { User, UserCredentials, UserData } from '../src/User';
 
 describe('User', () => {

@@ -1,9 +1,13 @@
 import { inject, injectable } from 'inversify';
+
 import { TYPES } from '../di/types';
 import { InternetmarkeError, SoapError, UserError } from '../Error';
+import { ProductError } from '../prodWs/Error';
 import { Product } from '../prodWs/product';
 import { DataStore } from '../services/DataStore';
 import { SoapService } from '../services/Soap';
+import { User, UserCredentials, UserInfo } from '../User';
+import { amountToCents, parseAmount } from '../utils/amount';
 import { parseAddress, SimpleAddress } from './address';
 import {
   AddressError,
@@ -17,10 +21,7 @@ import { GalleryItem, ImageItem, MotiveLink } from './gallery';
 import { Order, parseOrder, ShoppingCartItem, ShoppingCartSummary } from './order';
 import { PageFormat, PageFormatPosition } from './pageFormat';
 import { Partner, PartnerCredentials } from './Partner';
-import { User, UserCredentials, UserInfo } from '../User';
 import { VoucherFormat, VoucherLayout } from './voucher';
-import { ProductError } from '../prodWs/Error';
-import { amountToCents, parseAmount } from '../utils/amount';
 
 export interface OneClickForAppServiceOptions {
   /** The partner credentials to pass to the service. */

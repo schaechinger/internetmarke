@@ -1,4 +1,5 @@
 import { stub } from 'sinon';
+
 import { userInfoResult } from './User.stub';
 
 export const oneClickForAppServiceStub: any = {

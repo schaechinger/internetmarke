@@ -1,4 +1,5 @@
 import { stub } from 'sinon';
+
 import { validProducts } from '../product/product.data';
 
 export const prodWsStub = {

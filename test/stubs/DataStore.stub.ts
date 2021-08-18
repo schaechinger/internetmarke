@@ -1,4 +1,5 @@
 import { stub } from 'sinon';
+
 import { IDataStore } from '../../src/services/DataStore';
 
 export const dataStoreStub: IDataStore<any> = {

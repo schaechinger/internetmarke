@@ -1,11 +1,12 @@
 import { expect } from 'chai';
 import moxios from 'moxios';
+
 import { InternetmarkeError, UserError } from '../../src/Error';
-import { PaymentMethod, PortokasseService } from '../../src/portokasse/Service';
-import { userCredentials } from '../1c4a/helper';
-import { User } from '../../src/User';
-import { JournalError } from '../../src/portokasse/Error';
 import { Internetmarke } from '../../src/Internetmarke';
+import { JournalError } from '../../src/portokasse/Error';
+import { PaymentMethod, PortokasseService } from '../../src/portokasse/Service';
+import { User } from '../../src/User';
+import { userCredentials } from '../1c4a/helper';
 import { getLoggerStub } from '../stubs/logger.stub';
 import { journalResult } from './journal/journal.spec';
 

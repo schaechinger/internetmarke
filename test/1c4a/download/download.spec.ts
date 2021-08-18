@@ -3,6 +3,7 @@ import { accessSync, readFileSync } from 'fs';
 import moxios from 'moxios';
 import { join as joinPath } from 'path';
 import { sync as rmdirSync } from 'rimraf';
+
 import { downloadOrder, getBasePath } from '../../../src/1c4a/download';
 import { Order } from '../../../src/1c4a/order';
 import { Voucher } from '../../../src/1c4a/voucher';

@@ -1,4 +1,5 @@
 import { expect } from 'chai';
+
 import { amountToCents, parseAmount } from '../../src/utils/amount';
 
 describe('Amount', () => {

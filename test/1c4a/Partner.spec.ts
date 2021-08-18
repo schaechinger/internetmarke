@@ -1,4 +1,5 @@
 import { expect } from 'chai';
+
 import { Partner } from '../../src/1c4a/Partner';
 import { partnerCredentials } from './helper';
 

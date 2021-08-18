@@ -4,6 +4,7 @@ import { accessSync, unlinkSync } from 'fs';
 import { join as joinPath } from 'path';
 import { sync as rmdirSync } from 'rimraf';
 import { stub, useFakeTimers } from 'sinon';
+
 import { DataStore } from '../../src/services/DataStore';
 import { getLoggerStub } from '../stubs/logger.stub';
 

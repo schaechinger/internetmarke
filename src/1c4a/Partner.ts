@@ -1,5 +1,6 @@
 import { injectable } from 'inversify';
 import md5 from 'md5';
+
 import { formatDate } from './date';
 
 export interface PartnerCredentials {

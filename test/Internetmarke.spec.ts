@@ -1,4 +1,5 @@
 import { expect } from 'chai';
+
 import { VoucherLayout } from '../src/1c4a/voucher';
 import { InternetmarkeError } from '../src/Error';
 import { Order } from '../src/Internetmarke';

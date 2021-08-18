@@ -1,4 +1,5 @@
 import { expect } from 'chai';
+
 import { parseJournalEntry } from '../../../src/portokasse/journal';
 
 export const journalResult = {

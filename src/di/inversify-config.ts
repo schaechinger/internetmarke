@@ -1,19 +1,21 @@
 import 'reflect-metadata';
+
 import debug, { Debugger } from 'debug';
 import { Container, interfaces } from 'inversify';
 import { Client as SoapClient, createClientAsync } from 'soap';
-import { TYPES } from './types';
+
+import { GalleryItem, MotiveLink } from '../1c4a/gallery';
+import { PageFormat } from '../1c4a/pageFormat';
 import { Partner } from '../1c4a/Partner';
 import { OneClickForAppService } from '../1c4a/Service';
-import { User } from '../User';
-import { Client } from '../prodWs/Client';
-import { ProductService } from '../prodWs/Service';
-import { DataStore } from '../services/DataStore';
-import { PageFormat } from '../1c4a/pageFormat';
-import { GalleryItem, MotiveLink } from '../1c4a/gallery';
-import { Product } from '../prodWs/product';
 import { PortokasseService } from '../portokasse/Service';
 import { Catalog } from '../prodWs/catalog';
+import { Client } from '../prodWs/Client';
+import { Product } from '../prodWs/product';
+import { ProductService } from '../prodWs/Service';
+import { DataStore } from '../services/DataStore';
+import { User } from '../User';
+import { TYPES } from './types';
 
 const container = new Container();
 

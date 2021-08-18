@@ -1,4 +1,5 @@
 import { expect } from 'chai';
+
 import { SimpleAddress } from '../../../src/1c4a/address';
 import {
   AddressError,

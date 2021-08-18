@@ -1,5 +1,6 @@
 import { inject, injectable } from 'inversify';
 import { WSSecurity } from 'soap';
+
 import { TYPES } from '../di/types';
 import { DataStore } from '../services/DataStore';
 import { SoapService } from '../services/Soap';
