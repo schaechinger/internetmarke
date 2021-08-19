@@ -7,7 +7,7 @@ A node implementation to use the Internetmarke web service of Deutsche Post.
 - [Usage](#usage)
 - [1C4A (One Click For Application Service)](#1c4a-one-click-for-application-service)
   - [User Info](#user-info)
-  - [Page Formats (PDF only)](#page-formats-pdf-only)
+  - [Page Formats](#page-formats)
   - [Create Order Id](#create-order-id)
   - [Public Gallery Images](#public-gallery-images)
   - [Private Gallery Images](#private-gallery-images)
@@ -24,7 +24,7 @@ A node implementation to use the Internetmarke web service of Deutsche Post.
 - [ProdWS (Product Service)](#prodws-product-service)
   - [Product List](#product-list)
   - [Oudated Products](#outdated-products)
-  - [Catalog list](#catalog-list)
+  - [Catalog List](#catalog-list)
 
 ## Installation
 
@@ -143,7 +143,7 @@ The user info holds all the information about your account including your wallet
 balance.
 In addition you can retrieve the order id of the latest order in this session.
 
-### Page Formats (PDF only)
+### Page Formats
 
 If you wish to generate vouchers in PDF format you may want to list all the
 available page templates from the service.
@@ -161,7 +161,7 @@ In some cases it might be useful to generate the order id for the next order
 before the checkout. This is what the method `createShopOrderId()` is for:
 
 ```typescript
-const orderId = await internetmarke.createOrderId();
+const orderId = await internetmarke.createShopOrderId();
 ```
 
 This order id can be passed to the `checkoutShoppingCart()` method in the
