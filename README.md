@@ -480,7 +480,7 @@ const catalog = await internetmarke.getCatalog('Entgeltzone');
 [workflow-url]: https://github.com/schaechinger/internetmarke/actions/workflows/qa.yml
 [workflow-svg]: https://img.shields.io/github/workflow/status/schaechinger/internetmarke/qa
 [workflow-svg-gh]: https://github.com/schaechinger/internetmarke/actions/workflows/qa.yml/badge.svg
-[codecov-svg]: https://codecov.io/gh/schaechinger/internetmarke/branch/master/graph/badge.svg?token=44611cZi5g
+[codecov-svg]: https://codecov.io/gh/schaechinger/internetmarke/branch/main/graph/badge.svg?token=44611cZi5g
 [codecov-url]: https://codecov.io/gh/schaechinger/internetmarke
 [license-svg]: https://img.shields.io/npm/l/internetmarke.svg
 [dependencies-svg]: https://img.shields.io/david/schaechinger/internetmarke.svg
