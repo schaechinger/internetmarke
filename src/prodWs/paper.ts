@@ -55,7 +55,7 @@ export const getPaperDetails = (
 
   const isImperial = 'IMPERIAL' === paperOptions.system;
 
-  // TODO: convert custom weeight for imperial
+  // TODO: convert custom weight for imperial
 
   // DIN 4A0 init
   const dimensions: PaperDimensions = {

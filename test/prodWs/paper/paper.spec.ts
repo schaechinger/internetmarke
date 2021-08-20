@@ -49,6 +49,14 @@ describe('Paper', () => {
       expect(details.weight.value).to.equal(0.08);
     });
 
+    it('should calculate DIN A4 details for heavier paper', () => {
+      const details = getPaperDetails(DinAPaper.DinA4, { weight: 110 });
+
+      expect(details.dimensions.x).to.equal(210);
+      expect(details.dimensions.y).to.equal(297);
+      expect(details.weight.value).to.equal(6.86);
+    });
+
     it('should calculate DIN A4 details in imperial system', () => {
       const details = getPaperDetails(DinAPaper.DinA4, { system: 'IMPERIAL' });
 
