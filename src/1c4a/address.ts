@@ -88,6 +88,7 @@ export const parseAddress = (data: SimpleAddress): NamedAddress => {
   if (data.state) {
     zip = `${data.state.toUpperCase()} ${zip}`.trim();
   }
+
   const address: Address = {
     additional: (data.additional || '').substr(0, 50),
     street: data.street?.substr(0, 50),

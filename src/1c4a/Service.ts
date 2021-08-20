@@ -9,6 +9,7 @@ import { SoapService } from '../services/Soap';
 import { User, UserCredentials, UserInfo } from '../User';
 import { amountToCents, parseAmount } from '../utils/amount';
 import { parseAddress, SimpleAddress } from './address';
+import CountryCode from './countryCode';
 import {
   AddressError,
   CheckoutError,
@@ -363,9 +364,7 @@ export class OneClickForAppService extends SoapService implements OneClickForApp
     }
     if (options.sender || options.receiver) {
       if (!options.sender || !options.receiver) {
-        throw new AddressError(
-          'Address muss be available for sender and receiver if one is given.'
-        );
+        throw new AddressError('Address muss be available for sender and receiver if one is given');
       }
 
       if (VoucherLayout.FrankingZone === voucherLayout) {
@@ -376,6 +375,21 @@ export class OneClickForAppService extends SoapService implements OneClickForApp
       const receiver = parseAddress(options.receiver);
 
       position.address = { sender, receiver };
+
+      if (undefined !== product.domestic) {
+        // domestic product for abroad address
+        if (product.domestic && CountryCode.DEU !== receiver.address.country) {
+          throw new ProductError(
+            'Domestic products cannot be used for international receiver addresses'
+          );
+        }
+        // internatiomal product for national receiver address
+        else if (!product.domestic && CountryCode.DEU === receiver.address.country) {
+          throw new ProductError(
+            'International products should not be used for national receiver addresses'
+          );
+        }
+      }
     }
 
     if (product.ppl) {

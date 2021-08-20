@@ -18,6 +18,7 @@ import {
 import { OneClickForAppService } from '../../../src/1c4a/Service';
 import { VoucherLayout } from '../../../src/1c4a/voucher';
 import { UserError } from '../../../src/Error';
+import { CountryCode } from '../../../src/Internetmarke';
 import { ProductError } from '../../../src/prodWs/Error';
 import { Product } from '../../../src/prodWs/product';
 import { DataStore } from '../../../src/services/DataStore';
@@ -320,6 +321,29 @@ describe('1C4A Service', () => {
           receiver: receiverAddress
         });
       }).to.throw(AddressError);
+    });
+
+    it('should throw an error if a domestic product is used for an abroad receiver address', () => {
+      const receiverAddressAbroad = { ...receiverAddress };
+      receiverAddressAbroad.country = CountryCode.AUT;
+
+      expect(() => {
+        service.addItemToShoppingCart({ id: 1, price: 80, domestic: true } as Product, {
+          voucherLayout: VoucherLayout.AddressZone,
+          sender: senderAddress,
+          receiver: receiverAddressAbroad
+        });
+      }).to.throw(ProductError);
+    });
+
+    it('should throw an error if an internatioal product is used for a national receiver address', () => {
+      expect(() => {
+        service.addItemToShoppingCart({ id: 1, price: 80, domestic: false } as Product, {
+          voucherLayout: VoucherLayout.AddressZone,
+          sender: senderAddress,
+          receiver: receiverAddress
+        });
+      }).to.throw(ProductError);
     });
 
     it('should throw an error when passing addresses in franking layout', () => {
