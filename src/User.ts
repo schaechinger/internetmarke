@@ -78,7 +78,7 @@ export class User {
       return;
     }
 
-    if (data.walletBalance) {
+    if (undefined !== data.walletBalance) {
       this.walletBalance = parseAmount(data.walletBalance);
     }
     if (undefined !== data.showTermsAndCondition) {

@@ -1,6 +1,6 @@
 {
   "name": "internetmarke",
-  "version": "0.7.1",
+  "version": "0.8.0",
   "description": "A node implementation to use the Internetmarke web service of Deutsche Post.",
   "keywords": [
     "internetmarke",
@@ -31,7 +31,7 @@
     "test": "mocha -r ts-node/register 'test/**/*.spec.ts'",
     "test:dot": "npm run test -- -R dot",
     "test:codecov": "nyc --reporter=cobertura npm run test",
-    "test:coverage": "nyc npm run test"
+    "test:coverage": "nyc npm run test:dot"
   },
   "engines": {
     "node": ">=10.0.0"

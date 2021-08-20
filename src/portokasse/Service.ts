@@ -87,7 +87,7 @@ export class PortokasseService extends RestService implements Portokasse {
 
     const res = await this.request('GET', '/api/v1/wallet-overviews/me');
 
-    if (res?.balance) {
+    if (!Number.isNaN(res?.balance)) {
       this.user.load({
         walletBalance: res.balance
       });

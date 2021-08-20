@@ -46,6 +46,22 @@ describe('User', () => {
     expect(info.orderIds).to.be.empty;
   });
 
+  it('should load user data with 0 balance', () => {
+    const emptydata: UserData = {
+      walletBalance: 0,
+      infoMessage: 'msg',
+      showTermsAndCondition: true,
+      userToken: '<TOKEN>'
+    };
+    user.load(emptydata);
+
+    const info = user.getInfo();
+
+    expect(info).to.exist;
+    expect(info.walletBalance).to.exist;
+    expect(info.walletBalance!.value).to.equal(0);
+  });
+
   it('should not load data without a valid token', () => {
     const infoUpdate = {
       walletBalance: 2000
