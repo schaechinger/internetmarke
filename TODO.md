@@ -9,6 +9,8 @@ This document contains next steps and other todos for v1.0.0
 - [ ] [feat] Improve error handling from soap requests
 - [ ] [test] Service tests
 - [ ] [test] Checkout tests
+- [ ] [feat] Check shopping cart item address and match country to domestic
+      flag of product
 - [ ] [feat] <del>Private gallery walk through</del>
       **Update:** Not in use according to Deutsche Post
 
