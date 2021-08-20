@@ -21,4 +21,5 @@ This document contains next steps and other todos for v1.0.0
 
 - [x] [feat] Catalog list support
 - [ ] [feat] Find product by use case
+- [x] [fix] Product domestic flag
 - [ ] [feat] Additional products from the product list

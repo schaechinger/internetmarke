@@ -4,7 +4,7 @@
 
 This package is still in development until version 1.0.0 is released.
 
-Until then only the latest 0.x release is supported.
+Until then only the latest 0.x minor release is supported.
 
 | Version | Supported          |
 | ------- | ------------------ |

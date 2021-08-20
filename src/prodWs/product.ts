@@ -34,7 +34,7 @@ export const parseSalesProduct = (data: any): Product | null => {
       value: +data.priceDefinition.price.calculatedGrossPrice.attributes.value,
       currency: data.priceDefinition.price.calculatedGrossPrice.attributes.currency
     },
-    domestic: 'national' === data.extendedIdentifier.destination
+    domestic: 'national' === data.extendedIdentifier.attributes.destination
   };
 
   // dimensions
