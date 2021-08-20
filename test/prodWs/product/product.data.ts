@@ -11,6 +11,9 @@ export const invalidProducts = [
 export const validProducts = [
   {
     extendedIdentifier: {
+      attributes: {
+        destination: 'national'
+      },
       externIdentifier: {
         attributes: {
           source: 'PPL',
@@ -36,6 +39,9 @@ export const validProducts = [
   },
   {
     extendedIdentifier: {
+      attributes: {
+        destination: 'national'
+      },
       externIdentifier: {
         attributes: {
           source: 'PPL',
@@ -95,6 +101,9 @@ export const skipOptionals = [
   {
     raw: {
       extendedIdentifier: {
+        attributes: {
+          destination: 'national'
+        },
         externIdentifier: {
           attributes: {
             id: '1002',
