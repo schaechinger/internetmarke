@@ -1,3 +1,5 @@
+import { parsePropertyList } from './propertyList';
+
 export interface CatalogItem {
   name: string;
   value: string | string[];
@@ -10,25 +12,6 @@ export interface Catalog {
   description?: string;
   items: CatalogItem[];
 }
-
-const getPropertyValue = (prop: any): any => {
-  let value: any;
-  if (undefined !== prop.alphanumericValue) {
-    value = prop.alphanumericValue.attributes.fixValue;
-  } else if (undefined !== prop.numericValue) {
-    value = +prop.numericValue.attributes.fixValue;
-  } else if (undefined !== prop.booleanValue) {
-    value = 'true' === prop.booleanValue;
-  } else if (undefined !== prop.dateValue) {
-    value = (prop.dateValue && new Date(prop.dateValue.attributes.fixDate)) || null;
-  } else {
-    const key = Object.keys(prop)[0];
-    value = prop[key].attributes?.fixValue || prop[key];
-    // throw new Error(`Unknown prop type: ${Object.keys(prop)[0]}`);
-  }
-
-  return value;
-};
 
 export const parseCatalog = (data: any): Catalog | null => {
   if (!data?.catalogValueList) {
@@ -63,24 +46,7 @@ export const parseCatalog = (data: any): Catalog | null => {
     }
 
     if (value.propertyList) {
-      catalogValue.properties = {};
-      const propertyList = Array.isArray(value.propertyList.property)
-        ? value.propertyList.property
-        : [value.propertyList.property];
-
-      propertyList.forEach(prop => {
-        const { name } = prop.attributes;
-        const val = getPropertyValue(prop.propertyValue);
-        if (!catalogValue.properties![name]) {
-          catalogValue.properties![name] = val;
-        } else {
-          if (!Array.isArray(catalogValue.properties![name])) {
-            catalogValue.properties![name] = [catalogValue.properties![name]];
-          }
-
-          catalogValue.properties![name].push(val);
-        }
-      });
+      catalogValue.properties = parsePropertyList(value.propertyList);
     }
 
     catalog.items.push(catalogValue);

@@ -23,7 +23,7 @@ import {
   PortokasseServiceOptions
 } from './portokasse/Service';
 import { Catalog } from './prodWs/catalog';
-import { Product } from './prodWs/product';
+import { matchProduct, MatchProductOptions, Product } from './prodWs/product';
 import { ProductService, ProductServiceOptions, ProdWS } from './prodWs/Service';
 import { UserInfo } from './User';
 import { Amount } from './utils/amount';
@@ -64,6 +64,18 @@ export { PaymentMethod, PaymentResponse, PortokasseServiceOptions } from './port
 // ProdWS
 export { Catalog, CatalogItem } from './prodWs/catalog';
 export { ClientCredentials } from './prodWs/Client';
+export {
+  Dimension,
+  DinEnvelope,
+  DinFormat,
+  DinPaper,
+  LengthUnit,
+  MeasurementSystem,
+  PaperDetailOptions,
+  PaperDetails,
+  Weight,
+  WeightUnit
+} from './prodWs/paper';
 export { Product } from './prodWs/product';
 export { ProductServiceOptions } from './prodWs/Service';
 
@@ -296,6 +308,17 @@ export class Internetmarke implements OneClickForApp, Portokasse, ProdWS {
    */
   public getProduct(id: number): Promise<Product | null> {
     return this.productService.getProduct(id);
+  }
+
+  /**
+   * Matches the given options to the right product.
+   *
+   * @param options Match options to retrieve the right product.
+   */
+  public async matchProduct(options: MatchProductOptions): Promise<Product | null> {
+    const products = await this.productService.getProductList();
+
+    return matchProduct(products, options);
   }
 
   //

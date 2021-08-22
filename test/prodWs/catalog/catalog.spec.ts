@@ -234,6 +234,57 @@ describe('catalog', () => {
     }
   });
 
+  it('should parse a catalog with an alphanumeric property that serves a boolean', () => {
+    const value = {
+      name: 'name',
+      value: 'value',
+      propertyList: {
+        property: [
+          {
+            attributes: {
+              name: 'propTrue'
+            },
+            propertyValue: {
+              alphanumericValue: {
+                attributes: {
+                  fixValue: 'ja'
+                }
+              }
+            }
+          },
+          {
+            attributes: {
+              name: 'propFalse'
+            },
+            propertyValue: {
+              alphanumericValue: {
+                attributes: {
+                  fixValue: 'nein'
+                }
+              }
+            }
+          }
+        ]
+      }
+    };
+    data.catalogValueList.catalogValue = [value];
+
+    const catalog = parseCatalog(data);
+
+    expect(catalog).to.exist;
+    if (catalog) {
+      expect(catalog.items).to.have.length(1);
+
+      const item = catalog.items[0];
+      expect(item.properties).to.exist;
+
+      if (item.properties) {
+        expect(item.properties.propTrue).to.equal(true);
+        expect(item.properties.propFalse).to.equal(false);
+      }
+    }
+  });
+
   it('should parse a catalog with a numeric property', () => {
     const value = {
       name: 'name',
@@ -269,6 +320,48 @@ describe('catalog', () => {
       if (item.properties) {
         expect(item.properties).to.have.property('prop');
         expect(item.properties.prop).to.equal(1234);
+      }
+    }
+  });
+
+  it('should parse a catalog with a numeric property with ranges', () => {
+    const value = {
+      name: 'name',
+      value: 'value',
+      propertyList: {
+        property: [
+          {
+            attributes: {
+              name: 'prop'
+            },
+            propertyValue: {
+              numericValue: {
+                attributes: {
+                  minValue: '10',
+                  maxValue: '20',
+                  unit: 'g'
+                }
+              }
+            }
+          }
+        ]
+      }
+    };
+    data.catalogValueList.catalogValue = [value];
+
+    const catalog = parseCatalog(data);
+
+    expect(catalog).to.exist;
+    if (catalog) {
+      expect(catalog.items).to.have.length(1);
+
+      const item = catalog.items[0];
+      expect(item.properties).to.exist;
+
+      if (item.properties) {
+        expect(item.properties).to.have.property('prop');
+        expect(item.properties.prop.min).to.eql({ value: 10, unit: 'g' });
+        expect(item.properties.prop.max).to.eql({ value: 20, unit: 'g' });
       }
     }
   });
