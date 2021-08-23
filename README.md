@@ -25,6 +25,7 @@ A node implementation to use the Internetmarke web service of Deutsche Post.
   - [Product List](#product-list)
   - [Oudated Products](#outdated-products)
   - [Catalog List](#catalog-list)
+  - [Match Product for Letter](#match-product-for-letter)
 
 ## Installation
 
@@ -472,6 +473,27 @@ Note that catalogs come with strings as their id instead of numeric values.
 ```typescript
 const catalogs = await internetmarke.getCatalogList();
 const catalog = await internetmarke.getCatalog('Entgeltzone');
+```
+
+### Match Product for Letter
+
+Your letter is complete are the only thing left is the voucher. But which one is
+neccessary for the letter? The `matchProduct()` method calculates the right one
+for you. Depending on your needs and the combination of paper end envelope the
+corrept product is retrieved.
+
+```typescript
+const options: MatchProductOptions = {
+  pages: 1, // the number of pages
+  paper, // optional, defines the paper format and grammage that is used for the letter, defaults to DIN A4 with 80 g/m²
+  envelope, // optional, defines the envelope format and grammage that is used for the letter, defaults to DIN Lang with 90 g/m²
+  domestic, // optional, whether the letter is sent within Germany, defaults to true
+  priority, // optional, whether the letter should be sent as priority letter, defaults to false
+  registered, // optional, 'Einschreiben'; whether the letter should as registered letter letter, defaults to false
+  tracking // optional, whether the letter should trackable, defaults to false
+};
+
+const product = await internetmarke.matchProduct(options);
 ```
 
 [npm-url]: https://npmjs.org/package/internetmarke

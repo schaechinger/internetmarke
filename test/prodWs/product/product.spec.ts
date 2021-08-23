@@ -21,28 +21,28 @@ describe('Product', () => {
 
   describe('matchProduct', () => {
     it('should match a product for a single DIN A4 paper in DIN Lang envelope', () => {
-      const product = matchProduct(productList, { paperCount: 1 })!;
+      const product = matchProduct(productList, { pages: 1 })!;
 
       expect(product).to.exist;
       expect(product.id).to.equal(1);
     });
 
     it('should match a product for five DIN A4 papers in DIN Lang envelope', () => {
-      const product = matchProduct(productList, { paperCount: 5 })!;
+      const product = matchProduct(productList, { pages: 5 })!;
 
       expect(product).to.exist;
       expect(product.id).to.equal(11);
     });
 
     it('should match a product for five DIN A5 papers in DIN Lang envelope', () => {
-      const product = matchProduct(productList, { paperCount: 5, paper: DinPaper.DinA5 })!;
+      const product = matchProduct(productList, { pages: 5, paper: DinPaper.DinA5 })!;
 
       expect(product).to.exist;
       expect(product.id).to.equal(1);
     });
 
     it('should match a product for a single DIN A4 paper in DIN C4 envelope', () => {
-      const product = matchProduct(productList, { paperCount: 5, envelope: DinEnvelope.DinC4 })!;
+      const product = matchProduct(productList, { pages: 5, envelope: DinEnvelope.DinC4 })!;
 
       expect(product).to.exist;
       expect(product.id).to.equal(21);
@@ -50,7 +50,7 @@ describe('Product', () => {
 
     xit('should match a product for post cards', () => {
       const product = matchProduct(productList, {
-        paperCount: 1,
+        pages: 1,
         paper: { format: DinPaper.DinA6, grammage: 150 },
         envelope: DinEnvelope.None
       })!;
@@ -60,21 +60,21 @@ describe('Product', () => {
     });
 
     it('should match a product with priority label', () => {
-      const product = matchProduct(productList, { paperCount: 1, priority: true })!;
+      const product = matchProduct(productList, { pages: 1, priority: true })!;
 
       expect(product).to.exist;
       expect(product.id).to.equal(195);
     });
 
     it('should match a product with registered label', () => {
-      const product = matchProduct(productList, { paperCount: 1, registered: true })!;
+      const product = matchProduct(productList, { pages: 1, registered: true })!;
 
       expect(product).to.exist;
       expect(product.id).to.equal(1002);
     });
 
     it('should match a product for an abroad letter', () => {
-      const product = matchProduct(productList, { paperCount: 1, domestic: false })!;
+      const product = matchProduct(productList, { pages: 1, domestic: false })!;
 
       expect(product).to.exist;
       expect(product.id).to.equal(10001);

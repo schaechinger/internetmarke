@@ -37,7 +37,7 @@ export interface Product {
 }
 
 export interface MatchProductOptions {
-  paperCount: number;
+  pages: number;
   paper?:
     | {
         // defaults to 'A4'
@@ -218,8 +218,7 @@ export const matchProduct = (products: Product[], options: MatchProductOptions):
   }
   const envelopeDetails = getPaperDetails(matchOptions.envelope!.format, envelopeOptions);
 
-  const weight =
-    paperDetails.weight.value * options.paperCount + (envelopeDetails?.weight.value || 0);
+  const weight = paperDetails.weight.value * options.pages + (envelopeDetails?.weight.value || 0);
   const dimensions = envelopeDetails?.dimensions || paperDetails.dimensions;
 
   const validProducts = products.filter(product => {

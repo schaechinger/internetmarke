@@ -74,6 +74,9 @@ describe('Internetmarke', () => {
       expect(internetmarke.getCatalog('name')).to.eventually.be.rejectedWith(InternetmarkeError),
       expect(internetmarke.getProductList()).to.eventually.be.rejectedWith(InternetmarkeError),
       expect(internetmarke.getProduct(0)).to.eventually.be.rejectedWith(InternetmarkeError),
+      expect(internetmarke.matchProduct({ pages: 1 })).to.eventually.be.rejectedWith(
+        InternetmarkeError
+      ),
 
       expect(internetmarke.initProductService({} as any)).to.eventually.be.rejected
     ]);
