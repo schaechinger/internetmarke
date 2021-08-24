@@ -1,4 +1,6 @@
-### [![NPM version][npm-svg]][npm-url] [![Workflow Status][workflow-svg-gh]][workflow-url] [![Test Coverage][codecov-svg]][codecov-url]
+# Internetmarke
+
+[![NPM version][npm-svg]][npm-url] [![Workflow Status][workflow-svg-gh]][workflow-url] [![Test Coverage][codecov-svg]][codecov-url]
 
 - [Installation](#installation)
 - [Prerequisites / Required Accounts](#prerequisites--required-accounts)
