@@ -201,7 +201,7 @@ const options: PreviewVoucherOptions = {
 
 // get product from product service of hand over an obect with the id only
 // const product = await internetmarke.getProduct(1);
-const previeLink = await internetmarke.retrievePreviewVoucher(product, options);
+const previewLink = await internetmarke.retrievePreviewVoucher(product, options);
 ```
 
 ### Managing the Shopping Cart
