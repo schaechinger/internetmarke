@@ -118,7 +118,6 @@ dist
 .pnp.*
 
 # GitHub Pages
-/docs
 /docs/_site
 
 # custom

@@ -1,4 +1,40 @@
-remote_theme: pages-themes/cayman@v0.2.0
+# remote_theme: mmistakes/minimal-mistakes@4.24.0
 plugins:
+  - jekyll-include-cache
   - jekyll-remote-theme
+github: [metadata]
 title: Internetmarke
+
+# minimal_mistakes_skin: 'dark'
+footer:
+  links:
+    - label: Imprint
+      icon: 'x'
+      url: /imprint
+atom_feed:
+  hide: true
+breadcrumbs: true
+
+name: Manuel Schächinger
+author:
+  name: Manuel Schächinger
+  bio: 'Passionate JavaScript Engineer, runner and coffee enthusiast'
+  avatar: 'https://images.schaechinger.com/2/schaechinger.jpg'
+  location: Ottobrunn, Germany
+  links:
+    - label: 'schaechinger.com'
+      icon: 'fas fa-fw fa-link'
+      url: 'https://www.schaechinger.com'
+  github: schaechinger
+  xing: ManuelSchaechinger
+  linkedin: schaechinger
+
+defaults:
+  - scope:
+      path: '/docs/*'
+    values:
+      layout: single
+      classes:
+        - wide
+      sidebar:
+        nav: 'docs'

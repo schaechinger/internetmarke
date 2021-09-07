@@ -1,0 +1,68 @@
+main:
+  - title: 'Getting Started'
+    url: /docs/getting-started/
+  - title: '1C4A'
+    url: /docs/1c4a/
+  - title: 'Portokasse'
+    url: /docs/portokasse/
+  - title: 'ProdWS'
+    url: /docs/prodws/
+
+docs:
+  - title: Getting Started
+    url: /docs/getting-started/
+    children:
+      - title: Installation
+        url: /docs/getting-started/#installation
+      - title: Prerequisites
+        url: /docs/getting-started/#prerequisites
+      - title: Usage
+        url: /docs/getting-started/#usage
+
+  - title: One Click for App Service
+    url: /docs/1c4a/
+    children:
+      - title: User Info
+        url: /docs/1c4a/user-info
+      - title: Page Formats
+        url: /docs/1c4a/page-formats
+      - title: Create Order Id
+        url: /docs/1c4a/order-id
+      - title: Public Gallery Images
+        url: /docs/1c4a/public-gallery
+      - title: Private Gallery Images
+        url: /docs/1c4a/private-gallery
+      - title: Voucher Preview
+        url: /docs/1c4a/voucher-preview
+      - title: Managing the Shopping Cart
+        url: /docs/1c4a/shopping-cart
+      - title: Checkout Shopping Cart
+        url: /docs/1c4a/checkout
+      - title: Retrieve Orders
+        url: /docs/1c4a/retrieve-orders
+      - title: Download Orders
+        url: /docs/1c4a/download-orders
+      - title: Addresses
+        url: /docs/1c4a/addresses
+
+  - title: Portokasse Service
+    url: /docs/portokasse/
+    children:
+      - title: Wallet Overview
+        url: /docs/portokasse/wallet-overview
+      - title: Top Up Account
+        url: /docs/portokasse/top-up
+      - title: Order Journal
+        url: /docs/portokasse/journal
+
+  - title: Product Service
+    url: /docs/prodws/
+    children:
+      - title: Product List
+        url: /docs/prodws/products
+      - title: Outdated Products
+        url: /docs/prodws/products#outdated
+      - title: Catalogs
+        url: /docs/prodws/catalogs
+      - title: Match Product to Letter
+        url: /docs/prodws/match
