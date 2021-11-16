@@ -240,15 +240,15 @@ describe('1C4A Service', () => {
     });
 
     it('should add an item to the shopping cart', () => {
-      service.addItemToShoppingCart({ id: 1, price: 80 } as Product, {
+      service.addItemToShoppingCart({ id: 49, price: 490 } as Product, {
         voucherLayout: VoucherLayout.FrankingZone,
         position: { labelX: 1, labelY: 2 }
       });
       const cart = service.getShoppingCartSummary();
 
       expect(cart.positions).to.have.length(1);
-      expect(cart.positions[0].productCode).to.equal(1);
-      expect(cart.total.value).to.equal(0.8);
+      expect(cart.positions[0].productCode).to.equal(49);
+      expect(cart.total.value).to.equal(4.9);
     });
 
     it('should sum up the total price of the shopping cart', () => {

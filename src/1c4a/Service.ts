@@ -446,7 +446,6 @@ export class OneClickForAppService extends SoapService implements OneClickForApp
       .map(position => {
         if (position) {
           total += amountToCents(position.price);
-          total = Math.floor(total);
         }
 
         return position;
