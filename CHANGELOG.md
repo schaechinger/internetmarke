@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.9.2] - 2022-10-13
 
+### Changed
+
+- Minimum node version is now 14.20.0
+
 ### Fixed
 
 - Fixed failing Portokasse login after platform links were updated (Thanks to @as19git67)

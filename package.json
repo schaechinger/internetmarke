@@ -35,7 +35,7 @@
     "test:coverage": "nyc npm run test:dot"
   },
   "engines": {
-    "node": ">=10.0.0"
+    "node": ">=14.20.0 <15.0.0 || >=16.0.0"
   },
   "directories": {
     "lib": "./lib/",
