@@ -1,5 +1,5 @@
 import axios, { AxiosRequestConfig, Method } from 'axios';
-import axiosCookieJarSupport from 'axios-cookiejar-support';
+import { wrapper } from 'axios-cookiejar-support';
 import { Debugger } from 'debug';
 import { inject, injectable } from 'inversify';
 import { CookieJar } from 'tough-cookie';
@@ -68,7 +68,7 @@ export class PortokasseService extends RestService implements Portokasse {
       throw new UserError('Missing user credentials for Portokasse service init.');
     }
 
-    axiosCookieJarSupport(axios);
+    wrapper(axios);
     this.user.setCredentials(options.user);
     this.cookieJar = new CookieJar();
 
@@ -177,7 +177,9 @@ export class PortokasseService extends RestService implements Portokasse {
   }
 
   private async login(): Promise<boolean> {
-    await this.request('GET', '/login');
+    // call login page first for cookies
+    await this.request('GET', '/');
+    // perform login
     const info = await this.request('POST', '/login', this.user.getCredentials());
 
     this.user.load(info, true);
@@ -239,9 +241,13 @@ export class PortokasseService extends RestService implements Portokasse {
       const res = await axios(options);
 
       if (res.headers && res.headers['set-cookie']) {
-        res.headers['set-cookie'].forEach((cookie: string) => {
-          if (cookie.startsWith('CSRF-TOKEN')) {
-            this.csrf = cookie.substr(11, 36);
+        const cookies = Array.isArray(res.headers['set-cookie'])
+          ? res.headers['set-cookie']
+          : (res.headers['set-cookie'] as string).split(';');
+
+        cookies.forEach((cookie: string) => {
+          if (cookie.trim().startsWith('CSRF-TOKEN')) {
+            this.csrf = cookie.substring(11, 11 + 36);
           }
         });
       }

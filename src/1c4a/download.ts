@@ -4,6 +4,7 @@ import { tmpdir } from 'os';
 import { join as joinPath } from 'path';
 import yauzl, { Entry } from 'yauzl';
 
+import { OneClickForAppError } from './Error';
 import { Order } from './order';
 
 export interface DownloadLinks {
@@ -100,24 +101,28 @@ export const downloadOrder = async (
 
   const { vouchers } = order.shoppingCart;
   const res = await axios.get(order.link, { responseType: 'arraybuffer' });
-  let filename: string = res.headers['content-disposition'].substr(
-    res.headers['content-disposition'].lastIndexOf('=') + 1
-  );
+  let filename: string | null =
+    res.headers['content-disposition']?.substring(
+      res.headers['content-disposition'].lastIndexOf('=') + 1
+    ) || null;
+  if (!filename) {
+    throw new OneClickForAppError('Could not get filename of order');
+  }
   const { data } = res;
 
   const basePath = getBasePath(options.path);
 
-  const type: string = res.headers['content-type'];
+  const type: string = res.headers['content-type']!;
   const isArchive = 'application/zip' === type;
 
   const id =
     1 === vouchers.length && !isArchive
       ? vouchers[0].voucherId
       : `im-${order.shoppingCart.shopOrderId}`;
-  filename = `${id}${filename.substr(filename.lastIndexOf('.'))}`;
+  filename = filename && `${id}${filename.substring(filename.lastIndexOf('.'))}`;
 
   vouchers.forEach(({ voucherId }) => {
-    links[voucherId] = joinPath(basePath, filename);
+    links[voucherId] = joinPath(basePath, filename!);
   });
 
   const filePath = joinPath(basePath, filename);

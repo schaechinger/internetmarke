@@ -16,7 +16,7 @@ describe('Portokasse Service', () => {
 
   beforeEach(() => {
     moxios.install();
-    moxios.stubOnce('get', /\/login$/, {
+    moxios.stubOnce('get', /\/$/, {
       status: 200,
       headers: {
         'set-cookie': [`CSRF-TOKEN=${token}; path=/portokasse; secure`]
